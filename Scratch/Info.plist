@@ -39,6 +39,11 @@
 			</array>
 		</dict>
 	</dict>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>googlechromes</string>
+        <string>comgooglemaps</string>
+    </array>
     <key>MGLMapboxAccessToken</key>
     <string>pk.eyJ1IjoiamtlcmNoZXZhbCIsImEiOiJja2g2dDF3M3AwNHluMnpwZnl2ZGdrNWE3In0.7Fi3zlffJ4sOINpH0TeYqQ</string>
     <key>NSLocationWhenInUseUsageDescription</key>

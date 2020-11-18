@@ -1,20 +1,69 @@
 PODS:
+  - geos (5.0.0)
+  - GEOSwift (7.2.0):
+    - geos (~> 5.0)
+  - Google-Maps-iOS-Utils (3.4.1):
+    - Google-Maps-iOS-Utils/Clustering (= 3.4.1)
+    - Google-Maps-iOS-Utils/Geometry (= 3.4.1)
+    - Google-Maps-iOS-Utils/Heatmap (= 3.4.1)
+    - Google-Maps-iOS-Utils/QuadTree (= 3.4.1)
+    - GoogleMaps
+  - Google-Maps-iOS-Utils/Clustering (3.4.1):
+    - Google-Maps-iOS-Utils/QuadTree
+    - GoogleMaps
+  - Google-Maps-iOS-Utils/Geometry (3.4.1):
+    - GoogleMaps
+  - Google-Maps-iOS-Utils/Heatmap (3.4.1):
+    - Google-Maps-iOS-Utils/QuadTree
+    - GoogleMaps
+  - Google-Maps-iOS-Utils/QuadTree (3.4.1):
+    - GoogleMaps
+  - GoogleMaps (4.0.0):
+    - GoogleMaps/Maps (= 4.0.0)
+  - GoogleMaps/Base (4.0.0)
+  - GoogleMaps/Maps (4.0.0):
+    - GoogleMaps/Base
   - Mapbox-iOS-SDK (6.2.2):
     - MapboxMobileEvents (~> 0.10.4)
   - MapboxMobileEvents (0.10.5)
+  - PINCache (3.0.3):
+    - PINCache/Arc-exception-safe (= 3.0.3)
+    - PINCache/Core (= 3.0.3)
+  - PINCache/Arc-exception-safe (3.0.3):
+    - PINCache/Core
+  - PINCache/Core (3.0.3):
+    - PINOperation (~> 1.2.1)
+  - PINOperation (1.2.1)
 
 DEPENDENCIES:
+  - geos
+  - GEOSwift
+  - Google-Maps-iOS-Utils
+  - GoogleMaps (= 4.0.0)
   - Mapbox-iOS-SDK
+  - PINCache
 
 SPEC REPOS:
   trunk:
+    - geos
+    - GEOSwift
+    - Google-Maps-iOS-Utils
+    - GoogleMaps
     - Mapbox-iOS-SDK
     - MapboxMobileEvents
+    - PINCache
+    - PINOperation
 
 SPEC CHECKSUMS:
+  geos: e91fba0bb3497e3a8e68ca6103bddd45ec548e06
+  GEOSwift: 1aed09f3a98848017717d2402ac74df6c3ff3ee0
+  Google-Maps-iOS-Utils: 9a3bfc50dab84dda55ab7fd1c3af39120798ea57
+  GoogleMaps: b7f7fc569a9b354a3af0d9729dbec40957b7d41e
   Mapbox-iOS-SDK: 3f83697efa97f3c21ea7f65c1e75205e1dc030ee
   MapboxMobileEvents: 7f6fb7fb0360302f524d198d36ccec3a0beae523
+  PINCache: 7a8fc1a691173d21dbddbf86cd515de6efa55086
+  PINOperation: 00c935935f1e8cf0d1e2d6b542e75b88fc3e5e20
 
-PODFILE CHECKSUM: e5a569e4fc8f905eaee8bd112351542ba255f31a
+PODFILE CHECKSUM: 788a219bcd49614301d5549febbb016d5b4b50d5
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.9.3

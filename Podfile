@@ -7,6 +7,12 @@ target 'Scratch' do
   pod 'Mapbox-iOS-SDK'
   # Pods for Scratch
 
+  pod 'geos'
+  pod 'GEOSwift'
+  pod 'GoogleMaps', '4.0.0'
+  pod 'Google-Maps-iOS-Utils'
+  pod 'PINCache'
+
   target 'ScratchTests' do
     inherit! :search_paths
     # Pods for testing
