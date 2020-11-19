@@ -7,16 +7,19 @@
 
 import UIKit
 import CoreLocation
+import GoogleMaps
 
 class ICEMapTile: NSObject {
     var image : UIImage
-    var topLeft : CLLocationCoordinate2D
-    var bottomRight : CLLocationCoordinate2D
+    var bounds : GMSCoordinateBounds
+    var northWest : CLLocationCoordinate2D
+    var southEast : CLLocationCoordinate2D
     
-    init(withImage image: UIImage, topL : CLLocationCoordinate2D, bottomR : CLLocationCoordinate2D) {
+    init(withImage image: UIImage, northWest : CLLocationCoordinate2D, southEast : CLLocationCoordinate2D) {
         self.image = image
-        self.topLeft = topL
-        self.bottomRight = bottomR
+        bounds = GMSCoordinateBounds(coordinate: northWest, coordinate: southEast)
+        self.northWest = northWest
+        self.southEast = southEast
         super.init()
     }
 }

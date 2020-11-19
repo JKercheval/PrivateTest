@@ -8,8 +8,11 @@
 import Foundation
 import CoreLocation
 import UIKit
+import GoogleMaps
 
 let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
+func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
+func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
 extension CLLocation {
     
@@ -26,13 +29,31 @@ extension CLLocation {
     }
 }
 
+extension CLLocationCoordinate2D: Codable {
+    public enum CodingKeys: String, CodingKey {
+        case latitude
+        case longitude
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(latitude, forKey: .latitude)
+        try container.encode(longitude, forKey: .longitude)
+    }
+    
+    public init(from decoder: Decoder) throws {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        latitude = try values.decode(Double.self, forKey: .latitude)
+        longitude = try values.decode(Double.self, forKey: .longitude)
+    }
+}
+
 extension CLLocationCoordinate2D: Equatable {
   static public func ==(lhs: Self, rhs: Self) -> Bool {
     return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
   }
   
-  fileprivate func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
-  fileprivate func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
   
   func boundingRect(bearing: Double, distanceInMeter distance: CLLocationDistance) -> [CLLocationCoordinate2D] {
     let top = coordinate(bearing: 0.0, distanceInMeter: distance);
@@ -43,7 +64,7 @@ extension CLLocationCoordinate2D: Equatable {
   }
   
   func coordinate(bearing: Double, distanceInMeter distance: CLLocationDistance) -> CLLocationCoordinate2D {
-    let kLatLonEarthRadius: CLLocationDegrees = 6371.0
+    let kLatLonEarthRadius: CLLocationDegrees = LatLonEarthRadius
     let brng: Double = radians(degrees: bearing)
     let lat1: Double = radians(degrees: self.latitude)
     let lon1: Double = radians(degrees: self.longitude)
@@ -90,21 +111,6 @@ extension CLLocationCoordinate2D: Equatable {
   }
   
   /// https://gist.github.com/jmcd/4502302
-//  private func calculateCoordinateFrom(_ coordinate : CLLocationCoordinate2D, _ bearingInRadians : Double, _ distanceInMetres : Double) -> CLLocationCoordinate2D {
-//    let coordinateLatitudeInRadians : Double = coordinate.latitude * Double.pi / 180;
-//    let coordinateLongitudeInRadians : Double = coordinate.longitude * Double.pi / 180;
-//    
-//    let distanceComparedToEarth = distanceInMetres / 6378100;
-//    
-//    let resultLatitudeInRadians = asin(sin(coordinateLatitudeInRadians) * cos(distanceComparedToEarth) + cos(coordinateLatitudeInRadians) * sin(distanceComparedToEarth) * cos(bearingInRadians));
-//    let resultLongitudeInRadians = coordinateLongitudeInRadians + atan2(sin(bearingInRadians) * sin(distanceComparedToEarth) * cos(coordinateLatitudeInRadians), cos(distanceComparedToEarth) - sin(coordinateLatitudeInRadians) * sin(resultLatitudeInRadians));
-//    
-//    var result : CLLocationCoordinate2D = CLLocationCoordinate2D()
-//    result.latitude = resultLatitudeInRadians * 180 / Double.pi;
-//    result.longitude = resultLongitudeInRadians * 180 / Double.pi;
-//    return result;
-//  }
-
   func locationWithBearing(bearingRadians:Double, distanceMeters:Double) -> CLLocationCoordinate2D {
     let distRadians = distanceMeters / (6372797.6) // earth radius in meters
     
@@ -143,7 +149,7 @@ extension CLLocationCoordinate2D: Equatable {
     
     let latitudeInRadians = latitude * Double.pi / 180.0
     let longitudeInRadians = longitude * Double.pi / 180.0
-    let radiusMeters = 6371010.0
+    let radiusMeters = LatLonEarthRadius
     
     
     let angularDistance = distance / radiusMeters

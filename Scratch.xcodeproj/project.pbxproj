@@ -19,6 +19,8 @@
 		CC00103225658EF900BAE4F9 /* FotF Plot F Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102C25658EF900BAE4F9 /* FotF Plot F Boundary.geojson */; };
 		CC00103325658EF900BAE4F9 /* FotF Plot B Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */; };
 		CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */; };
+		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
+		CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200E0125672B57001759EC /* CustomTileLayer.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
 		CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817452556E48400137BE2 /* SceneDelegate.swift */; };
 		CC7817482556E48400137BE2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817472556E48400137BE2 /* ViewController.swift */; };
@@ -66,6 +68,8 @@
 		CC00102C25658EF900BAE4F9 /* FotF Plot F Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot F Boundary.geojson"; sourceTree = "<group>"; };
 		CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot B Boundary.geojson"; sourceTree = "<group>"; };
 		CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		CC200DF225671F98001759EC /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
+		CC200E0125672B57001759EC /* CustomTileLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTileLayer.swift; sourceTree = "<group>"; };
 		CC7817402556E48400137BE2 /* Scratch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scratch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817432556E48400137BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CC7817452556E48400137BE2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -138,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				CC00102225658EC900BAE4F9 /* MapBox-Utilites.swift */,
+				CC200DF225671F98001759EC /* FieldGpsGenerator.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -161,6 +166,14 @@
 				CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */,
 			);
 			path = extensions;
+			sourceTree = "<group>";
+		};
+		CC200E0025672B57001759EC /* Layers */ = {
+			isa = PBXGroup;
+			children = (
+				CC200E0125672B57001759EC /* CustomTileLayer.swift */,
+			);
+			path = Layers;
 			sourceTree = "<group>";
 		};
 		CC7817372556E48300137BE2 = {
@@ -188,6 +201,7 @@
 		CC7817422556E48400137BE2 /* Scratch */ = {
 			isa = PBXGroup;
 			children = (
+				CC200E0025672B57001759EC /* Layers */,
 				CC8ED6D72565D69E000A1198 /* Classes */,
 				CC00103725658F1E00BAE4F9 /* extensions */,
 				CC00102725658EF900BAE4F9 /* geoJson */,
@@ -517,6 +531,8 @@
 				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,
 				CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
+				CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */,
+				CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

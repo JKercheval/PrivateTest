@@ -139,7 +139,7 @@
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l4k-0H-Pta">
                                 <rect key="frame" x="20" y="108" width="60" height="35"/>
-                                <color key="backgroundColor" systemColor="systemGrayColor"/>
+                                <color key="backgroundColor" systemColor="systemBlueColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="Gks-0i-Iin"/>
                                     <constraint firstAttribute="height" constant="35" id="q7m-jF-VDL"/>
@@ -162,22 +162,77 @@
                                     <action selector="onStartButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="Um7-YE-MPp"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ECP-QU-8hj">
+                                <rect key="frame" x="105" y="108" width="60" height="35"/>
+                                <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="IyE-4k-qvM"/>
+                                    <constraint firstAttribute="width" constant="60" id="LkJ-5K-ypt"/>
+                                </constraints>
+                                <state key="normal" title="Stop">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onStopButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="SBm-mU-q7f"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ls6-yY-o8G">
+                                <rect key="frame" x="190" y="108" width="60" height="35"/>
+                                <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="8Mx-mX-FU2"/>
+                                    <constraint firstAttribute="width" constant="60" id="Mlg-EQ-vsf"/>
+                                </constraints>
+                                <state key="normal" title="Makers">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="2"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onMarkersButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="ZBG-i0-7pg"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Vra-2Y-oXQ"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="l4k-0H-Pta" firstAttribute="leading" secondItem="Vra-2Y-oXQ" secondAttribute="leading" constant="20" id="Bby-xh-BPt"/>
+                            <constraint firstItem="ECP-QU-8hj" firstAttribute="leading" secondItem="l4k-0H-Pta" secondAttribute="trailing" constant="25" id="FaU-tD-aVo"/>
                             <constraint firstItem="l4k-0H-Pta" firstAttribute="top" secondItem="Vra-2Y-oXQ" secondAttribute="top" constant="20" id="Id2-3D-LLJ"/>
+                            <constraint firstItem="ECP-QU-8hj" firstAttribute="top" secondItem="l4k-0H-Pta" secondAttribute="top" id="Kdq-Nn-lec"/>
+                            <constraint firstItem="ls6-yY-o8G" firstAttribute="leading" secondItem="ECP-QU-8hj" secondAttribute="trailing" constant="25" id="Pu1-m4-JNg"/>
+                            <constraint firstItem="ls6-yY-o8G" firstAttribute="top" secondItem="ECP-QU-8hj" secondAttribute="top" id="yb3-aC-z6B"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="X7H-Ch-RZB"/>
                     <connections>
                         <outlet property="startButton" destination="l4k-0H-Pta" id="j4d-As-bHc"/>
+                        <outlet property="stopButton" destination="ECP-QU-8hj" id="4rI-X9-S6u"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2oL-Q4-cSC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="783" y="-348"/>
+            <point key="canvasLocation" x="782.60869565217399" y="-348.21428571428572"/>
         </scene>
         <!--Selection View Controller-->
         <scene sceneID="jAf-dh-FEH">
@@ -236,8 +291,8 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
-        <systemColor name="systemGrayColor">
-            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
