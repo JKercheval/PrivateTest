@@ -27,6 +27,7 @@
 		CC7817502556E48400137BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */; };
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
+		CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		CC7817612556E48400137BE2 /* ScratchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScratchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817652556E48400137BE2 /* ScratchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchUITests.swift; sourceTree = "<group>"; };
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICEMapTile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 		CC7817422556E48400137BE2 /* Scratch */ = {
 			isa = PBXGroup;
 			children = (
+				CC8ED6D72565D69E000A1198 /* Classes */,
 				CC00103725658F1E00BAE4F9 /* extensions */,
 				CC00102725658EF900BAE4F9 /* geoJson */,
 				CC00102125658EC900BAE4F9 /* Utils */,
@@ -217,6 +220,14 @@
 				CC7817672556E48400137BE2 /* Info.plist */,
 			);
 			path = ScratchUITests;
+			sourceTree = "<group>";
+		};
+		CC8ED6D72565D69E000A1198 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -501,6 +512,7 @@
 			files = (
 				CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
+				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,
 				CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */,

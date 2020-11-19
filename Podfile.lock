@@ -34,6 +34,7 @@ PODS:
   - PINCache/Core (3.0.3):
     - PINOperation (~> 1.2.1)
   - PINOperation (1.2.1)
+  - UIScreenExtension (0.0.7)
 
 DEPENDENCIES:
   - geos
@@ -42,6 +43,7 @@ DEPENDENCIES:
   - GoogleMaps (= 4.0.0)
   - Mapbox-iOS-SDK
   - PINCache
+  - UIScreenExtension (from `https://github.com/marchv/UIScreenExtension`)
 
 SPEC REPOS:
   trunk:
@@ -54,6 +56,15 @@ SPEC REPOS:
     - PINCache
     - PINOperation
 
+EXTERNAL SOURCES:
+  UIScreenExtension:
+    :git: https://github.com/marchv/UIScreenExtension
+
+CHECKOUT OPTIONS:
+  UIScreenExtension:
+    :commit: a195be2327a2131ba04fa644b575e18bdc2f8e14
+    :git: https://github.com/marchv/UIScreenExtension
+
 SPEC CHECKSUMS:
   geos: e91fba0bb3497e3a8e68ca6103bddd45ec548e06
   GEOSwift: 1aed09f3a98848017717d2402ac74df6c3ff3ee0
@@ -63,7 +74,8 @@ SPEC CHECKSUMS:
   MapboxMobileEvents: 7f6fb7fb0360302f524d198d36ccec3a0beae523
   PINCache: 7a8fc1a691173d21dbddbf86cd515de6efa55086
   PINOperation: 00c935935f1e8cf0d1e2d6b542e75b88fc3e5e20
+  UIScreenExtension: d96b7ab20679afe53992ea07aeea84774cd4a116
 
-PODFILE CHECKSUM: 788a219bcd49614301d5549febbb016d5b4b50d5
+PODFILE CHECKSUM: b1b65b7ecbc57132f93ba1100a371d62562e52c5
 
 COCOAPODS: 1.9.3

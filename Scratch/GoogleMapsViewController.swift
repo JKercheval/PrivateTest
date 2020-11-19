@@ -9,29 +9,33 @@ import UIKit
 import GoogleMaps
 import GoogleMapsUtils
 import PINCache
+import UIScreenExtension
 
 let TileSize : CGFloat = 512.0
-
-class TileRectMap {
-    var tileRectDictionary : [UInt : CGRect] = [UInt : CGRect]()
-}
+let inchesPerMeter: Double = 39.37007874
 
 class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
-
-    var geoFeild : GeoJSONField?
+    
+    @IBOutlet weak var startButton: UIButton!
+    @IBOutlet weak var stopButton: UIButton!
+    
+    var geoField : GeoJSONField?
     var gMapView : GMSMapView!
     var boundingRect : CGRect = CGRect.zero
     var tileMap : TileRectMap = TileRectMap()
     var currentZoom : Float = 16.0
     var tileLayer : CustomTileLayer!
-
+    var gpsGenerator : FieldGpsGenerator!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        PINMemoryCache.shared.removeAllObjects()
+        NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
+        
         // Do any additional setup after loading the view.
         
-        geoFeild = GeoJSONField(fieldName: "FotF Plot E Boundary")
-        guard let feild = geoFeild else {
+        geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
+        guard let feild = geoField else {
             return
         }
         // Do any additional setup after loading the view.
@@ -43,8 +47,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         
         gMapView.delegate = self
         gMapView.mapType = .satellite
-//        self.view.insertSubview(gMapView, belowSubview: self.TestButton)
-        self.view.addSubview(gMapView)
+        self.view.insertSubview(gMapView, belowSubview: self.startButton)
+        //        self.view.addSubview(gMapView)
         
         guard let path = Bundle.main.path(forResource: "FotF Plot E Boundary", ofType: "geojson") else {
             return
@@ -52,20 +56,133 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         
         let url = URL(fileURLWithPath: path)
         renderGeoJSON(withUrl: url)
-
+        
+        boundingRect = getCoordRect(forZoomLevel: UInt(currentZoom))
+        tileMap.tileRectDictionary[UInt(currentZoom)] = boundingRect
+        debugPrint("\(#function) - Bounding tile rect is: \(boundingRect)")
+        
+        tileLayer = CustomTileLayer(tileDictionary: self.tileMap)
+        tileLayer.tileSize = Int(TileSize)
+        tileLayer.opacity = 0.3
+        tileLayer.fadeIn = false
+        tileLayer.map = gMapView
+        
+        guard let envelope = geoField?.fieldEnvelope else {
+            return
+        }
+        gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
     }
     
-
+    
     /*
-    // MARK: - Navigation
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destination.
+     // Pass the selected object to the new view controller.
+     }
+     */
+    
+    @objc func ondidUpdateLocation(_ notification:Notification) {
+        
+        //        DispatchQueue.main.async { [weak self] in
+        guard let mapView = self.gMapView else {
+            return
+        }
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else { return }
+            let coord = notification.object as! CLLocationCoordinate2D
+            let zoom = UInt(strongSelf.currentZoom)
+            let tilePt = strongSelf.createInfoWindowContent(latLng: coord, zoom: zoom)
+            
+            let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
+            guard let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile else {
+                return
+            }
+            
+//            let ppi = (UIScreen.pixelsPerInch ?? 264)
+//            let screenPixelsPerMeter = Double(ppi) * inchesPerMeter
+//            let resolution = Double(zoom)/screenPixelsPerMeter
+            
+            let mapPoint = mapView.projection.point(for: coord)
+            let tileExtent = CartesianExtents2D(XMinimum: 0, XMaximum: 512, YMinimum: 0, YMaximum: 512)
+            let screenExtent = CartesianExtents2D(XMinimum: strongSelf.gMapView.bounds.minX,
+                                                  XMaximum: strongSelf.gMapView.bounds.maxX,
+                                                  YMinimum: strongSelf.gMapView.bounds.minY,
+                                                  YMaximum: strongSelf.gMapView.bounds.maxY)
+            let drawPoint = MBUtils.convertToReal(point: mapPoint,
+                                                     extents: tileExtent,
+                                                     containerWidth: strongSelf.gMapView.bounds.width,
+                                                     containerHeight: strongSelf.gMapView.bounds.height)
+            let drawPoint1 = MBUtils.convertToReal(point: mapPoint,
+                                                      extents: screenExtent,
+                                                      containerWidth: strongSelf.gMapView.bounds.width,
+                                                      containerHeight: strongSelf.gMapView.bounds.height)
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+            let drawPoint2 = MBUtils.convertToScreen(point: mapPoint,
+                                                      extents: tileExtent,
+                                                      containerWidth: strongSelf.gMapView.bounds.width,
+                                                      containerHeight: strongSelf.gMapView.bounds.height)
+
+            debugPrint("\(#function) MapPoint is:\(mapPoint), drawPoint is \(drawPoint), drawPoint1 is \(drawPoint1), drawPoint2 is \(drawPoint2)")
+            if let newImage = strongSelf.drawRectangleOnImage(image: cachedTile.image, atPoint: drawPoint) {
+                cachedTile.image = newImage
+                strongSelf.tileLayer.clearTileCache()
+            }
+            //            PINMemoryCache.shared.setObject(newImage, forKey: key)
+        }
     }
-    */
-
+    
+    @IBAction func onStartButtonSelected(_ sender: Any) {
+        gpsGenerator.step()
+    }
+    
+    func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+        //    debugPrint("\(#function) Zoom level is: \(position.zoom)")
+        let zoomFloor = UInt(floor(position.zoom))
+        let zoomCeil = UInt(ceil(position.zoom))
+        if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
+            let bounds = getCoordRect(forZoomLevel: zoomCeil)
+            //      debugPrint("\(#function) Bounds for Zoom Level \(zoomCeil) is \(bounds)")
+            tileMap.tileRectDictionary[zoomCeil] = bounds
+        }
+        if tileMap.tileRectDictionary.keys.contains(zoomFloor) == false {
+            let bounds = getCoordRect(forZoomLevel: zoomFloor)
+            //      debugPrint("\(#function) Bounds for Zoom Level \(zoomFloor) is \(bounds)")
+            tileMap.tileRectDictionary[zoomFloor] = bounds
+        }
+        self.currentZoom = position.zoom
+    }
+    
+    func drawRectangleOnImage(image : UIImage, atPoint point : CGPoint) -> UIImage? {
+        let rowCount : Int = 96
+//        let ppi = (UIScreen.pixelsPerInch ?? 264)
+//        let screenPixelsPerMeter = Double(ppi) * inchesPerMeter
+//        let resolution = Double(16)/screenPixelsPerMeter
+        
+        let renderer = UIGraphicsImageRenderer(size: image.size)
+        let img = renderer.image { ctx in
+            
+            ctx.cgContext.setStrokeColor(UIColor.gray.cgColor)
+            ctx.cgContext.setLineWidth(0.1)
+            
+            image.draw(at: CGPoint.zero)
+            //      let partsWidth = (image.size.width - 20) / CGFloat(rowCount) / CGFloat(self.groundResolution)
+            let partsWidth : CGFloat = 5 //(90) / CGFloat(rowCount) / CGFloat(1.7835797061735517)
+            let startX : CGFloat = point.x
+            for n in 0..<rowCount {
+                var color = UIColor.black.cgColor
+                if n % 2 == 0 {
+                    color = UIColor.red.cgColor
+                }
+                ctx.cgContext.setFillColor(color)
+                let rect = CGRect(x: startX + (partsWidth * CGFloat(n)), y: point.y, width: partsWidth, height: partsWidth)
+                ctx.cgContext.fill(rect)
+            }
+        }
+        return img
+    }
 }
 
 extension GoogleMapsViewController {
@@ -80,7 +197,7 @@ extension GoogleMapsViewController {
     }
     
     func getCoordRect(forZoomLevel zoom : UInt) -> CGRect {
-        guard let field = geoFeild else {
+        guard let field = geoField else {
             return CGRect.zero
         }
         
@@ -101,7 +218,7 @@ extension GoogleMapsViewController {
             x: floor(worldCoordinate.x * CGFloat(scale)),
             y: floor(worldCoordinate.y * CGFloat(scale))
         );
-        
+        debugPrint("PixelCoodinate are :\(pixelCoordinate)")
         let tileCoordinate = CGPoint(
             x: floor((worldCoordinate.x * CGFloat(scale)) / CGFloat(TileSize)),
             y: floor((worldCoordinate.y * CGFloat(scale)) / CGFloat(TileSize))
@@ -151,16 +268,23 @@ class CustomTileLayer: GMSTileLayer {
             return
         }
         let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
-        if let cachedImage = PINCache.shared.object(forKey: key) as? UIImage {
+        if let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile {
             debugPrint("Using Cached image for \(key)")
-            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: cachedImage)
+            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: cachedTile.image)
             return
         }
         
-        let image = MBUtils.createFirstImage(size: CGSize(width: TileSize, height: TileSize))
-        PINCache.shared.setObject(image, forKey: key)
+        let topLeftTileCoord = MBUtils.topLeftCorner(with: tilePt, zoom)
+        let bottomRightTileCoord = MBUtils.topLeftCorner(with: CGPoint(x: tilePt.x + 1, y: tilePt.y + 1), zoom)
+        
+        guard let image = MBUtils.createFirstImage(size: CGSize(width: TileSize, height: TileSize)) else {
+            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: nil)
+            return
+        }
+        
+        let tile = ICEMapTile(withImage: image, topL: topLeftTileCoord, bottomR: bottomRightTileCoord)
+        PINMemoryCache.shared.setObject(tile, forKey: key)
         receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: image)
-        debugPrint("Provided image for \(key)")
-        //    debugPrint("We would return a tile here")
+//        debugPrint("Provided image for \(key)")
     }
 }

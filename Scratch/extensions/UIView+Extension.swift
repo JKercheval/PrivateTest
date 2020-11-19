@@ -11,6 +11,21 @@ import UIKit
 
 let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
 
+extension CLLocation {
+    
+    /// Get distance between two points
+    ///
+    /// - Parameters:
+    ///   - from: first point
+    ///   - to: second point
+    /// - Returns: the distance in meters
+    class func distance(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> CLLocationDistance {
+        let from = CLLocation(latitude: from.latitude, longitude: from.longitude)
+        let to = CLLocation(latitude: to.latitude, longitude: to.longitude)
+        return from.distance(from: to)
+    }
+}
+
 extension CLLocationCoordinate2D: Equatable {
   static public func ==(lhs: Self, rhs: Self) -> Bool {
     return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude

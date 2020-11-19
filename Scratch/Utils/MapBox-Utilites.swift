@@ -12,35 +12,68 @@ import Mapbox
 
 func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 
-class MBUtils {
-  static func loadGeoJson(jsonFileName : String) ->Data {
+struct CartesianExtents2D {
+    var XMinimum : CGFloat
+    var XMaximum : CGFloat
+    var YMinimum : CGFloat
+    var YMaximum : CGFloat
+}
 
-    // Get the path for example.geojson in the app’s bundle.
-      guard let jsonUrl = Bundle.main.url(forResource: jsonFileName, withExtension: "geojson") else {
-        preconditionFailure("Failed to load local GeoJSON file")
-      }
-      
-      guard let jsonData = try? Data(contentsOf: jsonUrl) else {
-        preconditionFailure("Failed to parse GeoJSON file")
-      }
-    
-    return jsonData
-  }
-  
-  static func stringForCaching(withPoint point: CGPoint, zoomLevel : UInt) -> String {
-    return "\(point.x)_\(point.y)_\(zoomLevel)"
-  }
-  
-  static func createFirstImage(size: CGSize) -> UIImage? {
-    let renderer = UIGraphicsImageRenderer(size: size)
-    let img = renderer.image { ctx in
-      // Create the image with a transparent background
-      ctx.cgContext.setFillColor(UIColor.red.cgColor)
-      ctx.cgContext.setAlpha(0.2)
-      ctx.cgContext.fill(CGRect(origin: CGPoint(x: 0, y: 0), size: size))
+class TileRectMap {
+    var tileRectDictionary : [UInt : CGRect] = [UInt : CGRect]()
+}
+
+class MBUtils {
+    static func loadGeoJson(jsonFileName : String) ->Data {
+        
+        // Get the path for example.geojson in the app’s bundle.
+        guard let jsonUrl = Bundle.main.url(forResource: jsonFileName, withExtension: "geojson") else {
+            preconditionFailure("Failed to load local GeoJSON file")
+        }
+        
+        guard let jsonData = try? Data(contentsOf: jsonUrl) else {
+            preconditionFailure("Failed to parse GeoJSON file")
+        }
+        
+        return jsonData
     }
-    return img
-  }
+    
+    static func stringForCaching(withPoint point: CGPoint, zoomLevel : UInt) -> String {
+        return "\(point.x)_\(point.y)_\(zoomLevel)"
+    }
+    
+    static func createFirstImage(size: CGSize) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let img = renderer.image { ctx in
+            // Create the image with a transparent background
+            ctx.cgContext.setFillColor(UIColor.red.cgColor)
+            ctx.cgContext.setAlpha(0.2)
+            ctx.cgContext.fill(CGRect(origin: CGPoint(x: 0, y: 0), size: size))
+        }
+        return img
+    }
+    
+    static func topLeftCorner(with tilePt : CGPoint, _ zoomLevel : UInt) -> CLLocationCoordinate2D {
+        let pow2z = pow(2.0, Double(zoomLevel))
+        let xRangeRatio = Double(tilePt.x) / pow2z
+        let yRangeRatio = Double(tilePt.y) / pow2z
+        let lon = xRangeRatio * 360 - 180
+        let pi = Double.pi
+        let lat = atan(sinh(pi - yRangeRatio * 2 * pi)) * 180 / pi
+        return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+    }
+    
+    class func convertToScreen(point : CGPoint, extents : CartesianExtents2D, containerWidth : CGFloat, containerHeight : CGFloat) -> CGPoint {
+        let x = (point.x - extents.XMinimum) * containerWidth / (extents.XMaximum - extents.XMinimum);
+        let y = (extents.YMaximum - point.y) * containerHeight / (extents.YMaximum - extents.YMinimum);
+        return CGPoint(x: x, y: y)
+    }
+    
+    class func convertToReal(point : CGPoint, extents : CartesianExtents2D, containerWidth : CGFloat, containerHeight : CGFloat ) -> CGPoint {
+        let x = extents.XMinimum + (point.x * (extents.XMaximum - extents.XMinimum)) / containerWidth;
+        let y = extents.YMaximum - (point.y * (extents.YMaximum - extents.YMinimum)) / containerHeight;
+        return CGPoint(x: x, y: y)
+    }
 
 }
 
@@ -144,6 +177,10 @@ class FieldGpsGenerator {
     debugPrint("\(self):\(#function) - new curent location is: \(currentLocation)")
     timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(updateNextCoord), userInfo: nil, repeats: true)
   }
+    
+    func step() {
+        updateNextCoord()
+    }
 
   @objc func updateNextCoord() {
     let nextLoc = self.currentLocation.locationWithBearing(bearingRadians: radians(degrees: 0), distanceMeters: 1)

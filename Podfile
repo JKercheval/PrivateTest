@@ -12,7 +12,8 @@ target 'Scratch' do
   pod 'GoogleMaps', '4.0.0'
   pod 'Google-Maps-iOS-Utils'
   pod 'PINCache'
-
+  pod 'UIScreenExtension', :git => 'https://github.com/marchv/UIScreenExtension'
+  
   target 'ScratchTests' do
     inherit! :search_paths
     # Pods for testing
