@@ -67,7 +67,7 @@ class MBUtils {
         return CGPoint(x: x, y: y)
     }
     
-    class func convertToReal(point : CGPoint, extents : CartesianExtents2D, containerWidth : CGFloat, containerHeight : CGFloat ) -> CGPoint {
+    class func convertToViewport(point : CGPoint, extents : CartesianExtents2D, containerWidth : CGFloat, containerHeight : CGFloat ) -> CGPoint {
         let x = extents.XMinimum + (point.x * (extents.XMaximum - extents.XMinimum)) / containerWidth;
         let y = extents.YMaximum - (point.y * (extents.YMaximum - extents.YMinimum)) / containerHeight;
         return CGPoint(x: x, y: y)

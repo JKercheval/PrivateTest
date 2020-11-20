@@ -41,7 +41,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         }
         // Do any additional setup after loading the view.
         // Create a GMSCameraPosition that tells the map to display the
-        // coordinate -33.86,151.20 at zoom level 6.
+        // coordinate and zoom that we want
         let camera = GMSCameraPosition.camera(withLatitude: feild.bottomLeft.latitude, longitude: feild.bottomLeft.longitude, zoom: currentZoom)
         
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
@@ -78,6 +78,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     /*
      // MARK: - Navigation
      
+     
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      // Get the new view controller using segue.destination.
@@ -85,71 +86,107 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
      }
      */
     
+    func getZoomLevel(map : GMSMapView) -> UInt {
+        let region = map.projection.visibleRegion()
+        let longitudeDelta = region.farRight.longitude - region.farLeft.longitude
+        let zoom = log2(360.0 * Double(map.bounds.size.width) / longitudeDelta) - 8
+        return UInt(zoom)
+//    MKMapView *map = (MKMapView *)self.mapView;
+//    CLLocationDegrees longitudeDelta = map.region.span.longitudeDelta;
+//    CGFloat mapWidthInPixels = map.bounds.size.width;
+//    double zoomScale = longitudeDelta * 85445659.44705395 * M_PI / (180.0 * mapWidthInPixels);
+//    double zoomer = 20 - log2(zoomScale);
+//    if ( zoomer < 0 ) zoomer = 0;
+//
+//    return (NSInteger)zoomer;
+    }
+    
+    func getDrawPoint(with mapView : GMSMapView, cachedTile : ICEMapTile, from coord : CLLocationCoordinate2D) -> CGPoint {
+        let mapPoint = mapView.projection.point(for: coord)
+        
+        let northWestTileOriginScreenPt = mapView.projection.point(for: cachedTile.northWest)
+        let southEastTileOriginScreenPt = mapView.projection.point(for: cachedTile.southEast)
+        
+        // translation
+        let tileWidth = southEastTileOriginScreenPt.x - northWestTileOriginScreenPt.x
+        let tileHeight = southEastTileOriginScreenPt.y - northWestTileOriginScreenPt.y
+        
+        // transformation
+        let wRatio = TileSize / tileWidth
+        let hRatio = TileSize / tileHeight
+        
+        let xOffset = (mapPoint.x - northWestTileOriginScreenPt.x) * wRatio
+        let yOffset = (mapPoint.y - northWestTileOriginScreenPt.y) * hRatio
+        
+        let drawPoint = CGPoint(x: xOffset, y: yOffset)
+        return drawPoint
+    }
+    /*
+     Notes:
+        Maintain ZBuffer of space for draw coordinates, when required hand off the section
+     */
     @objc func ondidUpdateLocation(_ notification:Notification) {
         
         //        DispatchQueue.main.async { [weak self] in
         guard let mapView = self.gMapView else {
             return
         }
-//        DispatchQueue.main.async { [weak self] in
-//            guard let strongSelf = self else { return }
-            let coord = notification.object as! CLLocationCoordinate2D
-            let zoom = UInt(self.currentZoom)
-            let tilePt = self.createInfoWindowContent(latLng: coord, zoom: zoom)
-            
-            let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
+        //        DispatchQueue.main.async { [weak self] in
+        //            guard let strongSelf = self else { return }
+        let coord = notification.object as! CLLocationCoordinate2D
+        
+        // TODO: Need to figure out why Zoom level for actual tiles is larger than stated mapView zoom level
+        let zoom = UInt(self.currentZoom)
+        let otherZoom = getZoomLevel(map: mapView)
+        let tilePt = self.createInfoWindowContent(latLng: coord, zoom: zoom)
+        
+        let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
         guard let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile else {
-                return
-            }
-//            struct FirstTimeMarkers {
-//                static var firstTime = true
-//            }
-//            if FirstTimeMarkers.firstTime == true {
-//                FirstTimeMarkers.firstTime = false
-//                let marker = GMSMarker()
-//                marker.position = cachedTile.topLeft
-//                marker.map = mapView
-//                let marker1 = GMSMarker()
-//                marker1.position = cachedTile.bottomRight
-//                marker1.map = mapView
-//                if let bottomLeft = strongSelf.geoField?.bottomLeft {
-//                    let marker = GMSMarker()
-//                    marker.position = bottomLeft
-//                    marker.map = mapView
-//                }
-//            }
-
-//            let ppi = (UIScreen.pixelsPerInch ?? 264)
-//            let screenPixelsPerMeter = Double(ppi) * inchesPerMeter
-//            let resolution = Double(zoom)/screenPixelsPerMeter
-            
-            let mapPoint = mapView.projection.point(for: coord)
-            let tileExtent = CartesianExtents2D(XMinimum: 0, XMaximum: 512, YMinimum: 0, YMaximum: 512)
-            let screenExtent = CartesianExtents2D(XMinimum: self.gMapView.bounds.minX,
-                                                  XMaximum: self.gMapView.bounds.maxX,
-                                                  YMinimum: self.gMapView.bounds.minY,
-                                                  YMaximum: self.gMapView.bounds.maxY)
-            let drawPoint = MBUtils.convertToReal(point: mapPoint,
-                                                     extents: tileExtent,
-                                                     containerWidth: self.gMapView.bounds.width,
-                                                     containerHeight: self.gMapView.bounds.height)
-            let drawPoint1 = MBUtils.convertToReal(point: mapPoint,
-                                                      extents: screenExtent,
-                                                      containerWidth: self.gMapView.bounds.width,
-                                                      containerHeight: self.gMapView.bounds.height)
-
-            let drawPoint2 = MBUtils.convertToScreen(point: mapPoint,
-                                                      extents: tileExtent,
-                                                      containerWidth: self.gMapView.bounds.width,
-                                                      containerHeight: self.gMapView.bounds.height)
-
-            debugPrint("\(#function) MapPoint is:\(mapPoint), drawPoint is \(drawPoint), drawPoint1 is \(drawPoint1), drawPoint2 is \(drawPoint2)")
-            if let newImage = self.drawRectangleOnImage(image: cachedTile.image, atPoint: drawPoint) {
-                cachedTile.image = newImage
-                self.tileLayer.clearTileCache()
-            }
-            //            PINMemoryCache.shared.setObject(newImage, forKey: key)
-//        }
+            return
+        }
+        let drawPoint = getDrawPoint(with: mapView, cachedTile: cachedTile, from: coord)
+//        let mapPoint = mapView.projection.point(for: coord)
+//        let northWestTileOriginScreenPt = mapView.projection.point(for: cachedTile.northWest)
+//        let southEastTileOriginScreenPt = mapView.projection.point(for: cachedTile.southEast)
+//
+//        // translation
+//        let tileWidth = southEastTileOriginScreenPt.x - northWestTileOriginScreenPt.x
+//        let tileHeight = southEastTileOriginScreenPt.y - northWestTileOriginScreenPt.y
+//
+//        // transformation
+//        let wRatio = TileSize / tileWidth
+//        let hRatio = TileSize / tileHeight
+//
+//        let xOffset = (mapPoint.x - northWestTileOriginScreenPt.x) * wRatio
+//        let yOffset = (mapPoint.y - northWestTileOriginScreenPt.y) * hRatio
+//
+//        let drawPoint = CGPoint(x: xOffset, y: yOffset)
+//        let tileExtent = CartesianExtents2D(XMinimum: 0, XMaximum: 512, YMinimum: 0, YMaximum: 512)
+//        let screenExtent = CartesianExtents2D(XMinimum: self.gMapView.bounds.minX,
+//                                              XMaximum: self.gMapView.bounds.maxX,
+//                                              YMinimum: self.gMapView.bounds.minY,
+//                                              YMaximum: self.gMapView.bounds.maxY)
+//        let drawPoint = MBUtils.convertToReal(point: mapPoint,
+//                                              extents: tileExtent,
+//                                              containerWidth: self.gMapView.bounds.width,
+//                                              containerHeight: self.gMapView.bounds.height)
+//        let drawPoint1 = MBUtils.convertToReal(point: mapPoint,
+//                                               extents: screenExtent,
+//                                               containerWidth: self.gMapView.bounds.width,
+//                                               containerHeight: self.gMapView.bounds.height)
+//
+//        let drawPoint2 = MBUtils.convertToScreen(point: mapPoint,
+//                                                 extents: tileExtent,
+//                                                 containerWidth: self.gMapView.bounds.width,
+//                                                 containerHeight: self.gMapView.bounds.height)
+//
+//        debugPrint("\(#function) MapPoint is:\(mapPoint), drawPoint is \(drawPoint), drawPoint1 is \(drawPoint1), drawPoint2 is \(drawPoint2)")
+        if let newImage = self.drawRectangleOnImage(image: cachedTile.image, atPoint: drawPoint) {
+            cachedTile.image = newImage
+            self.tileLayer.clearTileCache()
+        }
+        //            PINMemoryCache.shared.setObject(newImage, forKey: key)
+        //        }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
@@ -195,7 +232,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-        //    debugPrint("\(#function) Zoom level is: \(position.zoom)")
+        debugPrint("\(#function) Zoom level is: \(position.zoom)")
         let zoomFloor = UInt(floor(position.zoom))
         let zoomCeil = UInt(ceil(position.zoom))
         if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
@@ -206,7 +243,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             let bounds = getCoordRect(forZoomLevel: zoomFloor)
             tileMap.tileRectDictionary[zoomFloor] = bounds
         }
-        self.currentZoom = position.zoom
+        self.currentZoom = floor(position.zoom)
+        debugPrint("\(#function) Current zoom level set to: \(position.zoom)")
     }
     
     func drawRectangleOnImage(image : UIImage, atPoint point : CGPoint) -> UIImage? {

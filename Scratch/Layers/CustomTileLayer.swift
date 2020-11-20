@@ -16,6 +16,7 @@ class CustomTileLayer: GMSTileLayer {
     }
     override func requestTileFor(x: UInt, y: UInt, zoom: UInt, receiver: GMSTileReceiver) {
         let tilePt = CGPoint(x: Int(x), y: Int(y))
+        debugPrint("\(#function) Tile coordinate is: \(tilePt), zoom is \(zoom)")
         guard let boundary = tileDictionary.tileRectDictionary[zoom] else {
             receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: nil)
             return
