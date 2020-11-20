@@ -43,6 +43,5 @@ class CustomTileLayer: GMSTileLayer {
         let tile = ICEMapTile(withImage: image, northWest: northWest, southEast: southEast)
         PINMemoryCache.shared.setObject(tile, forKey: key)
         receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: image)
-        //        debugPrint("Provided image for \(key)")
     }
 }

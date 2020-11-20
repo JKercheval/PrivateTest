@@ -14,6 +14,11 @@ let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
 func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
+extension Float {
+    var whole: Self { modf(self).0 }
+    var fraction: Self { modf(self).1 }
+}
+
 extension CLLocation {
     
     /// Get distance between two points

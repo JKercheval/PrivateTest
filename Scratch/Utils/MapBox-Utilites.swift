@@ -73,6 +73,38 @@ class MBUtils {
         return CGPoint(x: x, y: y)
     }
 
+    /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
+    class func createInfoWindowContent(latLng: CLLocationCoordinate2D, zoom: UInt) -> CGPoint {
+        let scale = 1 << zoom;
+        
+        let worldCoordinate = project(latLng: latLng);
+        
+        let pixelCoordinate = CGPoint(
+            x: floor(worldCoordinate.x * CGFloat(scale)),
+            y: floor(worldCoordinate.y * CGFloat(scale))
+        );
+        debugPrint("PixelCoodinate are :\(pixelCoordinate)")
+        let tileCoordinate = CGPoint(
+            x: floor((worldCoordinate.x * CGFloat(scale)) / CGFloat(TileSize)),
+            y: floor((worldCoordinate.y * CGFloat(scale)) / CGFloat(TileSize))
+        );
+        
+        return tileCoordinate
+    }
+    
+    // The mapping between latitude, longitude and pixels is defined by the web
+    // mercator projection.
+    private class func project(latLng: CLLocationCoordinate2D) -> CGPoint {
+        var siny = sin((latLng.latitude * Double.pi) / 180);
+        
+        // Truncating to 0.9999 effectively limits latitude to 89.189. This is
+        // about a third of a tile past the edge of the world tile.
+        siny = min(max(siny, -0.9999), 0.9999);
+        let xPt = TileSize * CGFloat((0.5 + latLng.longitude / 360))
+        let yPt = CGFloat(Double(TileSize) * (0.5 - log((1 + siny) / (1 - siny)) / (4 * Double.pi)))
+        return CGPoint(x: xPt, y: yPt)
+    }
+
 }
 
 class GeoJSONField {
