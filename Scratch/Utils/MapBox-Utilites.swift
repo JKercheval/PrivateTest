@@ -73,17 +73,23 @@ class MBUtils {
         return CGPoint(x: x, y: y)
     }
 
+    class func getPixelCoordinates(latLng: CLLocationCoordinate2D, zoom: UInt) -> CGPoint {
+        let scale = 1 << zoom
+        let worldCoordinate = project(latLng: latLng)
+        let pixelCoordinate = CGPoint(
+            x: floor(worldCoordinate.x * CGFloat(scale)),
+            y: floor(worldCoordinate.y * CGFloat(scale))
+        )
+        return pixelCoordinate
+    }
+    
     /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
     class func createInfoWindowContent(latLng: CLLocationCoordinate2D, zoom: UInt) -> CGPoint {
         let scale = 1 << zoom;
         
-        let worldCoordinate = project(latLng: latLng);
+        let worldCoordinate = project(latLng: latLng)
+        let pixelCoordinate = getPixelCoordinates(latLng: latLng, zoom: zoom)
         
-        let pixelCoordinate = CGPoint(
-            x: floor(worldCoordinate.x * CGFloat(scale)),
-            y: floor(worldCoordinate.y * CGFloat(scale))
-        );
-        debugPrint("PixelCoodinate are :\(pixelCoordinate)")
         let tileCoordinate = CGPoint(
             x: floor((worldCoordinate.x * CGFloat(scale)) / CGFloat(TileSize)),
             y: floor((worldCoordinate.y * CGFloat(scale)) / CGFloat(TileSize))
@@ -134,7 +140,7 @@ class GeoJSONField {
     }
   }
   
-  var topLeft : CLLocationCoordinate2D {
+  var northWest : CLLocationCoordinate2D {
     get {
       if let envelope = fieldEnvelope {
         return CLLocationCoordinate2D(latitude: envelope.maxY, longitude: envelope.minX)
@@ -143,7 +149,7 @@ class GeoJSONField {
     }
   }
   
-  var bottomLeft : CLLocationCoordinate2D {
+  var southWest : CLLocationCoordinate2D {
     get {
       if let envelope = fieldEnvelope {
         return CLLocationCoordinate2D(latitude: envelope.minY, longitude: envelope.minX)
@@ -152,7 +158,7 @@ class GeoJSONField {
     }
   }
   
-  var bottomRight : CLLocationCoordinate2D {
+  var southEast : CLLocationCoordinate2D {
     get {
       if let envelope = fieldEnvelope {
         return CLLocationCoordinate2D(latitude: envelope.minY, longitude: envelope.maxX)
@@ -161,7 +167,7 @@ class GeoJSONField {
     }
   }
   
-  var topRight : CLLocationCoordinate2D {
+  var northEast : CLLocationCoordinate2D {
     get {
       if let envelope = fieldEnvelope {
         return CLLocationCoordinate2D(latitude: envelope.maxY, longitude: envelope.maxX)

@@ -52,7 +52,7 @@ class FieldGpsGenerator {
         // calculateCoordinateFrom(self.currentLocation, 0, 1)
         NotificationCenter.default.post(name: NSNotification.Name.didUpdateLocation, object: nextLoc)
         currentLocation = nextLoc
-        debugPrint("\(#function) - new curent location is: \(currentLocation)")
+//        debugPrint("\(#function) - new curent location is: \(currentLocation)")
         if currentLocation.latitude > endLocation.latitude {
             stop()
         }

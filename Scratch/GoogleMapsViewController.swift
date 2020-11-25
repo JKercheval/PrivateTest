@@ -23,10 +23,12 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var gMapView : GMSMapView!
     var boundingRect : CGRect = CGRect.zero
     var tileMap : TileRectMap = TileRectMap()
-    var currentZoom : Float = 16.0
+    var currentZoom : CGFloat = 16.0
     var tileLayer : CustomTileLayer!
     var gpsGenerator : FieldGpsGenerator!
     var drawingManager : DrawingManager!
+    var imageSource : TileImageSourceServer?
+//    var markerDictionary : [UInt : [GMSMarker]]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,13 +38,13 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         // Do any additional setup after loading the view.
         
         geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
-        guard let feild = geoField else {
+        guard let field = geoField else {
             return
         }
         // Do any additional setup after loading the view.
         // Create a GMSCameraPosition that tells the map to display the
         // coordinate and zoom that we want
-        let camera = GMSCameraPosition.camera(withLatitude: feild.bottomLeft.latitude, longitude: feild.bottomLeft.longitude, zoom: currentZoom)
+        let camera = GMSCameraPosition.camera(withLatitude: field.southWest.latitude, longitude: field.southWest.longitude, zoom: Float(currentZoom))
         
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
         
@@ -62,20 +64,47 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         boundingRect = getCoordRect(forZoomLevel: UInt(currentZoom))
         tileMap.tileRectDictionary[UInt(currentZoom)] = boundingRect
         debugPrint("\(#function) - Bounding tile rect is: \(boundingRect)")
-        
-        tileLayer = CustomTileLayer(tileDictionary: self.tileMap)
+        guard let envelope = field.fieldEnvelope else {
+            return
+        }
+
+        let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
+        let boundary = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundary, mapView: gMapView)
+
+        tileLayer = CustomTileLayer(tileDictionary: self.tileMap, imageServer: imageSource!)
         tileLayer.tileSize = Int(TileSize)
         tileLayer.opacity = 0.3
         tileLayer.fadeIn = false
         tileLayer.map = gMapView
         
-        guard let envelope = geoField?.fieldEnvelope else {
-            return
-        }
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
+        let nwMarker = GMSMarker(position: boundary.northWest)
+        let seMarker = GMSMarker(position: boundary.southEast)
+        let neMarker = GMSMarker(position: boundary.northEast)
+        let swMarker = GMSMarker(position: boundary.southWest)
+        nwMarker.map = self.gMapView
+        seMarker.map = self.gMapView
+        neMarker.map = self.gMapView
+        swMarker.map = self.gMapView
+        
+//        let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
+//        let northWestMaxZoom = MBUtils.topLeftCorner(with: boundsMaxZoom.origin, UInt(20))
+//        let southEastMaxZoom = MBUtils.topLeftCorner(with: CGPoint(x: boundsMaxZoom.origin.x + boundsMaxZoom.width, y: boundsMaxZoom.origin.y + boundsMaxZoom.height), UInt(20))
+//        let boundaryMaxZoom = BoundaryQuad(withCoordinates: northWestMaxZoom, southEast: southEastMaxZoom)
+//        let nwMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.northWest)
+//        let seMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.southEast)
+//        let neMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.northEast)
+//        let swMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.southWest)
+//        nwMarkerMaxZoom.map = self.gMapView
+//        seMarkerMaxZoom.map = self.gMapView
+//        neMarkerMaxZoom.map = self.gMapView
+//        swMarkerMaxZoom.map = self.gMapView
+
+//        debugPrint("Tile bounds for field are: \(bounds)")
+//        imageSource?.drawGridOutline()
     }
-    
-    
+        
     /*
      // MARK: - Navigation
      
@@ -108,14 +137,24 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
      */
     @objc func ondidUpdateLocation(_ notification:Notification) {
         let coord = notification.object as! CLLocationCoordinate2D
-        self.drawingManager.zoom = UInt(self.currentZoom)
-        if self.drawingManager.drawRow(at: coord) == true {
-            self.tileLayer.clearTileCache()
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else {
+                return
+            }
+            strongSelf.drawingManager.zoom = strongSelf.currentZoom
+            let _ = strongSelf.imageSource?.drawRow(at: coord)
+            if strongSelf.imageSource?.drawRow(at: coord) == true {
+                strongSelf.tileLayer.clearTileCache()
+            }
+//            if strongSelf.drawingManager.drawRow(at: coord) == true {
+//                strongSelf.tileLayer.clearTileCache()
+//            }
         }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
-        gpsGenerator.start()
+        self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
+        gpsGenerator.step()
     }
 
     @IBAction func onStopButtonSelected(_ sender: Any) {
@@ -131,7 +170,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             static var currentLocMarker : GMSMarker?
         }
         let zoom = UInt(self.currentZoom)
-        let tilePt = self.createInfoWindowContent(latLng: gpsGenerator.startLocation, zoom: zoom)
+        let tilePt = MBUtils.createInfoWindowContent(latLng: gpsGenerator.startLocation, zoom: zoom)
         let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
         guard let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile else {
             return
@@ -157,7 +196,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-        debugPrint("\(#function) Zoom level is: \(position.zoom)")
+//        debugPrint("\(#function) Zoom level is: \(position.zoom)")
         let zoomFloor = UInt(floor(position.zoom))
         let zoomCeil = UInt(ceil(position.zoom))
         if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
@@ -168,18 +207,9 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             let bounds = getCoordRect(forZoomLevel: zoomFloor)
             tileMap.tileRectDictionary[zoomFloor] = bounds
         }
-        // HACK HACK
-        let remainder = position.zoom.fraction
-        if remainder > 0.4 {
-            self.currentZoom = ceil(position.zoom)
-        }
-        else {
-            self.currentZoom = floor(position.zoom)
-        }
-        debugPrint("\(#function) Current zoom level set to: \(self.currentZoom)")
+        self.currentZoom = CGFloat(floor(position.zoom))
+//        debugPrint("\(#function) Current zoom level set to: \(self.currentZoom)")
     }
-    
-    
 }
 
 extension GoogleMapsViewController {
@@ -198,43 +228,11 @@ extension GoogleMapsViewController {
             return CGRect.zero
         }
         
-        let topLeft = createInfoWindowContent(latLng: field.topLeft, zoom: zoom)
-        let topRight = createInfoWindowContent(latLng: field.topRight, zoom: zoom)
-        let bottomRight = createInfoWindowContent(latLng: field.bottomRight, zoom: zoom)
+        let topLeft = MBUtils.createInfoWindowContent(latLng: field.northWest, zoom: zoom)
+        let topRight = MBUtils.createInfoWindowContent(latLng: field.northEast, zoom: zoom)
+        let bottomRight = MBUtils.createInfoWindowContent(latLng: field.southEast, zoom: zoom)
         //    let bottomLeft = createInfoWindowContent(latLng: field.bottomLeft, zoom: 16)
-        debugPrint("Pts are: \(topLeft), \(topRight), \(bottomRight)")
+//        debugPrint("Pts are: \(topLeft), \(topRight), \(bottomRight)")
         return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
-    }
-    
-    /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
-    func createInfoWindowContent(latLng: CLLocationCoordinate2D, zoom: UInt) -> CGPoint {
-        let scale = 1 << zoom;
-        
-        let worldCoordinate = project(latLng: latLng);
-        
-        let pixelCoordinate = CGPoint(
-            x: floor(worldCoordinate.x * CGFloat(scale)),
-            y: floor(worldCoordinate.y * CGFloat(scale))
-        );
-        debugPrint("PixelCoodinate are :\(pixelCoordinate)")
-        let tileCoordinate = CGPoint(
-            x: floor((worldCoordinate.x * CGFloat(scale)) / CGFloat(TileSize)),
-            y: floor((worldCoordinate.y * CGFloat(scale)) / CGFloat(TileSize))
-        );
-        
-        return tileCoordinate
-    }
-    
-    // The mapping between latitude, longitude and pixels is defined by the web
-    // mercator projection.
-    func project(latLng: CLLocationCoordinate2D) -> CGPoint {
-        var siny = sin((latLng.latitude * Double.pi) / 180);
-        
-        // Truncating to 0.9999 effectively limits latitude to 89.189. This is
-        // about a third of a tile past the edge of the world tile.
-        siny = min(max(siny, -0.9999), 0.9999);
-        let xPt = TileSize * CGFloat((0.5 + latLng.longitude / 360))
-        let yPt = CGFloat(Double(TileSize) * (0.5 - log((1 + siny) / (1 - siny)) / (4 * Double.pi)))
-        return CGPoint(x: xPt, y: yPt)
     }
 }

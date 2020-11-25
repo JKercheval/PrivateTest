@@ -32,7 +32,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         }
 
         mglMapView = MGLMapView(frame: view.bounds, styleURL: MGLStyle.satelliteStreetsStyleURL)
-        self.mglMapView.setCenter(field.topLeft, zoomLevel: currentZoom, animated: false)
+        self.mglMapView.setCenter(field.northWest, zoomLevel: currentZoom, animated: false)
         
         locationManager.requestAlwaysAuthorization()
         locationManager.requestWhenInUseAuthorization()

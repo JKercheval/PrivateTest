@@ -14,10 +14,56 @@ let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
 func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
+extension UIImage {
+    func cropped(boundingBox: CGRect) -> UIImage? {
+        guard let cgImage = self.cgImage?.cropping(to: boundingBox) else {
+            return nil
+        }
+        
+        return UIImage(cgImage: cgImage)
+    }
+    
+    func crop(rect : CGRect) -> UIImage? {
+        var imageRect = rect
+        if (self.scale > 1.0) {
+            imageRect = CGRect(x: rect.origin.x * self.scale,
+                               y: rect.origin.y * self.scale,
+                               width: rect.size.width * self.scale,
+                               height: rect.size.height * self.scale);
+        }
+        guard let cgImage = self.cgImage else {
+            return nil
+        }
+        guard let imageRef = cgImage.cropping(to: imageRect) else {
+            return nil
+        }
+        let result = UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
+        return result;
+    }
+}
+
 extension Float {
     var whole: Self { modf(self).0 }
     var fraction: Self { modf(self).1 }
 }
+
+extension Double {
+    /// Rounds the double to decimal places value
+    func rounded(toPlaces places:Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
+    }
+}
+
+extension CGFloat {
+    /// Rounds the double to decimal places value
+    func rounded(toPlaces places:Int) -> CGFloat {
+        let divisor = pow(10.0, Double(places))
+        return CGFloat((Double(self) * divisor).rounded() / divisor)
+    }
+}
+
+
 
 extension CLLocation {
     
@@ -32,6 +78,12 @@ extension CLLocation {
         let to = CLLocation(latitude: to.latitude, longitude: to.longitude)
         return from.distance(from: to)
     }
+
+//x
+}
+
+extension Double {
+    var radians: Double { return (self * Double.pi)/180.0 }
 }
 
 extension CLLocationCoordinate2D: Codable {
@@ -59,7 +111,13 @@ extension CLLocationCoordinate2D: Equatable {
     return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
   }
   
-  
+    /// Returns distance from coordianate in meters.
+    /// - Parameter from: coordinate which will be used as end point.
+    /// - Returns: Returns distance in meters.
+    func distance(from: CLLocationCoordinate2D) -> CLLocationDistance {
+        return CLLocation.distance(from: self, to: from)
+    }
+
   func boundingRect(bearing: Double, distanceInMeter distance: CLLocationDistance) -> [CLLocationCoordinate2D] {
     let top = coordinate(bearing: 0.0, distanceInMeter: distance);
     let right = coordinate(bearing: 90.0, distanceInMeter: distance);

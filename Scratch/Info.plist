@@ -18,8 +18,22 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>googlechromes</string>
+		<string>comgooglemaps</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MGLMapboxAccessToken</key>
+	<string>pk.eyJ1IjoiamtlcmNoZXZhbCIsImEiOiJja2g2dDF3M3AwNHluMnpwZnl2ZGdrNWE3In0.7Fi3zlffJ4sOINpH0TeYqQ</string>
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>MGLAccuracyAuthorizationDescription</key>
+		<string>Please enable precise location. Turn-by-turn directions only work when precise location data is available.</string>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your precise location is used to calculate turn-by-turn directions, show your location on the map, and help improve the map.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -39,20 +53,6 @@
 			</array>
 		</dict>
 	</dict>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>googlechromes</string>
-        <string>comgooglemaps</string>
-    </array>
-    <key>MGLMapboxAccessToken</key>
-    <string>pk.eyJ1IjoiamtlcmNoZXZhbCIsImEiOiJja2g2dDF3M3AwNHluMnpwZnl2ZGdrNWE3In0.7Fi3zlffJ4sOINpH0TeYqQ</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Your precise location is used to calculate turn-by-turn directions, show your location on the map, and help improve the map.</string>
-    <key>NSLocationTemporaryUsageDescriptionDictionary</key>
-    <dict>
-        <key>MGLAccuracyAuthorizationDescription</key>
-        <string>Please enable precise location. Turn-by-turn directions only work when precise location data is available.</string>
-    </dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

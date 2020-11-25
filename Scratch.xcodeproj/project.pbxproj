@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -22,6 +22,7 @@
 		CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1281D22567F96500773444 /* DrawinngManager.swift */; };
 		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
 		CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200E0125672B57001759EC /* CustomTileLayer.swift */; };
+		CC3FA6AA2568550D006BEB4B /* TileImageSourceServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* TileImageSourceServer.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
 		CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817452556E48400137BE2 /* SceneDelegate.swift */; };
 		CC7817482556E48400137BE2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817472556E48400137BE2 /* ViewController.swift */; };
@@ -30,6 +31,7 @@
 		CC7817502556E48400137BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */; };
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
+		CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */; };
 		CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +74,7 @@
 		CC1281D22567F96500773444 /* DrawinngManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawinngManager.swift; sourceTree = "<group>"; };
 		CC200DF225671F98001759EC /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
 		CC200E0125672B57001759EC /* CustomTileLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTileLayer.swift; sourceTree = "<group>"; };
+		CC3FA6A92568550D006BEB4B /* TileImageSourceServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileImageSourceServer.swift; sourceTree = "<group>"; };
 		CC7817402556E48400137BE2 /* Scratch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scratch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817432556E48400137BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CC7817452556E48400137BE2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -86,6 +89,7 @@
 		CC7817612556E48400137BE2 /* ScratchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScratchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817652556E48400137BE2 /* ScratchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchUITests.swift; sourceTree = "<group>"; };
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMercator.swift; sourceTree = "<group>"; };
 		CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICEMapTile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -242,7 +246,9 @@
 			isa = PBXGroup;
 			children = (
 				CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */,
+				CC3FA6A92568550D006BEB4B /* TileImageSourceServer.swift */,
 				CC1281D22567F96500773444 /* DrawinngManager.swift */,
+				CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -483,7 +489,8 @@
 		};
 		8EB41B863CE059419F482D56 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -493,7 +500,7 @@
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Scratch-ScratchUITests/Pods-Scratch-ScratchUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Scratch-ScratchUITests/Pods-Scratch-ScratchUITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
@@ -531,10 +538,12 @@
 				CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,
+				CC3FA6AA2568550D006BEB4B /* TileImageSourceServer.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,
 				CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
+				CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */,
 				CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */,
 				CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */,
 			);
@@ -714,13 +723,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = PDLK6696YR;
+				DEVELOPMENT_TEAM = WD22543E47;
 				INFOPLIST_FILE = Scratch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.base.dev.Scratch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kercheval.maptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -734,13 +743,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = PDLK6696YR;
+				DEVELOPMENT_TEAM = WD22543E47;
 				INFOPLIST_FILE = Scratch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.base.dev.Scratch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kercheval.maptest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
