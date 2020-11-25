@@ -33,6 +33,9 @@
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
 		CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */; };
 		CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */; };
+		CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */; };
+		CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE1256F127300759A6F /* Primitives+Extension.swift */; };
+		CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +94,9 @@
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMercator.swift; sourceTree = "<group>"; };
 		CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICEMapTile.swift; sourceTree = "<group>"; };
+		CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		CCD73BE1256F127300759A6F /* Primitives+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Primitives+Extension.swift"; sourceTree = "<group>"; };
+		CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +176,9 @@
 			isa = PBXGroup;
 			children = (
 				CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */,
+				CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */,
+				CCD73BE1256F127300759A6F /* Primitives+Extension.swift */,
+				CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -534,7 +543,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */,
 				CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */,
+				CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */,
 				CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,
@@ -542,6 +553,7 @@
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,
 				CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */,
+				CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
 				CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */,
 				CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */,

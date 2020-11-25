@@ -28,7 +28,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var gpsGenerator : FieldGpsGenerator!
     var drawingManager : DrawingManager!
     var imageSource : TileImageSourceServer?
-//    var markerDictionary : [UInt : [GMSMarker]]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +51,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gMapView.mapType = .satellite
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
-
         
         guard let path = Bundle.main.path(forResource: "FotF Plot E Boundary", ofType: "geojson") else {
             return
@@ -87,22 +85,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         seMarker.map = self.gMapView
         neMarker.map = self.gMapView
         swMarker.map = self.gMapView
-        
-//        let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
-//        let northWestMaxZoom = MBUtils.topLeftCorner(with: boundsMaxZoom.origin, UInt(20))
-//        let southEastMaxZoom = MBUtils.topLeftCorner(with: CGPoint(x: boundsMaxZoom.origin.x + boundsMaxZoom.width, y: boundsMaxZoom.origin.y + boundsMaxZoom.height), UInt(20))
-//        let boundaryMaxZoom = BoundaryQuad(withCoordinates: northWestMaxZoom, southEast: southEastMaxZoom)
-//        let nwMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.northWest)
-//        let seMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.southEast)
-//        let neMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.northEast)
-//        let swMarkerMaxZoom = GMSMarker(position: boundaryMaxZoom.southWest)
-//        nwMarkerMaxZoom.map = self.gMapView
-//        seMarkerMaxZoom.map = self.gMapView
-//        neMarkerMaxZoom.map = self.gMapView
-//        swMarkerMaxZoom.map = self.gMapView
-
-//        debugPrint("Tile bounds for field are: \(bounds)")
-//        imageSource?.drawGridOutline()
     }
         
     /*
@@ -196,7 +178,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-//        debugPrint("\(#function) Zoom level is: \(position.zoom)")
         let zoomFloor = UInt(floor(position.zoom))
         let zoomCeil = UInt(ceil(position.zoom))
         if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
@@ -208,7 +189,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             tileMap.tileRectDictionary[zoomFloor] = bounds
         }
         self.currentZoom = CGFloat(floor(position.zoom))
-//        debugPrint("\(#function) Current zoom level set to: \(self.currentZoom)")
     }
 }
 

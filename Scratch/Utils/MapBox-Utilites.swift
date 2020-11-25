@@ -83,12 +83,18 @@ class MBUtils {
         return pixelCoordinate
     }
     
+    /// Takes the CLLocationCoordinate2D for the location interested in and creates a CGPoint
+    /// for the tile coordinate (coordinate in the grid): See
     /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
+    /// - Parameters:
+    ///   - latLng: CLLocationCoordinate2D of the location
+    ///   - zoom: Zoom level for tile coordinate
+    /// - Returns: CGPoint of the tile in the world tile grid.
     class func createInfoWindowContent(latLng: CLLocationCoordinate2D, zoom: UInt) -> CGPoint {
         let scale = 1 << zoom;
         
         let worldCoordinate = project(latLng: latLng)
-        let pixelCoordinate = getPixelCoordinates(latLng: latLng, zoom: zoom)
+//        let pixelCoordinate = getPixelCoordinates(latLng: latLng, zoom: zoom)
         
         let tileCoordinate = CGPoint(
             x: floor((worldCoordinate.x * CGFloat(scale)) / CGFloat(TileSize)),
@@ -98,8 +104,11 @@ class MBUtils {
         return tileCoordinate
     }
     
-    // The mapping between latitude, longitude and pixels is defined by the web
-    // mercator projection.
+    /// The mapping between latitude, longitude and pixels is defined by the web
+    /// mercator projection: from
+    /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
+    /// - Parameter latLng: CLLocationCoordinate2D coodinate for the location for the mapping
+    /// - Returns: CGPoint of the world coordinate.
     private class func project(latLng: CLLocationCoordinate2D) -> CGPoint {
         var siny = sin((latLng.latitude * Double.pi) / 180);
         

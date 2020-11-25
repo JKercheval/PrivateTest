@@ -30,6 +30,9 @@ struct TileCoordinate {
     var southEast : CLLocationCoordinate2D
 }
 
+
+/// This class handles all the code necessary to use on drawing surface, and create the tiles when
+/// needed.
 class TileImageSourceServer {
     let boundary : CGRect
     let boundaryQuad : BoundaryQuad
@@ -37,34 +40,42 @@ class TileImageSourceServer {
     let sourceZoom : UInt // default to zoom level 20
     var widthRatio : CGFloat = 0
     var hieghtRatio : CGFloat = 0
-    var metersPerPx : Double = 1
+    var metersPerPixel : Double = 1
     var rowCount : Int = 54
     var internalMapView : GMSMapView!
     var mapView : GMSMapView!
     
     
+    /// Initialization method
+    /// - Parameters:
+    ///   - boundaryRect: CGRect of the field
+    ///   - boundQuad: BoundaryQuad object which contains the NW, NE, SW, and SE CLLocationCoordinate2D coordinates.
+    ///   - mapView: User Mode GMSMapView - this is the GMSMapView that represents what the user is actually seing on
+    ///     the screen
+    ///   - zoom: Zoom level which will be used to create default drawing surface.
     init(with boundaryRect : CGRect, boundQuad : BoundaryQuad, mapView : GMSMapView,  zoom : UInt = 20) {
         boundary = boundaryRect
         boundaryQuad = boundQuad
         sourceZoom = zoom
         self.mapView = mapView
-        self.metersPerPx = getMetersPerPixel(coord: boundQuad.northWest, zoom: 20)
+        self.metersPerPixel = getMetersPerPixel(coord: boundQuad.northWest, zoom: 20)
         // Get the distance in meters.
         let widthDistance = boundaryQuad.northEast.distance(from: boundQuad.northWest)
         let heightDistance = boundaryQuad.northWest.distance(from: boundQuad.southWest)
 
-        let imageWidth = widthDistance / self.metersPerPx
-        let imageHeight = heightDistance / self.metersPerPx
+        let imageWidth = widthDistance / self.metersPerPixel
+        let imageHeight = heightDistance / self.metersPerPixel
         
-//        let imageSize = CGSize(width: boundary.size.width * TileSize, height: boundary.size.height * TileSize)
         let imageSize = CGSize(width: imageWidth, height: imageHeight)
-//        debugPrint("\(self):\(#function) - Image grid is \(boundary.size)")
         image = self.createFirstImage(size: imageSize)
         let camera = GMSCameraPosition.camera(withLatitude: boundQuad.northWest.latitude, longitude: boundQuad.northWest.longitude, zoom: Float(20))
-        
         self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: camera)
     }
     
+    
+    /// Creates the initial UIImage that is currently used as the drawing surface for the plotted information
+    /// - Parameter size: CGSize (width, height) for the image.
+    /// - Returns: UIImage created with the size passed in.
     func createFirstImage(size: CGSize) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         let img = renderer.image { ctx in
@@ -79,10 +90,6 @@ class TileImageSourceServer {
             ctx.cgContext.drawPath(using: .fillStroke)
         }
         return img
-    }
-    
-    var imageCanvas : UIImage? {
-        return image
     }
     
     func setCenterCoordinate(coord : CLLocationCoordinate2D) {
@@ -114,8 +121,6 @@ class TileImageSourceServer {
         let yOffset = max(0, (northWestImageOriginScreenPt.y - northWestTileOriginScreenPt.y) * hieghtRatio)
         
         drawPoint = CGPoint(x: xOffset, y: yOffset)
-//        debugPrint("\(self):\(#function) Offset pt is: \(drawPoint), ratios are: \(widthRatio), \(hieghtRatio)")
-        //        }
         return drawPoint
     }
     
@@ -151,8 +156,8 @@ class TileImageSourceServer {
         let tileWidth = tileLoc.northWest.distance(from: convertedNorthEastCorner)
         let tileHeight = tileLoc.northWest.distance(from: convertedSouthWestCorner)
         
-        let convertedTileWidth = tileWidth / self.metersPerPx
-        let convertedTileHeight = tileHeight / self.metersPerPx
+        let convertedTileWidth = tileWidth / self.metersPerPixel
+        let convertedTileHeight = tileHeight / self.metersPerPixel
         
         // Distance from left edge of tile, to left edge of image
         let northWestImageCornerLon = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: boundaryQuad.northWest.longitude)
@@ -161,8 +166,8 @@ class TileImageSourceServer {
         let xDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLon)// - offset.x
         let yDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLat)// - offset.y
         
-        let convertedXDistanceFromCorner = xDistanceFromCorner / self.metersPerPx
-        let convertedYDistanceFromCorner = yDistanceFromCorner / self.metersPerPx
+        let convertedXDistanceFromCorner = xDistanceFromCorner / self.metersPerPixel
+        let convertedYDistanceFromCorner = yDistanceFromCorner / self.metersPerPixel
         var xPt : CGFloat = CGFloat(convertedXDistanceFromCorner)
         var yPt : CGFloat = CGFloat(convertedYDistanceFromCorner)
 
@@ -340,29 +345,6 @@ class TileImageSourceServer {
 
 extension TileImageSourceServer {
     
-    func getDrawPoint(with mapView : GMSMapView, from coord : CLLocationCoordinate2D) -> CGPoint {
-        let mapPoint = internalMapView.projection.point(for: coord)
-
-        let northWestTileOriginScreenPt = internalMapView.projection.point(for: self.boundaryQuad.northWest)
-        let southEastTileOriginScreenPt = internalMapView.projection.point(for: self.boundaryQuad.southEast)
-        
-        // translation
-        let tileWidth = southEastTileOriginScreenPt.x - northWestTileOriginScreenPt.x
-        let tileHeight = southEastTileOriginScreenPt.y - northWestTileOriginScreenPt.y
-        
-        let imageSize = CGSize(width: boundary.size.width * TileSize, height: boundary.size.height * TileSize)
-        // transformation
-        widthRatio = imageSize.width / tileWidth
-        hieghtRatio = imageSize.height / tileHeight
-        
-        //        debugPrint("WidthRatio: \(widthRatio),  Rounded Width Ratio: \(widthRatio.rounded(.up))")
-        let xOffset = (mapPoint.x - northWestTileOriginScreenPt.x) * widthRatio
-        let yOffset = (mapPoint.y - northWestTileOriginScreenPt.y) * hieghtRatio
-        
-        let drawPoint = CGPoint(x: xOffset, y: yOffset)
-        return drawPoint
-    }
-    
     func getMetersPerPixel(coord : CLLocationCoordinate2D, zoom : UInt) -> Double {
         let mpp = (156543.03392 * cos(coord.latitude * Double.pi / 180) / pow(2, Double(zoom))).rounded(toPlaces: 4)
         return mpp
@@ -378,15 +360,14 @@ extension TileImageSourceServer {
         // So, take the current draw coordinates and calculate the offset from our topleft point.
         let horDistance = coord.distance(from: CLLocationCoordinate2D(latitude: coord.latitude, longitude: self.boundaryQuad.northWest.longitude))
         let verDistance = coord.distance(from: CLLocationCoordinate2D(latitude: self.boundaryQuad.northWest.latitude, longitude: coord.longitude))
-        let verOffset = verDistance / self.metersPerPx
-        let horOffset = horDistance / self.metersPerPx
+        let verOffset = verDistance / self.metersPerPixel
+        let horOffset = horDistance / self.metersPerPixel
 
         let drawPoint = CGPoint(x: horOffset, y: verOffset)
-//        let drawPoint = getDrawPoint(with: zoomedMapView, from: coord)
         guard let currentImage = self.image else {
             return false
         }
-        self.metersPerPx = getMetersPerPixel(coord: coord, zoom: 20)
+        self.metersPerPixel = getMetersPerPixel(coord: coord, zoom: 20)
         guard let newImage = drawRectangleOnImage(image: currentImage, atPoint: drawPoint) else {
             debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
             return false
@@ -404,7 +385,7 @@ extension TileImageSourceServer {
             ctx.cgContext.setLineWidth(0.1)
             
             image.draw(at: CGPoint.zero)
-            let partsWidth = CGFloat((120.0 / 54.0) / self.metersPerPx) // / widthRatio.rounded(.up)).rounded(toPlaces: 4)
+            let partsWidth = CGFloat((120.0 / 54.0) / self.metersPerPixel) // / widthRatio.rounded(.up)).rounded(toPlaces: 4)
 //            debugPrint("\(self):\(#function) partsWidth is \(partsWidth)")
             let startX : CGFloat = point.x
             for n in 0..<self.rowCount {

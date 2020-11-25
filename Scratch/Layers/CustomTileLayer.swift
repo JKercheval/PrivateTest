@@ -24,6 +24,19 @@ class CustomTileLayer: GMSTileLayer {
         self.tileDictionary = tileDictionary
         self.imageServer = imageServer
     }
+    
+    
+    /// requestTileForX:y:zoom:receiver: generates image tiles for GMSTileOverlay. It must be overridden
+    /// by subclasses. The tile for the given |x|, |y| and |zoom| _must_ be later passed to |receiver|.
+    /// Specify kGMSTileLayerNoTile if no tile is available for this location; or nil if a transient
+    /// error occured and a tile may be available later.
+    /// Calls to this method will be made on the main thread. See GMSSyncTileLayer for a base class that
+    /// implements a blocking tile layer that does not run on your application's main thread.
+    /// - Parameters:
+    ///   - x: x location for the tile
+    ///   - y: y location for the tile
+    ///   - zoom: zoom level for the tile
+    ///   - receiver: GMSTileReceiver which is called when the tile is retreived.
     override func requestTileFor(x: UInt, y: UInt, zoom: UInt, receiver: GMSTileReceiver) {
         if lastRequestedZoomLevel != zoom {
             lastRequestedZoomLevel = zoom
@@ -35,68 +48,8 @@ class CustomTileLayer: GMSTileLayer {
         let tilePt = CGPoint(x: Int(x), y: Int(y))
         let northWest = MBUtils.topLeftCorner(with: tilePt, zoom)
         let southEast = MBUtils.topLeftCorner(with: CGPoint(x: tilePt.x + 1, y: tilePt.y + 1), zoom)
-//        debugPrint("\(#function) Tile coordinate is: \(tilePt), zoom is \(zoom)")
-//        guard let boundary = tileDictionary.tileRectDictionary[zoom] else {
-//            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: nil)
-//            return
-//        }
-//        guard boundary.contains(tilePt) else {
-//            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: kGMSTileLayerNoTile)
-//            debugPrint("\(self)\(#function) Tile not in our boundary !!!")
-//
-//            return
-//        }
         let tileLoc = TileCoordinate(northWest: northWest, southEast: southEast)
         let image = self.imageServer.getImageForTile(tile: tilePt,tileLoc: tileLoc , zoom: zoom)
-//        let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
-//        if let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile {
-//            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: cachedTile.image)
-//            return
-//        }
-//
-//        let northWest = MBUtils.topLeftCorner(with: tilePt, zoom)
-//        let southEast = MBUtils.topLeftCorner(with: CGPoint(x: tilePt.x + 1, y: tilePt.y + 1), zoom)
-//
-//        guard let image = MBUtils.createFirstImage(size: CGSize(width: TileSize, height: TileSize)) else {
-//            receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: nil)
-//            return
-//        }
-//
-//        let tile = ICEMapTile(withImage: image, northWest: northWest, southEast: southEast)
-//        PINMemoryCache.shared.setObject(tile, forKey: key)
         receiver.receiveTileWith(x: x, y: y, zoom: zoom, image: image)
-    }
-}
-
-class CustomSyncTileLayer: GMSSyncTileLayer {
-    var tileDictionary : TileRectMap!
-    init(tileDictionary : TileRectMap) {
-        self.tileDictionary = tileDictionary
-    }
-    
-    override func tileFor(x: UInt, y: UInt, zoom: UInt) -> UIImage? {
-        let tilePt = CGPoint(x: Int(x), y: Int(y))
-        //        debugPrint("\(#function) Tile coordinate is: \(tilePt), zoom is \(zoom)")
-        guard let boundary = tileDictionary.tileRectDictionary[zoom] else {
-            return nil
-        }
-        guard boundary.contains(tilePt) else {
-            return kGMSTileLayerNoTile
-        }
-        let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
-        if let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile {
-            return cachedTile.image
-        }
-        
-        let northWest = MBUtils.topLeftCorner(with: tilePt, zoom)
-        let southEast = MBUtils.topLeftCorner(with: CGPoint(x: tilePt.x + 1, y: tilePt.y + 1), zoom)
-        
-        guard let image = MBUtils.createFirstImage(size: CGSize(width: TileSize, height: TileSize)) else {
-            return nil
-        }
-        
-        let tile = ICEMapTile(withImage: image, northWest: northWest, southEast: southEast)
-        PINMemoryCache.shared.setObject(tile, forKey: key)
-        return image
     }
 }
