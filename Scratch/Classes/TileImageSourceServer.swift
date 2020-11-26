@@ -43,7 +43,8 @@ class TileImageSourceServer {
     var rowCount : Int = 54
     var internalMapView : GMSMapView!
     var mapView : GMSMapView!
-    var currentDrawingLayer : CGContext?
+    var plottingBitmapContext : CGContext?
+    var tileBitmapContext : CGContext?
     var imageSize : CGSize = CGSize.zero
     
     
@@ -68,13 +69,12 @@ class TileImageSourceServer {
         let imageHeight = heightDistance / self.metersPerPixel
         
         imageSize = CGSize(width: imageWidth, height: imageHeight)
-        self.currentDrawingLayer = createBitmapContext(size: imageSize)
+        self.plottingBitmapContext = createBitmapContext(size: imageSize)
         let camera = GMSCameraPosition.camera(withLatitude: boundQuad.northWest.latitude, longitude: boundQuad.northWest.longitude, zoom: Float(20))
         self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: camera)
     }
     
-    func createBitmapContext (size : CGSize) -> CGContext?
-    {
+    func createBitmapContext (size : CGSize) -> CGContext? {
         let colorSpace:CGColorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
         let bytesPerPixel = 4
@@ -232,7 +232,7 @@ class TileImageSourceServer {
 
             let imagePt = getOffsetPoint(with: self.mapView, tileLoc: tileLoc, from: self.boundaryQuad.northWest)
             let imageRect = getCroppedImageRectForTile(gridSize: boundaryForZoom.size, tileLoc: tileLoc, zoom: zoom, offset: imagePt)
-            guard let cropped = getSubImageFromCanvas(bitmapContext: self.currentDrawingLayer, rect: imageRect) else {
+            guard let cropped = getSubImageFromCanvas(bitmapContext: self.plottingBitmapContext, rect: imageRect) else {
                 debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
                 return nil
             }
@@ -245,6 +245,22 @@ class TileImageSourceServer {
         }
     }
     
+    func createImageQuad(tileLoc : TileCoordinate) -> BoundaryQuad {
+        let northWestCorner : CLLocationCoordinate2D = createNorthWestQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
+        let northEastCorner : CLLocationCoordinate2D = createNorthEastQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
+        let southWestCorner : CLLocationCoordinate2D = createSouthWestQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
+        let southEastCorner : CLLocationCoordinate2D = createSouthEastQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
+        
+        return BoundaryQuad(withCoordinates: northWestCorner, southEast: southEastCorner, northEast: northEastCorner, southWest: southWestCorner)
+    }
+
+    private func getCoordRect(coordinateQuad : BoundaryQuad,  forZoomLevel zoom : UInt) -> CGRect {
+        let topLeft = MBUtils.createInfoWindowContent(latLng: coordinateQuad.northWest, zoom: zoom)
+        let topRight = MBUtils.createInfoWindowContent(latLng: coordinateQuad.northEast, zoom: zoom)
+        let bottomRight = MBUtils.createInfoWindowContent(latLng: coordinateQuad.southEast, zoom: zoom)
+        return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
+    }
+
     func getSubImageFromCanvas(bitmapContext : CGContext?, rect : CGRect) -> UIImage? {
         guard let context = bitmapContext else {
             return nil
@@ -260,46 +276,6 @@ class TileImageSourceServer {
         return UIImage(cgImage: cropped)
     }
     
-    func createNorthWestQuadLocation(tileLoc : TileCoordinate) -> CLLocationCoordinate2D{
-        // max lat, max long
-        let northWestCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: min(tileLoc.northWest.latitude, self.boundaryQuad.northWest.latitude), longitude: max(tileLoc.northWest.longitude, self.boundaryQuad.northWest.longitude))
-        return northWestCorner
-    }
-    
-    func createNorthEastQuadLocation(tileLoc : TileCoordinate) -> CLLocationCoordinate2D {
-        // max latitude, min long
-        let northEastCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: min(tileLoc.northWest.latitude, self.boundaryQuad.northEast.latitude), longitude: min(tileLoc.southEast.longitude, self.boundaryQuad.northEast.longitude))
-        return northEastCorner
-    }
-    
-    func createSouthEastQuadLocation(tileLoc : TileCoordinate) -> CLLocationCoordinate2D{
-        //min lat and min long
-        let southEastCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: max(tileLoc.southEast.latitude, self.boundaryQuad.southEast.latitude), longitude: min(tileLoc.southEast.longitude, self.boundaryQuad.southEast.longitude))
-        return southEastCorner
-    }
-
-    func createSouthWestQuadLocation(tileLoc : TileCoordinate) -> CLLocationCoordinate2D{
-        // Min long, max lat
-        let southWestCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: max(tileLoc.southEast.latitude, self.boundaryQuad.southEast.latitude), longitude: max(tileLoc.northWest.longitude, self.boundaryQuad.southWest.longitude))
-        return southWestCorner
-    }
-
-    func createImageQuad(tileLoc : TileCoordinate) -> BoundaryQuad {
-        let northWestCorner : CLLocationCoordinate2D = createNorthWestQuadLocation(tileLoc: tileLoc)
-        let northEastCorner : CLLocationCoordinate2D = createNorthEastQuadLocation(tileLoc: tileLoc)
-        let southWestCorner : CLLocationCoordinate2D = createSouthWestQuadLocation(tileLoc: tileLoc)
-        let southEastCorner : CLLocationCoordinate2D = createSouthEastQuadLocation(tileLoc: tileLoc)
-        
-        return BoundaryQuad(withCoordinates: northWestCorner, southEast: southEastCorner, northEast: northEastCorner, southWest: southWestCorner)
-    }
-
-    private func getCoordRect(coordinateQuad : BoundaryQuad,  forZoomLevel zoom : UInt) -> CGRect {
-        let topLeft = MBUtils.createInfoWindowContent(latLng: coordinateQuad.northWest, zoom: zoom)
-        let topRight = MBUtils.createInfoWindowContent(latLng: coordinateQuad.northEast, zoom: zoom)
-        let bottomRight = MBUtils.createInfoWindowContent(latLng: coordinateQuad.southEast, zoom: zoom)
-        return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
-    }
-
     func createTileImage(imageFrom : UIImage, startPt : CGPoint, drawSize : CGSize, size: CGSize) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         let img = renderer.image { ctx in
@@ -318,40 +294,40 @@ class TileImageSourceServer {
         return img
     }
 
-    func addTextToImage(text: String, inImage: UIImage, atPoint:CGPoint) -> UIImage? {
-        
-        // Setup the font specific variables
-        let textColor = UIColor.black
-        let textFont = UIFont(name: "Helvetica Bold", size: 30)!
-        
-        //Setups up the font attributes that will be later used to dictate how the text should be drawn
-        let textFontAttributes = [
-            NSAttributedString.Key.font: textFont,
-            NSAttributedString.Key.foregroundColor: textColor,
-        ]
-        
-        // Create bitmap based graphics context
-        UIGraphicsBeginImageContextWithOptions(inImage.size, false, 0.0)
-        
-        
-        //Put the image into a rectangle as large as the original image.
-        inImage.draw(in: CGRect(x: 0, y: 0, width: inImage.size.width, height: inImage.size.height))
-        
-        // Our drawing bounds
-        let drawingBounds = CGRect(x: 0.0, y: 0.0, width: inImage.size.width, height: inImage.size.height)
-        
-        let textSize = text.size(withAttributes: [NSAttributedString.Key.font:textFont])
-        let textRect = CGRect(x: drawingBounds.size.width/2 - textSize.width/2, y: drawingBounds.size.height/2 - textSize.height/2,
-                              width: textSize.width, height: textSize.height)
-        
-        text.draw(in: textRect, withAttributes: textFontAttributes)
-        
-        // Get the image from the graphics context
-        let newImag = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return newImag
-    }
+//    func addTextToImage(text: String, inImage: UIImage, atPoint:CGPoint) -> UIImage? {
+//
+//        // Setup the font specific variables
+//        let textColor = UIColor.black
+//        let textFont = UIFont(name: "Helvetica Bold", size: 30)!
+//
+//        //Setups up the font attributes that will be later used to dictate how the text should be drawn
+//        let textFontAttributes = [
+//            NSAttributedString.Key.font: textFont,
+//            NSAttributedString.Key.foregroundColor: textColor,
+//        ]
+//
+//        // Create bitmap based graphics context
+//        UIGraphicsBeginImageContextWithOptions(inImage.size, false, 0.0)
+//
+//
+//        //Put the image into a rectangle as large as the original image.
+//        inImage.draw(in: CGRect(x: 0, y: 0, width: inImage.size.width, height: inImage.size.height))
+//
+//        // Our drawing bounds
+//        let drawingBounds = CGRect(x: 0.0, y: 0.0, width: inImage.size.width, height: inImage.size.height)
+//
+//        let textSize = text.size(withAttributes: [NSAttributedString.Key.font:textFont])
+//        let textRect = CGRect(x: drawingBounds.size.width/2 - textSize.width/2, y: drawingBounds.size.height/2 - textSize.height/2,
+//                              width: textSize.width, height: textSize.height)
+//
+//        text.draw(in: textRect, withAttributes: textFontAttributes)
+//
+//        // Get the image from the graphics context
+//        let newImag = UIGraphicsGetImageFromCurrentImageContext()
+//        UIGraphicsEndImageContext()
+//
+//        return newImag
+//    }
     
 }
 
@@ -376,7 +352,7 @@ extension TileImageSourceServer {
         let horOffset = horDistance / self.metersPerPixel
 
         let drawPoint = CGPoint(x: horOffset, y: verOffset)
-        guard let canvas = self.currentDrawingLayer else {
+        guard let canvas = self.plottingBitmapContext else {
             return false
         }
         self.metersPerPixel = getMetersPerPixel(coord: coord, zoom: 20)

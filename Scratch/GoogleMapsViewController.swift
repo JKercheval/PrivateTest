@@ -126,7 +126,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             strongSelf.drawingManager.zoom = strongSelf.currentZoom
             if strongSelf.imageSource?.drawRow(at: coord) == true {
                 DispatchQueue.main.async {
-                    debugPrint("\(strongSelf):\(#function) - Clearing cache")
+//                    debugPrint("\(strongSelf):\(#function) - Clearing cache")
                     strongSelf.tileLayer.clearTileCache()
                 }
             }
@@ -135,8 +135,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
         self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
-//        gpsGenerator.step()
-        gpsGenerator.start()
+        gpsGenerator.step()
+//        gpsGenerator.start()
     }
 
     @IBAction func onStopButtonSelected(_ sender: Any) {

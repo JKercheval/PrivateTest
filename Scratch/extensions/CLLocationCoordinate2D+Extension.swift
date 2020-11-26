@@ -45,6 +45,30 @@ extension CLLocationCoordinate2D: Codable {
     }
 }
 
+func createNorthWestQuadLocation(tileLoc : TileCoordinate, quad : BoundaryQuad) -> CLLocationCoordinate2D {
+    // max lat, max long
+    let northWestCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: min(tileLoc.northWest.latitude, quad.northWest.latitude), longitude: max(tileLoc.northWest.longitude, quad.northWest.longitude))
+    return northWestCorner
+}
+
+func createNorthEastQuadLocation(tileLoc : TileCoordinate, quad : BoundaryQuad) -> CLLocationCoordinate2D {
+    // max latitude, min long
+    let northEastCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: min(tileLoc.northWest.latitude, quad.northEast.latitude), longitude: min(tileLoc.southEast.longitude, quad.northEast.longitude))
+    return northEastCorner
+}
+
+func createSouthEastQuadLocation(tileLoc : TileCoordinate, quad : BoundaryQuad) -> CLLocationCoordinate2D {
+    //min lat and min long
+    let southEastCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: max(tileLoc.southEast.latitude, quad.southEast.latitude), longitude: min(tileLoc.southEast.longitude, quad.southEast.longitude))
+    return southEastCorner
+}
+
+func createSouthWestQuadLocation(tileLoc : TileCoordinate, quad : BoundaryQuad) -> CLLocationCoordinate2D {
+    // Min long, max lat
+    let southWestCorner : CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: max(tileLoc.southEast.latitude, quad.southEast.latitude), longitude: max(tileLoc.northWest.longitude, quad.southWest.longitude))
+    return southWestCorner
+}
+
 extension CLLocationCoordinate2D: Equatable {
     
     static public func ==(lhs: Self, rhs: Self) -> Bool {

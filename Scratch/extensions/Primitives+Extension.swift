@@ -8,6 +8,16 @@
 import Foundation
 import UIKit
 
+extension CGContext {
+    func drawFlipped(image: CGImage, rect: CGRect) {
+        saveGState()
+        translateBy(x: 0, y: rect.height)
+        scaleBy(x: 1, y: -1)
+        draw(image, in: rect)
+        restoreGState()
+    }
+}
+
 extension Float {
     var whole: Self { modf(self).0 }
     var fraction: Self { modf(self).1 }
