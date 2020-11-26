@@ -15,13 +15,11 @@ protocol CWGMSTileLayerDelegate {
 }
 
 class CustomTileLayer: GMSTileLayer {
-    var tileDictionary : TileRectMap!
     var lastRequestedZoomLevel : UInt = 0
     var delegate : CWGMSTileLayerDelegate?
     var imageServer : TileImageSourceServer!
     
-    init(tileDictionary : TileRectMap, imageServer : TileImageSourceServer) {
-        self.tileDictionary = tileDictionary
+    init(imageServer : TileImageSourceServer) {
         self.imageServer = imageServer
     }
     

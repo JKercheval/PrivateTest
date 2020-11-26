@@ -29,6 +29,17 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var drawingManager : DrawingManager!
     var imageSource : TileImageSourceServer?
     
+    fileprivate func initializeMapTileLayer(imageServer : TileImageSourceServer?) {
+        guard let server = imageServer else {
+            return
+        }
+        tileLayer = CustomTileLayer(imageServer: server)
+        tileLayer.tileSize = Int(TileSize)
+        tileLayer.opacity = 0.3
+        tileLayer.fadeIn = false
+        tileLayer.map = gMapView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         PINMemoryCache.shared.removeAllObjects()
@@ -68,13 +79,10 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
         let boundary = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        
         imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundary, mapView: gMapView)
 
-        tileLayer = CustomTileLayer(tileDictionary: self.tileMap, imageServer: imageSource!)
-        tileLayer.tileSize = Int(TileSize)
-        tileLayer.opacity = 0.3
-        tileLayer.fadeIn = false
-        tileLayer.map = gMapView
+        initializeMapTileLayer(imageServer: imageSource)
         
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
         let nwMarker = GMSMarker(position: boundary.northWest)
@@ -103,14 +111,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         let longitudeDelta = region.farRight.longitude - region.farLeft.longitude
         let zoom = log2(360.0 * Double(map.bounds.size.width) / longitudeDelta) - 8
         return UInt(zoom)
-//    MKMapView *map = (MKMapView *)self.mapView;
-//    CLLocationDegrees longitudeDelta = map.region.span.longitudeDelta;
-//    CGFloat mapWidthInPixels = map.bounds.size.width;
-//    double zoomScale = longitudeDelta * 85445659.44705395 * M_PI / (180.0 * mapWidthInPixels);
-//    double zoomer = 20 - log2(zoomScale);
-//    if ( zoomer < 0 ) zoomer = 0;
-//
-//    return (NSInteger)zoomer;
     }
     
     /*
@@ -119,24 +119,24 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
      */
     @objc func ondidUpdateLocation(_ notification:Notification) {
         let coord = notification.object as! CLLocationCoordinate2D
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.global().async { [weak self] in
             guard let strongSelf = self else {
                 return
             }
             strongSelf.drawingManager.zoom = strongSelf.currentZoom
-            let _ = strongSelf.imageSource?.drawRow(at: coord)
             if strongSelf.imageSource?.drawRow(at: coord) == true {
-                strongSelf.tileLayer.clearTileCache()
+                DispatchQueue.main.async {
+                    debugPrint("\(strongSelf):\(#function) - Clearing cache")
+                    strongSelf.tileLayer.clearTileCache()
+                }
             }
-//            if strongSelf.drawingManager.drawRow(at: coord) == true {
-//                strongSelf.tileLayer.clearTileCache()
-//            }
         }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
         self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
-        gpsGenerator.step()
+//        gpsGenerator.step()
+        gpsGenerator.start()
     }
 
     @IBAction func onStopButtonSelected(_ sender: Any) {

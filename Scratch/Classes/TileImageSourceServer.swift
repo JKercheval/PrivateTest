@@ -36,7 +36,6 @@ struct TileCoordinate {
 class TileImageSourceServer {
     let boundary : CGRect
     let boundaryQuad : BoundaryQuad
-    var image : UIImage?
     let sourceZoom : UInt // default to zoom level 20
     var widthRatio : CGFloat = 0
     var hieghtRatio : CGFloat = 0
@@ -44,6 +43,8 @@ class TileImageSourceServer {
     var rowCount : Int = 54
     var internalMapView : GMSMapView!
     var mapView : GMSMapView!
+    var currentDrawingLayer : CGContext?
+    var imageSize : CGSize = CGSize.zero
     
     
     /// Initialization method
@@ -66,30 +67,32 @@ class TileImageSourceServer {
         let imageWidth = widthDistance / self.metersPerPixel
         let imageHeight = heightDistance / self.metersPerPixel
         
-        let imageSize = CGSize(width: imageWidth, height: imageHeight)
-        image = self.createFirstImage(size: imageSize)
+        imageSize = CGSize(width: imageWidth, height: imageHeight)
+        self.currentDrawingLayer = createBitmapContext(size: imageSize)
         let camera = GMSCameraPosition.camera(withLatitude: boundQuad.northWest.latitude, longitude: boundQuad.northWest.longitude, zoom: Float(20))
         self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: camera)
     }
     
-    
-    /// Creates the initial UIImage that is currently used as the drawing surface for the plotted information
-    /// - Parameter size: CGSize (width, height) for the image.
-    /// - Returns: UIImage created with the size passed in.
-    func createFirstImage(size: CGSize) -> UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: size)
-        let img = renderer.image { ctx in
-            // Create the image with a transparent background
-            ctx.cgContext.setFillColor(UIColor.clear.cgColor)
-            ctx.cgContext.setAlpha(0.2)
-            let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
-            ctx.cgContext.fill(imageRect)
-            ctx.cgContext.addRect(imageRect)
-            ctx.cgContext.setStrokeColor(UIColor.black.cgColor)
-            ctx.cgContext.setLineWidth(25.0)
-            ctx.cgContext.drawPath(using: .fillStroke)
-        }
-        return img
+    func createBitmapContext (size : CGSize) -> CGContext?
+    {
+        let colorSpace:CGColorSpace = CGColorSpaceCreateDeviceRGB()
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        let bytesPerPixel = 4
+        let bytesPerRow = bytesPerPixel * Int(size.width)
+        let bitmapContext = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
+        bitmapContext?.translateBy(x: 0, y: size.height)
+        bitmapContext?.scaleBy(x: 1.0, y: -1.0)
+        let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
+        bitmapContext?.setFillColor(UIColor.clear.cgColor)
+//        bitmapContext?.setAlpha(0.2)
+        bitmapContext?.fill(imageRect)
+
+        bitmapContext?.addRect(imageRect)
+        bitmapContext?.setStrokeColor(UIColor.black.cgColor)
+        bitmapContext?.setLineWidth(25.0)
+        bitmapContext?.drawPath(using: .fillStroke)
+
+        return bitmapContext
     }
     
     func setCenterCoordinate(coord : CLLocationCoordinate2D) {
@@ -146,10 +149,6 @@ class TileImageSourceServer {
 
     func getCroppedImageRectForTile(gridSize : CGSize, tileLoc : TileCoordinate, zoom : UInt, offset : CGPoint) -> CGRect {
         
-        guard let currentImage = self.image else {
-            return CGRect.zero
-        }
-
         let convertedSouthWestCorner = CLLocationCoordinate2D(latitude: tileLoc.southEast.latitude, longitude: tileLoc.northWest.longitude)
         let convertedNorthEastCorner = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: tileLoc.southEast.longitude)
         
@@ -181,34 +180,34 @@ class TileImageSourceServer {
         let imageNWCornerLocationLat = CLLocation(latitude: northWestImageCornerLat.latitude, longitude: northWestImageCornerLat.longitude)
         let yBearing = getBearingBetweenTwoPoints(point1: tileNWCornerLocation, point2: imageNWCornerLocationLat)
         
-        var imageWidth = currentImage.size.width
-        var imageHeight = currentImage.size.height
+        var imageWidth = self.imageSize.width
+        var imageHeight = self.imageSize.height
         
         if imageCornerPt.x < tileCornerPt.x {
             
             if xBearing < 0.0 {
-                imageWidth = min(CGFloat(convertedTileWidth), currentImage.size.width - CGFloat(convertedXDistanceFromCorner))
+                imageWidth = min(CGFloat(convertedTileWidth), self.imageSize.width - CGFloat(convertedXDistanceFromCorner))
             }
         }
         else {
             xPt = 0
-            if currentImage.size.width > CGFloat(convertedTileWidth - convertedXDistanceFromCorner) {
+            if self.imageSize.width > CGFloat(convertedTileWidth - convertedXDistanceFromCorner) {
                 imageWidth = CGFloat(convertedTileWidth - convertedXDistanceFromCorner)
             }
         }
 
         if imageCornerPt.y < tileCornerPt.y {
             if yBearing.rounded() == 0.0 {
-                imageHeight = min(CGFloat(convertedTileHeight), currentImage.size.height - CGFloat(convertedYDistanceFromCorner))
+                imageHeight = min(CGFloat(convertedTileHeight), self.imageSize.height - CGFloat(convertedYDistanceFromCorner))
             }
         }
         else {
             yPt = 0
             if yBearing.rounded() == 0.0 {
-                imageHeight = min(CGFloat(convertedTileHeight), currentImage.size.height - CGFloat(convertedYDistanceFromCorner))
+                imageHeight = min(CGFloat(convertedTileHeight), self.imageSize.height - CGFloat(convertedYDistanceFromCorner))
             }
             else {
-                if currentImage.size.height > CGFloat(convertedTileHeight - convertedYDistanceFromCorner) {
+                if self.imageSize.height > CGFloat(convertedTileHeight - convertedYDistanceFromCorner) {
                     imageHeight = CGFloat(convertedTileHeight - convertedYDistanceFromCorner)
                 }
             }
@@ -220,11 +219,9 @@ class TileImageSourceServer {
 
     func getImageForTile(tile : CGPoint, tileLoc : TileCoordinate, zoom : UInt) -> UIImage? {
         DispatchQueue.main.sync {
-            guard let currentImage = self.image else {
-                return nil
-            }
             let boundaryForZoom : CGRect = getCoordRect(coordinateQuad: self.boundaryQuad, forZoomLevel: zoom)
             if boundaryForZoom.contains(tile) == false {
+//                debugPrint("\(self):\(#function) tile not in boundary")
                 return nil
             }
 
@@ -235,10 +232,10 @@ class TileImageSourceServer {
 
             let imagePt = getOffsetPoint(with: self.mapView, tileLoc: tileLoc, from: self.boundaryQuad.northWest)
             let imageRect = getCroppedImageRectForTile(gridSize: boundaryForZoom.size, tileLoc: tileLoc, zoom: zoom, offset: imagePt)
-            guard let cropped = currentImage.crop(rect: imageRect) else {
+            guard let cropped = getSubImageFromCanvas(bitmapContext: self.currentDrawingLayer, rect: imageRect) else {
+                debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
                 return nil
             }
-
             let drawSize = CGSize(width: (seImagePt.x - nwImagePt.x) * self.widthRatio, height: (seImagePt.y - nwImagePt.y) * self.hieghtRatio)
             guard let retValue = createTileImage(imageFrom: cropped, startPt: imagePt, drawSize: drawSize, size: CGSize(width: TileSize, height: TileSize)) else {
                 debugPrint("\(self):\(#function) ERROR! No Image returned from createTileImage !!!")
@@ -246,6 +243,21 @@ class TileImageSourceServer {
             }
             return retValue
         }
+    }
+    
+    func getSubImageFromCanvas(bitmapContext : CGContext?, rect : CGRect) -> UIImage? {
+        guard let context = bitmapContext else {
+            return nil
+        }
+        guard let cgImage = context.makeImage() else {
+            return nil
+        }
+        guard let cropped = cgImage.cropping(to: rect) else {
+            return nil
+        }
+        
+        // Convert back to UIImage
+        return UIImage(cgImage: cropped)
     }
     
     func createNorthWestQuadLocation(tileLoc : TileCoordinate) -> CLLocationCoordinate2D{
@@ -292,7 +304,7 @@ class TileImageSourceServer {
         let renderer = UIGraphicsImageRenderer(size: size)
         let img = renderer.image { ctx in
             ctx.cgContext.setFillColor(UIColor.red.cgColor)
-            ctx.cgContext.setAlpha(0.1)
+            ctx.cgContext.setAlpha(0.01)
             let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
 
             ctx.cgContext.fill(imageRect)
@@ -364,18 +376,53 @@ extension TileImageSourceServer {
         let horOffset = horDistance / self.metersPerPixel
 
         let drawPoint = CGPoint(x: horOffset, y: verOffset)
-        guard let currentImage = self.image else {
+        guard let canvas = self.currentDrawingLayer else {
             return false
         }
         self.metersPerPixel = getMetersPerPixel(coord: coord, zoom: 20)
-        guard let newImage = drawRectangleOnImage(image: currentImage, atPoint: drawPoint) else {
-            debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
+        guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint) else {
+            debugPrint("Failed to draw into image")
             return false
         }
-        self.image = newImage
+//
+//        guard let newImage = imageFromContext(context: canvas) else {
+//            debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
+//            return false
+//        }
+//        guard let newImage = drawRectangleOnImage(image: currentImage, atPoint: drawPoint) else {
+//            debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
+//            return false
+//        }
+//        self.image = newImage
         return true
     }
     
+    func imageFromContext(context : CGContext) -> UIImage? {
+        guard let cgImage = context.makeImage() else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage, scale: 1, orientation: .downMirrored)
+    }
+    
+    func drawRowIntoContext(bitmapContext : CGContext, atPoint point : CGPoint) -> Bool {
+
+        bitmapContext.setStrokeColor(UIColor.gray.cgColor)
+        bitmapContext.setLineWidth(0.1)
+        
+        let partsWidth = CGFloat((120.0 / 54.0) / self.metersPerPixel) // / widthRatio.rounded(.up)).rounded(toPlaces: 4)
+        //            debugPrint("\(self):\(#function) partsWidth is \(partsWidth)")
+        let startX : CGFloat = point.x
+        for n in 0..<self.rowCount {
+            var color = UIColor.black.cgColor
+            if n % 2 == 0 {
+                color = UIColor.red.cgColor
+            }
+            bitmapContext.setFillColor(color)
+            let rect = CGRect(x: startX + (partsWidth * CGFloat(n)), y: point.y, width: partsWidth, height: partsWidth)
+            bitmapContext.fill(rect)
+        }
+        return true
+    }
     
     func drawRectangleOnImage(image : UIImage, atPoint point : CGPoint) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: image.size)
