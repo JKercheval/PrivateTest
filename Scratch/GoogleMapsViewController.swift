@@ -85,14 +85,14 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         initializeMapTileLayer(imageServer: imageSource)
         
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
-        let nwMarker = GMSMarker(position: boundary.northWest)
-        let seMarker = GMSMarker(position: boundary.southEast)
-        let neMarker = GMSMarker(position: boundary.northEast)
-        let swMarker = GMSMarker(position: boundary.southWest)
-        nwMarker.map = self.gMapView
-        seMarker.map = self.gMapView
-        neMarker.map = self.gMapView
-        swMarker.map = self.gMapView
+//        let nwMarker = GMSMarker(position: boundary.northWest)
+//        let seMarker = GMSMarker(position: boundary.southEast)
+//        let neMarker = GMSMarker(position: boundary.northEast)
+//        let swMarker = GMSMarker(position: boundary.southWest)
+//        nwMarker.map = self.gMapView
+//        seMarker.map = self.gMapView
+//        neMarker.map = self.gMapView
+//        swMarker.map = self.gMapView
     }
         
     /*

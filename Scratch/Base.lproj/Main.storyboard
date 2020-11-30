@@ -129,6 +129,36 @@
             </objects>
             <point key="canvasLocation" x="-606" y="-672"/>
         </scene>
+        <!--Mapkit View Controller-->
+        <scene sceneID="5xo-fJ-CW4">
+            <objects>
+                <viewController id="KaG-YE-EIR" customClass="MapkitViewController" customModule="Scratch" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hEv-To-7nL">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="oCp-Xj-zMx">
+                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                            </mapView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="IUW-Eh-hT4"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="oCp-Xj-zMx" firstAttribute="bottom" secondItem="IUW-Eh-hT4" secondAttribute="bottom" id="LIv-cE-M4S"/>
+                            <constraint firstItem="oCp-Xj-zMx" firstAttribute="trailing" secondItem="IUW-Eh-hT4" secondAttribute="trailing" id="OQA-bI-h4x"/>
+                            <constraint firstItem="oCp-Xj-zMx" firstAttribute="top" secondItem="IUW-Eh-hT4" secondAttribute="top" id="eyz-US-Ed0"/>
+                            <constraint firstItem="oCp-Xj-zMx" firstAttribute="leading" secondItem="IUW-Eh-hT4" secondAttribute="leading" id="g03-mX-Zic"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="OpA-mt-CB9"/>
+                    <connections>
+                        <outlet property="mapView" destination="oCp-Xj-zMx" id="yZ6-qb-I5t"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AYo-kq-W91" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="61" y="-18"/>
+        </scene>
         <!--Google Maps View Controller-->
         <scene sceneID="aNd-EU-qFs">
             <objects>
@@ -253,10 +283,17 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyc-b4-6id">
-                                        <rect key="frame" x="20" y="106" width="91" height="30"/>
+                                        <rect key="frame" x="20" y="63" width="91" height="30"/>
                                         <state key="normal" title="Google Maps"/>
                                         <connections>
                                             <segue destination="JuP-8Z-8lW" kind="show" id="Jka-59-T6G"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ix5-mL-wOW">
+                                        <rect key="frame" x="24.5" y="106" width="82" height="30"/>
+                                        <state key="normal" title="Apple Maps"/>
+                                        <connections>
+                                            <segue destination="KaG-YE-EIR" kind="show" id="unr-8d-lPZ"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -266,8 +303,10 @@
                                     <constraint firstAttribute="width" constant="131" id="A18-X3-3di"/>
                                     <constraint firstItem="xXN-TE-HUq" firstAttribute="top" secondItem="apj-aB-275" secondAttribute="top" constant="20" id="Cjl-FY-RLT"/>
                                     <constraint firstItem="xXN-TE-HUq" firstAttribute="centerX" secondItem="apj-aB-275" secondAttribute="centerX" id="Gsg-vk-Hvs"/>
+                                    <constraint firstAttribute="bottom" secondItem="ix5-mL-wOW" secondAttribute="bottom" constant="20" id="WLY-hr-hTx"/>
+                                    <constraint firstItem="fyc-b4-6id" firstAttribute="centerY" secondItem="apj-aB-275" secondAttribute="centerY" id="dlL-S4-N8w"/>
                                     <constraint firstItem="fyc-b4-6id" firstAttribute="centerX" secondItem="apj-aB-275" secondAttribute="centerX" id="gjr-dh-eTm"/>
-                                    <constraint firstAttribute="bottom" secondItem="fyc-b4-6id" secondAttribute="bottom" constant="20" id="sK3-Cq-vPB"/>
+                                    <constraint firstItem="ix5-mL-wOW" firstAttribute="centerX" secondItem="apj-aB-275" secondAttribute="centerX" id="mua-rR-QUX"/>
                                 </constraints>
                             </view>
                         </subviews>

@@ -180,33 +180,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         }
         return img
     }
-    
-    func drawRectangleOnImage(image : UIImage, yLocation : CGFloat) -> UIImage? {
-        let rowCount : Int = 96
 
-        let renderer = UIGraphicsImageRenderer(size: image.size)
-        let img = renderer.image { ctx in
-            
-            ctx.cgContext.setStrokeColor(UIColor.gray.cgColor)
-            ctx.cgContext.setLineWidth(0.1)
-            
-            image.draw(at: CGPoint.zero)
-            let partsWidth = (image.size.width - 20) / CGFloat(rowCount)
-            let startX : CGFloat = 10.0
-            for n in 0..<rowCount {
-                var color = UIColor.yellow.cgColor
-                if n % 2 == 0 {
-                    color = UIColor.red.cgColor
-                }
-                ctx.cgContext.setFillColor(color)
-                let rect = CGRect(x: startX + (partsWidth * CGFloat(n)), y: yLocation, width: partsWidth, height: partsWidth)
-                ctx.cgContext.fill(rect)
-            }
-        }
-        return img
-    }
-
-    
     func addPreciseButton() {
         debugPrint("\(#function)")
         let preciseButton = UIButton(frame: CGRect.zero)

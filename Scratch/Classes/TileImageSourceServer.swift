@@ -30,6 +30,10 @@ struct TileCoordinate {
     var southEast : CLLocationCoordinate2D
 }
 
+struct MachineInfo {
+    var width : Double // meters
+    var rows : Int // number of rows on implement
+}
 
 /// This class handles all the code necessary to use on drawing surface, and create the tiles when
 /// needed.
@@ -46,7 +50,7 @@ class TileImageSourceServer {
     var plottingBitmapContext : CGContext?
     var tileBitmapContext : CGContext?
     var imageSize : CGSize = CGSize.zero
-    
+    var machineInfo : MachineInfo!
     
     /// Initialization method
     /// - Parameters:
@@ -59,6 +63,7 @@ class TileImageSourceServer {
         boundary = boundaryRect
         boundaryQuad = boundQuad
         sourceZoom = zoom
+        machineInfo = MachineInfo(width: 27.432, rows: 54)
         self.mapView = mapView
         self.metersPerPixel = getMetersPerPixel(coord: boundQuad.northWest, zoom: 20)
         // Get the distance in meters.
@@ -225,7 +230,7 @@ class TileImageSourceServer {
                 return nil
             }
 
-            let imageQuad = createImageQuad(tileLoc: tileLoc)
+            let imageQuad = createTileImageQuad(tileLoc: tileLoc, boundary: self.boundaryQuad)
             
             let nwImagePt = mapView.projection.point(for: imageQuad.northWest)
             let seImagePt = mapView.projection.point(for: imageQuad.southEast)
@@ -245,11 +250,11 @@ class TileImageSourceServer {
         }
     }
     
-    func createImageQuad(tileLoc : TileCoordinate) -> BoundaryQuad {
-        let northWestCorner : CLLocationCoordinate2D = createNorthWestQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
-        let northEastCorner : CLLocationCoordinate2D = createNorthEastQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
-        let southWestCorner : CLLocationCoordinate2D = createSouthWestQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
-        let southEastCorner : CLLocationCoordinate2D = createSouthEastQuadLocation(tileLoc: tileLoc, quad: self.boundaryQuad)
+    func createTileImageQuad(tileLoc : TileCoordinate, boundary : BoundaryQuad) -> BoundaryQuad {
+        let northWestCorner : CLLocationCoordinate2D = createNorthWestQuadLocation(tileLoc: tileLoc, quad: boundary)
+        let northEastCorner : CLLocationCoordinate2D = createNorthEastQuadLocation(tileLoc: tileLoc, quad: boundary)
+        let southWestCorner : CLLocationCoordinate2D = createSouthWestQuadLocation(tileLoc: tileLoc, quad: boundary)
+        let southEastCorner : CLLocationCoordinate2D = createSouthEastQuadLocation(tileLoc: tileLoc, quad: boundary)
         
         return BoundaryQuad(withCoordinates: northWestCorner, southEast: southEastCorner, northEast: northEastCorner, southWest: southWestCorner)
     }
@@ -294,41 +299,6 @@ class TileImageSourceServer {
         return img
     }
 
-//    func addTextToImage(text: String, inImage: UIImage, atPoint:CGPoint) -> UIImage? {
-//
-//        // Setup the font specific variables
-//        let textColor = UIColor.black
-//        let textFont = UIFont(name: "Helvetica Bold", size: 30)!
-//
-//        //Setups up the font attributes that will be later used to dictate how the text should be drawn
-//        let textFontAttributes = [
-//            NSAttributedString.Key.font: textFont,
-//            NSAttributedString.Key.foregroundColor: textColor,
-//        ]
-//
-//        // Create bitmap based graphics context
-//        UIGraphicsBeginImageContextWithOptions(inImage.size, false, 0.0)
-//
-//
-//        //Put the image into a rectangle as large as the original image.
-//        inImage.draw(in: CGRect(x: 0, y: 0, width: inImage.size.width, height: inImage.size.height))
-//
-//        // Our drawing bounds
-//        let drawingBounds = CGRect(x: 0.0, y: 0.0, width: inImage.size.width, height: inImage.size.height)
-//
-//        let textSize = text.size(withAttributes: [NSAttributedString.Key.font:textFont])
-//        let textRect = CGRect(x: drawingBounds.size.width/2 - textSize.width/2, y: drawingBounds.size.height/2 - textSize.height/2,
-//                              width: textSize.width, height: textSize.height)
-//
-//        text.draw(in: textRect, withAttributes: textFontAttributes)
-//
-//        // Get the image from the graphics context
-//        let newImag = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
-//
-//        return newImag
-//    }
-    
 }
 
 extension TileImageSourceServer {
@@ -360,16 +330,6 @@ extension TileImageSourceServer {
             debugPrint("Failed to draw into image")
             return false
         }
-//
-//        guard let newImage = imageFromContext(context: canvas) else {
-//            debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
-//            return false
-//        }
-//        guard let newImage = drawRectangleOnImage(image: currentImage, atPoint: drawPoint) else {
-//            debugPrint("\(self):\(#function) - FAILED TO DRAW NEW POINT")
-//            return false
-//        }
-//        self.image = newImage
         return true
     }
     
@@ -385,8 +345,8 @@ extension TileImageSourceServer {
         bitmapContext.setStrokeColor(UIColor.gray.cgColor)
         bitmapContext.setLineWidth(0.1)
         
-        let partsWidth = CGFloat((120.0 / 54.0) / self.metersPerPixel) // / widthRatio.rounded(.up)).rounded(toPlaces: 4)
-        //            debugPrint("\(self):\(#function) partsWidth is \(partsWidth)")
+        let partsWidth = CGFloat((self.machineInfo.width / Double(self.machineInfo.rows)) / self.metersPerPixel)
+//        debugPrint("\(self):\(#function) partsWidth is \(partsWidth)")
         let startX : CGFloat = point.x
         for n in 0..<self.rowCount {
             var color = UIColor.black.cgColor
@@ -398,30 +358,6 @@ extension TileImageSourceServer {
             bitmapContext.fill(rect)
         }
         return true
-    }
-    
-    func drawRectangleOnImage(image : UIImage, atPoint point : CGPoint) -> UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: image.size)
-        let img = renderer.image { ctx in
-            
-            ctx.cgContext.setStrokeColor(UIColor.gray.cgColor)
-            ctx.cgContext.setLineWidth(0.1)
-            
-            image.draw(at: CGPoint.zero)
-            let partsWidth = CGFloat((120.0 / 54.0) / self.metersPerPixel) // / widthRatio.rounded(.up)).rounded(toPlaces: 4)
-//            debugPrint("\(self):\(#function) partsWidth is \(partsWidth)")
-            let startX : CGFloat = point.x
-            for n in 0..<self.rowCount {
-                var color = UIColor.black.cgColor
-                if n % 2 == 0 {
-                    color = UIColor.red.cgColor
-                }
-                ctx.cgContext.setFillColor(color)
-                let rect = CGRect(x: startX + (partsWidth * CGFloat(n)), y: point.y, width: partsWidth, height: partsWidth)
-                ctx.cgContext.fill(rect)
-            }
-        }
-        return img
     }
 
 }
