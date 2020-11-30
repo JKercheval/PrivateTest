@@ -28,6 +28,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var gpsGenerator : FieldGpsGenerator!
     var drawingManager : DrawingManager!
     var imageSource : TileImageSourceServer?
+    let serialQueue = DispatchQueue(label: "com.queue.serial")
+    var stopWatch = Stopwatch()
     
     fileprivate func initializeMapTileLayer(imageServer : TileImageSourceServer?) {
         guard let server = imageServer else {
@@ -44,6 +46,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         super.viewDidLoad()
         PINMemoryCache.shared.removeAllObjects()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
         
         // Do any additional setup after loading the view.
         
@@ -60,6 +63,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         
         gMapView.delegate = self
         gMapView.mapType = .satellite
+        gMapView.setMinZoom(10, maxZoom: 20)
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
         
@@ -119,24 +123,37 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
      */
     @objc func ondidUpdateLocation(_ notification:Notification) {
         let coord = notification.object as! CLLocationCoordinate2D
-        DispatchQueue.global().async { [weak self] in
+        serialQueue.async { [weak self] in
             guard let strongSelf = self else {
                 return
             }
             strongSelf.drawingManager.zoom = strongSelf.currentZoom
-            if strongSelf.imageSource?.drawRow(at: coord) == true {
-                DispatchQueue.main.async {
-//                    debugPrint("\(strongSelf):\(#function) - Clearing cache")
-                    strongSelf.tileLayer.clearTileCache()
-                }
+            // Passing in Zoom only to help with caching, which is not yet complete and commented out
+            // in the TileImageSourceServer...
+            let _ = strongSelf.imageSource?.drawRow(at: coord, zoom: UInt(strongSelf.currentZoom))
+        }
+    }
+    
+    @objc func onDidUpdateRow(_ notification:Notification) {
+//        debugPrint("\(self)\(#function)")
+        if stopWatch.elapsedTimeInterval().seconds < 1 {
+            return
+        }
+        self.stopWatch.reset()
+        DispatchQueue.main.async { [weak self] in
+            guard let strongSelf = self else {
+                return
             }
+
+            strongSelf.tileLayer.clearTileCache()
         }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
         self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
-        gpsGenerator.step()
-//        gpsGenerator.start()
+        stopWatch.reset()
+//        gpsGenerator.step()
+        gpsGenerator.start()
     }
 
     @IBAction func onStopButtonSelected(_ sender: Any) {
@@ -214,5 +231,42 @@ extension GoogleMapsViewController {
         //    let bottomLeft = createInfoWindowContent(latLng: field.bottomLeft, zoom: 16)
 //        debugPrint("Pts are: \(topLeft), \(topRight), \(bottomRight)")
         return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
+    }
+}
+
+public struct Stopwatch {
+    private var startTime: TimeInterval
+    
+    /// Initialize with current time as start point.
+    public init() {
+        startTime = CACurrentMediaTime()
+    }
+    
+    /// Reset start point to current time
+    public mutating func reset() {
+        startTime = CACurrentMediaTime()
+    }
+    
+    /// Calculate elapsed time since initialization or last call to `reset()`.
+    ///
+    /// - returns: `NSTimeInterval`
+    public func elapsedTimeInterval() -> TimeInterval {
+        return CACurrentMediaTime() - startTime
+    }
+    
+    /// Get elapsed time in textual form.
+    ///
+    /// If elapsed time is less than a second, it will be rendered as milliseconds.
+    /// Otherwise it will be rendered as seconds.
+    ///
+    /// - returns: `String`
+    public func elapsedTimeString() -> String {
+        let interval = elapsedTimeInterval()
+        if interval < 1.0 {
+            return NSString(format:"%.1f ms", Double(interval * 1000)) as String
+        }
+        else {
+            return NSString(format:"%.2f s", Double(interval)) as String
+        }
     }
 }

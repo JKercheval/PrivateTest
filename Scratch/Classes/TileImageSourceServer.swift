@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import CoreLocation
 import GoogleMaps
+import PINCache
 
 class BoundaryQuad {
     var northWest : CLLocationCoordinate2D
@@ -25,6 +26,12 @@ class BoundaryQuad {
     }
 }
 
+struct TileCornerPoints {
+    var northWestTileOriginScreenPt : CGPoint
+    var southEastTileOriginScreenPt : CGPoint
+    var northWestImageOriginScreenPt : CGPoint
+}
+
 struct TileCoordinate {
     var northWest : CLLocationCoordinate2D
     var southEast : CLLocationCoordinate2D
@@ -34,6 +41,20 @@ struct MachineInfo {
     var width : Double // meters
     var rows : Int // number of rows on implement
 }
+
+// TODO: Caching started
+struct TileInfo {
+    var isDirty : Bool = false
+    var image : UIImage? = nil
+}
+typealias TileDictionary = [String : TileInfo]
+
+class TileCacheInfo {
+    var lastPlottedPoint : CLLocationCoordinate2D?
+    var tileCache : TileDictionary = TileDictionary()
+}
+// END CACHING STARTED code
+
 
 /// This class handles all the code necessary to use on drawing surface, and create the tiles when
 /// needed.
@@ -51,6 +72,9 @@ class TileImageSourceServer {
     var tileBitmapContext : CGContext?
     var imageSize : CGSize = CGSize.zero
     var machineInfo : MachineInfo!
+    var tileCachingInfo : TileCacheInfo = TileCacheInfo()
+    var currentPlottedRowZoomLevel : UInt = 0
+    
     
     /// Initialization method
     /// - Parameters:
@@ -109,24 +133,25 @@ class TileImageSourceServer {
         self.internalMapView.camera = newPosition
     }
     
-    func getOffsetPoint(with mapView : GMSMapView, tileLoc : TileCoordinate, from coord : CLLocationCoordinate2D) -> CGPoint {
+    
+    /// This method will get the offset for the portion of the image that will be contained in the tile.
+    /// - Parameters:
+    ///   - tileLoc: <#tileLoc description#>
+    ///   - coord: <#coord description#>
+    ///   - tileCorners: <#tileCorners description#>
+    /// - Returns: <#description#>
+    func getOffsetPoint(tileLoc : TileCoordinate, from coord : CLLocationCoordinate2D, tileCorners: TileCornerPoints) -> CGPoint {
         var drawPoint = CGPoint.zero
-        let northWestTileOriginScreenPt = mapView.projection.point(for: tileLoc.northWest)
-        let southEastTileOriginScreenPt = mapView.projection.point(for: tileLoc.southEast)
-        
-        let northWestImageOriginScreenPt = mapView.projection.point(for: self.boundaryQuad.northWest)
-//        debugPrint("\(self):\(#function) Image pt is: \(northWestImageOriginScreenPt)")
-        
         // translation
-        let tileWidth = southEastTileOriginScreenPt.x - northWestTileOriginScreenPt.x
-        let tileHeight = southEastTileOriginScreenPt.y - northWestTileOriginScreenPt.y
+        let tileWidth = tileCorners.southEastTileOriginScreenPt.x - tileCorners.northWestTileOriginScreenPt.x
+        let tileHeight = tileCorners.southEastTileOriginScreenPt.y - tileCorners.northWestTileOriginScreenPt.y
         
         // transformation
-        widthRatio = TileSize / tileWidth
-        hieghtRatio = TileSize / tileHeight
+        self.widthRatio = TileSize / tileWidth
+        self.hieghtRatio = TileSize / tileHeight
 
-        let xOffset = max(0, (northWestImageOriginScreenPt.x - northWestTileOriginScreenPt.x) * widthRatio)
-        let yOffset = max(0, (northWestImageOriginScreenPt.y - northWestTileOriginScreenPt.y) * hieghtRatio)
+        let xOffset = max(0, (tileCorners.northWestImageOriginScreenPt.x - tileCorners.northWestTileOriginScreenPt.x) * self.widthRatio)
+        let yOffset = max(0, (tileCorners.northWestImageOriginScreenPt.y - tileCorners.northWestTileOriginScreenPt.y) * self.hieghtRatio)
         
         drawPoint = CGPoint(x: xOffset, y: yOffset)
         return drawPoint
@@ -152,7 +177,16 @@ class TileImageSourceServer {
         return radiansToDegrees(radians: radiansBearing)
     }
 
-    func getCroppedImageRectForTile(gridSize : CGSize, tileLoc : TileCoordinate, zoom : UInt, offset : CGPoint) -> CGRect {
+    
+    /// Gets the rect that represents the the portion of the image that we will eventually display into the
+    /// tile.
+    /// - Parameters:
+    ///   - tileLoc: The northwest and southeast coordinates of the tile.
+    ///   - zoom: The zoom level
+    ///   - tileCorners: Contains the Northwest, Southeast corners of the the tile image, and the northwest corner point
+    ///   of the main image
+    /// - Returns: The CGRect of the image for the tile - a subimage of the main image.
+    func getCroppedImageRectForTile(tileLoc : TileCoordinate, zoom : UInt, tileCorners : TileCornerPoints) -> CGRect {
         
         let convertedSouthWestCorner = CLLocationCoordinate2D(latitude: tileLoc.southEast.latitude, longitude: tileLoc.northWest.longitude)
         let convertedNorthEastCorner = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: tileLoc.southEast.longitude)
@@ -167,16 +201,16 @@ class TileImageSourceServer {
         let northWestImageCornerLon = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: boundaryQuad.northWest.longitude)
         let northWestImageCornerLat = CLLocationCoordinate2D(latitude: boundaryQuad.northWest.latitude, longitude: tileLoc.northWest.longitude)
 
-        let xDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLon)// - offset.x
-        let yDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLat)// - offset.y
+        let xDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLon)
+        let yDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLat)
         
         let convertedXDistanceFromCorner = xDistanceFromCorner / self.metersPerPixel
         let convertedYDistanceFromCorner = yDistanceFromCorner / self.metersPerPixel
         var xPt : CGFloat = CGFloat(convertedXDistanceFromCorner)
         var yPt : CGFloat = CGFloat(convertedYDistanceFromCorner)
 
-        let imageCornerPt = self.mapView.projection.point(for: boundaryQuad.northWest)
-        let tileCornerPt = self.mapView.projection.point(for: tileLoc.northWest)
+        let imageCornerPt = tileCorners.northWestImageOriginScreenPt
+        let tileCornerPt = tileCorners.northWestTileOriginScreenPt
 
         let tileNWCornerLocation = CLLocation(latitude: tileLoc.northWest.latitude, longitude: tileLoc.northWest.longitude)
         let imageNWCornerLocationLon = CLLocation(latitude: northWestImageCornerLon.latitude, longitude: northWestImageCornerLon.longitude)
@@ -222,32 +256,67 @@ class TileImageSourceServer {
         return convertedRect
     }
 
+    
+    /// Get the UIImage that represents the tile at the given location
+    /// - Parameters:
+    ///   - tile: The tile grid point
+    ///   - tileLoc: The coordinates of the tile
+    ///   - zoom: The zoom level for the request.
+    /// - Returns: A UIImage that contains the actual tile image to be displayed.
     func getImageForTile(tile : CGPoint, tileLoc : TileCoordinate, zoom : UInt) -> UIImage? {
-        DispatchQueue.main.sync {
-            let boundaryForZoom : CGRect = getCoordRect(coordinateQuad: self.boundaryQuad, forZoomLevel: zoom)
-            if boundaryForZoom.contains(tile) == false {
-//                debugPrint("\(self):\(#function) tile not in boundary")
-                return nil
-            }
+        var tileCorners : TileCornerPoints = TileCornerPoints(northWestTileOriginScreenPt: CGPoint.zero, southEastTileOriginScreenPt: CGPoint.zero, northWestImageOriginScreenPt: CGPoint.zero)
 
-            let imageQuad = createTileImageQuad(tileLoc: tileLoc, boundary: self.boundaryQuad)
-            
-            let nwImagePt = mapView.projection.point(for: imageQuad.northWest)
-            let seImagePt = mapView.projection.point(for: imageQuad.southEast)
-
-            let imagePt = getOffsetPoint(with: self.mapView, tileLoc: tileLoc, from: self.boundaryQuad.northWest)
-            let imageRect = getCroppedImageRectForTile(gridSize: boundaryForZoom.size, tileLoc: tileLoc, zoom: zoom, offset: imagePt)
-            guard let cropped = getSubImageFromCanvas(bitmapContext: self.plottingBitmapContext, rect: imageRect) else {
-                debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
-                return nil
-            }
-            let drawSize = CGSize(width: (seImagePt.x - nwImagePt.x) * self.widthRatio, height: (seImagePt.y - nwImagePt.y) * self.hieghtRatio)
-            guard let retValue = createTileImage(imageFrom: cropped, startPt: imagePt, drawSize: drawSize, size: CGSize(width: TileSize, height: TileSize)) else {
-                debugPrint("\(self):\(#function) ERROR! No Image returned from createTileImage !!!")
-                return nil
-            }
-            return retValue
+        let gmsBounds = GMSCoordinateBounds(coordinate: tileLoc.northWest, coordinate: tileLoc.southEast)
+        var nwImagePt : CGPoint = CGPoint.zero
+        var seImagePt : CGPoint = CGPoint.zero
+        let boundaryForZoom : CGRect = getCoordRect(coordinateQuad: self.boundaryQuad, forZoomLevel: zoom)
+        if boundaryForZoom.contains(tile) == false {
+            return kGMSTileLayerNoTile
         }
+        let imageQuad = createTileImageQuad(tileLoc: tileLoc, boundary: self.boundaryQuad)
+        let tileKey = MBUtils.stringForCaching(withPoint: tile, zoomLevel: zoom)
+        
+//        var tileInfo :TileInfo = TileInfo()
+//        if let info = self.tileCachingInfo.tileCache[tileKey] {
+//            if let plottedPoint = self.tileCachingInfo.lastPlottedPoint {
+//                let seCoord = plottedPoint.locationWithBearing(bearingRadians: radians(degrees: 90), distanceMeters: self.machineInfo.width)
+//                if gmsBounds.contains(plottedPoint) == false && gmsBounds.contains(seCoord) == false {
+//                    debugPrint("\(self):\(#function) - Returning cached tile: \(tileKey)")
+//                    return info.image
+//                }
+//            }
+//            tileInfo = info
+//        }
+
+        // Handle all required projection calls now at one time to avoid being on the main thread as much as possible.
+        DispatchQueue.main.sync {
+            nwImagePt = mapView.projection.point(for: imageQuad.northWest)
+            seImagePt = mapView.projection.point(for: imageQuad.southEast)
+            
+            let northWestTileOriginScreenPt = mapView.projection.point(for: tileLoc.northWest)
+            let southEastTileOriginScreenPt = mapView.projection.point(for: tileLoc.southEast)
+            let northWestImageOriginScreenPt = mapView.projection.point(for: self.boundaryQuad.northWest)
+
+            tileCorners = TileCornerPoints(northWestTileOriginScreenPt: northWestTileOriginScreenPt, southEastTileOriginScreenPt: southEastTileOriginScreenPt, northWestImageOriginScreenPt: northWestImageOriginScreenPt)
+        }
+        
+        let imagePt = getOffsetPoint(tileLoc: tileLoc, from: self.boundaryQuad.northWest, tileCorners: tileCorners)
+        // Currently the getOffsetPoint calculates the current ratios and they are stored in a class variable
+        // TODO: Change this behavior
+        let drawSize = CGSize(width: (seImagePt.x - nwImagePt.x) * self.widthRatio, height: (seImagePt.y - nwImagePt.y) * self.hieghtRatio)
+
+        let imageRect = getCroppedImageRectForTile(tileLoc: tileLoc, zoom: zoom, tileCorners: tileCorners)
+        guard let cropped = getSubImageFromCanvas(bitmapContext: self.plottingBitmapContext, rect: imageRect) else {
+            debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
+            return nil
+        }
+        guard let retValue = createTileImage(imageFrom: cropped, startPt: imagePt, drawSize: drawSize, size: CGSize(width: TileSize, height: TileSize)) else {
+            debugPrint("\(self):\(#function) ERROR! No Image returned from createTileImage !!!")
+            return nil
+        }
+//        tileInfo.image = retValue
+//        self.tileCachingInfo.tileCache[tileKey] = tileInfo
+        return retValue
     }
     
     func createTileImageQuad(tileLoc : TileCoordinate, boundary : BoundaryQuad) -> BoundaryQuad {
@@ -313,9 +382,13 @@ extension TileImageSourceServer {
         return mpp * inchesPerMeter
     }
 
-    func drawRow(at coord : CLLocationCoordinate2D) -> Bool {
+    func drawRow(at coord : CLLocationCoordinate2D, zoom : UInt) -> Bool {
         // Our image size is currently the size of the rectangle defined by the field coordinates
         // So, take the current draw coordinates and calculate the offset from our topleft point.
+        if self.currentPlottedRowZoomLevel != zoom {
+            currentPlottedRowZoomLevel = zoom
+            self.tileCachingInfo.tileCache.removeAll()
+        }
         let horDistance = coord.distance(from: CLLocationCoordinate2D(latitude: coord.latitude, longitude: self.boundaryQuad.northWest.longitude))
         let verDistance = coord.distance(from: CLLocationCoordinate2D(latitude: self.boundaryQuad.northWest.latitude, longitude: coord.longitude))
         let verOffset = verDistance / self.metersPerPixel
@@ -330,7 +403,16 @@ extension TileImageSourceServer {
             debugPrint("Failed to draw into image")
             return false
         }
+        tileCachingInfo.lastPlottedPoint = coord
+        postRowDrawCompleteNotification()
         return true
+    }
+    
+    func postRowDrawCompleteNotification() -> Void {
+        DispatchQueue.main.async {
+            let notification = Notification(name: .didPlotRowNotification, object: nil, userInfo: nil)
+            NotificationQueue.default.enqueue(notification, postingStyle: .whenIdle, coalesceMask: .onName, forModes: nil)
+        }
     }
     
     func imageFromContext(context : CGContext) -> UIImage? {

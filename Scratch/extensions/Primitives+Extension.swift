@@ -18,6 +18,16 @@ extension CGContext {
     }
 }
 
+extension TimeInterval {
+    var milliseconds: Int {
+        return Int((truncatingRemainder(dividingBy: 1)) * 1000)
+    }
+    
+    var seconds: Int {
+        return Int(self) % 60
+    }
+}
+
 extension Float {
     var whole: Self { modf(self).0 }
     var fraction: Self { modf(self).1 }
