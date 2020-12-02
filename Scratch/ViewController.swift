@@ -9,6 +9,7 @@ import UIKit
 import Mapbox
 
 class MapboxMapViewImplementation: MapViewProtocol {
+    
     private var mapView : MGLMapView!
     private var parentView : UIView!
     
@@ -77,6 +78,8 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         
         imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
+        gpsGenerator.speed = 6.0 // mph
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -151,9 +154,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRow else {
             return
         }
-        
-//        debugPrint("\(#function) - CLLocationCoordinate2D is: \(plottedRow.coord), heading is: \(plottedRow.heading)")
-
         serialQueue.async { [weak self] in
             guard let strongSelf = self else {
                 return

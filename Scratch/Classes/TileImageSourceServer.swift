@@ -374,7 +374,7 @@ class TileImageSourceServer {
     ///   - startPt: CGPoint of where we will draw in the cropped image.
     ///   - drawSize: CGSize of the cropped image.
     ///   - size: CGSize of the tile image.
-    /// - Returns: <#description#>
+    /// - Returns: UIImage for the currrent tile
     func createTileImage(imageFrom : UIImage, startPt : CGPoint, drawSize : CGSize, size: CGSize) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: size)
         let img = renderer.image { ctx in
@@ -433,7 +433,7 @@ extension TileImageSourceServer {
             // get the distance between the rows
             drawHeight = coord.distance(from: lastRow) / mpp
         }
-//        debugPrint("Draw Height is: \(drawHeight)")
+//        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint, metersPerPixel: mpp, drawHeight: drawHeight, heading: radians(degrees: plottedRow.heading)) else {
             debugPrint("Failed to draw into image")
             return false

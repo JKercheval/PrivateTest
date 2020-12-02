@@ -15,10 +15,13 @@ import PINCache
 let TileSize : CGFloat = 512.0
 
 class GoogleMapViewImplementation: MapViewProtocol {
+    
     private var mapView : GMSMapView!
+
     init(mapView : GMSMapView) {
         self.mapView = mapView
     }
+    
     func point(for coord: CLLocationCoordinate2D) -> CGPoint {
         return mapView.projection.point(for: coord)
     }
@@ -76,7 +79,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         // Create a GMSCameraPosition that tells the map to display the
         // coordinate and zoom that we want
         let camera = GMSCameraPosition.camera(withLatitude: field.southWest.latitude, longitude: field.southWest.longitude, zoom: Float(currentZoom))
-        
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
         
         gMapView.delegate = self
@@ -84,7 +86,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 //        gMapView.settings.rotateGestures = false
         gMapView.mapType = .satellite
         gMapView.setMinZoom(10, maxZoom: 22)
-        
+
         mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
         
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
@@ -232,7 +234,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-        debugPrint("\(#function) - bearing is: \(position.bearing)")
+//        debugPrint("\(#function) - bearing is: \(position.bearing)")
         let nwPt = gMapView.projection.point(for: self.boundaryQuad.northWest)
         let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
         
@@ -243,7 +245,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             cheaterView.frame = frameRect
         }
         self.fieldView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
-        debugPrint("\(#function) - Frame is: \(frameRect)")
+//        debugPrint("\(#function) - Frame is: \(frameRect)")
         self.fieldView?.frame = frameRect
 //        debugPrint("\(#function) - PlottedRowView Frame is: \(self.fieldView?.frame)")
 //        debugPrint("\(#function) - PlottedRowView Bounds is: \(self.fieldView?.bounds)")

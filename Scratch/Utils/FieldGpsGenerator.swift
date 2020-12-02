@@ -14,7 +14,8 @@ class FieldGpsGenerator {
     var timer = Timer()
     private var fieldBoundary : Envelope = Envelope(minX: 0, maxX: 0, minY: 0, maxY: 0)
     private var currentLocation: CLLocationCoordinate2D = CLLocationCoordinate2D()
-    private var milesPerHourMeasurement = Measurement(value: 1, unit: UnitSpeed.milesPerHour)
+    // Default value for the MPH Measurement will be six...
+    private var milesPerHourMeasurement = Measurement(value: 6, unit: UnitSpeed.milesPerHour)
     private var currentHeading : Double = 0
     
     init(fieldBoundary : Envelope) {
