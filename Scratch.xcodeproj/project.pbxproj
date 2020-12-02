@@ -39,6 +39,8 @@
 		CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */; };
 		CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE1256F127300759A6F /* Primitives+Extension.swift */; };
 		CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */; };
+		CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF3B48725783D8800E55A2D /* PlottingImageCanvasProtocol.swift */; };
+		CCF3B48D25783DC200E55A2D /* PlottingImageCanvasImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCF3B48C25783DC200E55A2D /* PlottingImageCanvasImpl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +105,8 @@
 		CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		CCD73BE1256F127300759A6F /* Primitives+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Primitives+Extension.swift"; sourceTree = "<group>"; };
 		CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Extension.swift"; sourceTree = "<group>"; };
+		CCF3B48725783D8800E55A2D /* PlottingImageCanvasProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottingImageCanvasProtocol.swift; sourceTree = "<group>"; };
+		CCF3B48C25783DC200E55A2D /* PlottingImageCanvasImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottingImageCanvasImpl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,6 +226,7 @@
 		CC7817422556E48400137BE2 /* Scratch */ = {
 			isa = PBXGroup;
 			children = (
+				CCF3B48625783D6B00E55A2D /* Plotting */,
 				CC200E0025672B57001759EC /* Layers */,
 				CC8ED6D72565D69E000A1198 /* Classes */,
 				CC00103725658F1E00BAE4F9 /* extensions */,
@@ -269,6 +274,15 @@
 				CCBF6B302576AE38007EC9F3 /* PlotDrawingView.swift */,
 			);
 			path = Classes;
+			sourceTree = "<group>";
+		};
+		CCF3B48625783D6B00E55A2D /* Plotting */ = {
+			isa = PBXGroup;
+			children = (
+				CCF3B48725783D8800E55A2D /* PlottingImageCanvasProtocol.swift */,
+				CCF3B48C25783DC200E55A2D /* PlottingImageCanvasImpl.swift */,
+			);
+			path = Plotting;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -554,11 +568,13 @@
 			files = (
 				CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */,
 				CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */,
+				CCF3B48D25783DC200E55A2D /* PlottingImageCanvasImpl.swift in Sources */,
 				CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */,
 				CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */,
 				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,
+				CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */,
 				CC3FA6AA2568550D006BEB4B /* TileImageSourceServer.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,

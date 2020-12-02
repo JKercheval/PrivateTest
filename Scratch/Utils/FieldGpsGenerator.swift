@@ -85,8 +85,7 @@ class FieldGpsGenerator {
             }
         }
         // calculateCoordinateFrom(self.currentLocation, 0, 1)
-        let plottedRow = PlottedRow(plotCoord: nextLoc, rowValues: [])
-        plottedRow.heading = currentHeading
+        let plottedRow = PlottedRow(plotCoord: nextLoc, heading: currentHeading, rowValues: [])
         NotificationCenter.default.post(name: NSNotification.Name.didUpdateLocation, object: self, userInfo: ["plottedRow" : plottedRow])
         currentLocation = nextLoc
 //        debugPrint("\(#function) - new curent location is: \(currentLocation)")

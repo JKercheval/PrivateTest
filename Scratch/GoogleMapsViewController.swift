@@ -34,6 +34,9 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBOutlet weak var headingTextField: UITextField!
     @IBOutlet weak var stepperControl: UIStepper!
     
+    // Set this to True to see our Google Tile implementation at work.
+    var useGoogleTiles : Bool = false
+    
     var geoField : GeoJSONField?
     var gMapView : GMSMapView!
     var boundingRect : CGRect = CGRect.zero
@@ -47,7 +50,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var stopWatch = Stopwatch()
     var fieldView : PlotDrawingView?
     var cheaterView : UIView!
-    var boundaryQuad : BoundaryQuad!
+    var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : GoogleMapViewImplementation!
     
     
@@ -107,11 +110,13 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         }
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
-        boundaryQuad = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         
         imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
 
-//        initializeMapTileLayer(imageServer: imageSource)
+        if self.useGoogleTiles {
+            initializeMapTileLayer(imageServer: imageSource)
+        }
         
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
         gpsGenerator.speed = 6.0 // mph
@@ -136,20 +141,14 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
      // Pass the selected object to the new view controller.
      }
      */
-    
-    func getZoomLevel(map : GMSMapView) -> UInt {
-        let region = map.projection.visibleRegion()
-        let longitudeDelta = region.farRight.longitude - region.farLeft.longitude
-        let zoom = log2(360.0 * Double(map.bounds.size.width) / longitudeDelta) - 8
-        return UInt(zoom)
-    }
+
     
     /*
      Notes:
         Maintain ZBuffer of space for draw coordinates, when required hand off the section
      */
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRow else {
+        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRowInfoProtocol else {
             return
         }
         
@@ -175,17 +174,19 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     
     @objc func onDidUpdateRow(_ notification:Notification) {
 //        debugPrint("\(self)\(#function)")
-//        if stopWatch.elapsedTimeInterval().seconds < 1 {
-//            return
-//        }
-//        self.stopWatch.reset()
-//        DispatchQueue.main.async { [weak self] in
-//            guard let strongSelf = self else {
-//                return
-//            }
-//
-//            strongSelf.tileLayer.clearTileCache()
-//        }
+        if self.useGoogleTiles {
+            if stopWatch.elapsedTimeInterval().seconds < 1 {
+                return
+            }
+            self.stopWatch.reset()
+            DispatchQueue.main.async { [weak self] in
+                guard let strongSelf = self else {
+                    return
+                }
+                
+                strongSelf.tileLayer.clearTileCache()
+            }
+        }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
@@ -235,20 +236,19 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
 //        debugPrint("\(#function) - bearing is: \(position.bearing)")
-        let nwPt = gMapView.projection.point(for: self.boundaryQuad.northWest)
-        let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
-        
-        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
-        if self.fieldView == nil {
-            self.fieldView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
-            self.gMapView.addSubview(self.fieldView!)
-            cheaterView.frame = frameRect
+        if self.useGoogleTiles == false {
+            let nwPt = gMapView.projection.point(for: self.boundaryQuad.northWest)
+            let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
+            
+            let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+            if self.fieldView == nil {
+                self.fieldView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+                self.gMapView.addSubview(self.fieldView!)
+                cheaterView.frame = frameRect
+            }
+            self.fieldView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
+            self.fieldView?.frame = frameRect
         }
-        self.fieldView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
-//        debugPrint("\(#function) - Frame is: \(frameRect)")
-        self.fieldView?.frame = frameRect
-//        debugPrint("\(#function) - PlottedRowView Frame is: \(self.fieldView?.frame)")
-//        debugPrint("\(#function) - PlottedRowView Bounds is: \(self.fieldView?.bounds)")
 
         let zoomFloor = UInt(floor(position.zoom))
         let zoomCeil = UInt(ceil(position.zoom))

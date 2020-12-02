@@ -37,7 +37,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var layerIdentifier : String = ""
     var plottingView : PlotDrawingView?
     var imageSource : TileImageSourceServer?
-    var boundaryQuad : BoundaryQuad!
+    var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : MapboxMapViewImplementation!
     let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
     
@@ -74,7 +74,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
             return
         }
         let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
-        boundaryQuad = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         
         imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
@@ -151,7 +151,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRow else {
+        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRowInfoProtocol else {
             return
         }
         serialQueue.async { [weak self] in
