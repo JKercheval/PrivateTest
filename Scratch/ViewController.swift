@@ -8,6 +8,19 @@
 import UIKit
 import Mapbox
 
+class MapboxMapViewImplementation: MapViewProtocol {
+    private var mapView : MGLMapView!
+    private var parentView : UIView!
+    
+    init(mapView : MGLMapView, parent : UIView) {
+        self.mapView = mapView
+        self.parentView = parent
+    }
+    func point(for coord: CLLocationCoordinate2D) -> CGPoint {
+        return mapView.convert(coord, toPointTo: self.parentView)
+    }
+}
+
 class ViewController: UIViewController, MGLMapViewDelegate {
     @IBOutlet weak var mapView: UIView!
     @IBOutlet weak var startButton: UIButton!
@@ -21,11 +34,16 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var currentZoom : Double = 16.0
     var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
-
+    var plottingView : PlotDrawingView?
+    var imageSource : TileImageSourceServer?
+    var boundaryQuad : BoundaryQuad!
+    var mapViewImpl : MapboxMapViewImplementation!
+    let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
-        
+
         geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
         guard let field = geoField else {
             return
@@ -49,10 +67,15 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 //        mglMapView.showsUserLocation = true
         self.view.addSubview(mglMapView)
         self.view.insertSubview(mglMapView, belowSubview: startButton)
-        
+        mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.view)
+
         guard let envelope = geoField?.fieldEnvelope else {
             return
         }
+        let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
+        boundaryQuad = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        
+        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
     }
     
@@ -79,7 +102,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         style.removeSource(source)
         style.removeLayer(layer)
     }
-    
+        
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {
         guard let field = geoField else {
             return
@@ -88,6 +111,19 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         guard let centerPt = try? field.fieldEnvelope?.centroid() else {
             return
         }
+        
+        let nwPt = mapViewImpl.point(for: field.northWest)
+        let sePt = mapViewImpl.point(for: field.southEast)
+
+        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+        if self.plottingView == nil {
+            self.plottingView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+            self.mglMapView.addSubview(self.plottingView!)
+        }
+        self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
+        debugPrint("\(#function) - Frame is: \(frameRect)")
+        self.plottingView?.frame = frameRect
+        
         let centerLoc = CLLocationCoordinate2D(latitude: centerPt.y, longitude: centerPt.x)
         self.mglMapView.setCenter(centerLoc, zoomLevel: currentZoom, animated: false)
 
@@ -104,9 +140,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
             debugPrint("\(#function) - failed to get accuracy")
             return
         }
-//        mapView.setCenter(CLLocationCoordinate2D(latitude: 59.31, longitude: 18.06), zoomLevel: 9, animated: false)
-
-        
         if accuracySetting == .reducedAccuracy {
             addPreciseButton()
         } else {
@@ -115,26 +148,38 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     @objc func ondidUpdateLocation(_ notification:Notification) {
+        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRow else {
+            return
+        }
         
-        DispatchQueue.main.async { [weak self] in
-            guard let strongSelf = self, let mapView = strongSelf.mglMapView else {
+//        debugPrint("\(#function) - CLLocationCoordinate2D is: \(plottedRow.coord), heading is: \(plottedRow.heading)")
+
+        serialQueue.async { [weak self] in
+            guard let strongSelf = self else {
                 return
             }
-            let coord = notification.object as! CLLocationCoordinate2D
-            let thirtyInchesInMeters = 0.762
-            for n in stride(from: 25, through: 1, by: -1) {
-                let location = coord.locationWithBearing(bearingRadians: radians(degrees: 270), distanceMeters: (0.762 * 2) * Double(n))
-                let quad = location.quadRect(withDistance: thirtyInchesInMeters)
-                strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
-            }
-            let quad = coord.quadRect(withDistance: thirtyInchesInMeters)
-            strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
-            for n in 1...25 {
-                let location = coord.locationWithBearing(bearingRadians: radians(degrees: 90), distanceMeters: (0.762 * 2) * Double(n))
-                let quad = location.quadRect(withDistance: thirtyInchesInMeters)
-                strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
-            }
+            let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
         }
+
+//        DispatchQueue.main.async { [weak self] in
+//            guard let strongSelf = self, let mapView = strongSelf.mglMapView else {
+//                return
+//            }
+//            let coord = notification.object as! CLLocationCoordinate2D
+//            let thirtyInchesInMeters = 0.762
+//            for n in stride(from: 25, through: 1, by: -1) {
+//                let location = coord.locationWithBearing(bearingRadians: radians(degrees: 270), distanceMeters: (0.762 * 2) * Double(n))
+//                let quad = location.quadRect(withDistance: thirtyInchesInMeters)
+//                strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
+//            }
+//            let quad = coord.quadRect(withDistance: thirtyInchesInMeters)
+//            strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
+//            for n in 1...25 {
+//                let location = coord.locationWithBearing(bearingRadians: radians(degrees: 90), distanceMeters: (0.762 * 2) * Double(n))
+//                let quad = location.quadRect(withDistance: thirtyInchesInMeters)
+//                strongSelf.addQuadToShapeLayer(withMap: mapView, originalCoordinate: coord, coordinates: quad)
+//            }
+//        }
     }
     
     func addQuadToShapeLayer(withMap mapView : MGLMapView, originalCoordinate: CLLocationCoordinate2D, coordinates : [CLLocationCoordinate2D]) {
@@ -166,8 +211,35 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         
     }
     
+    func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {
+        //        debugPrint("\(#function)")
+        if let view = self.plottingView, let field = geoField {
+            let nwPt = mapViewImpl.point(for: field.northWest)
+            let sePt = mapViewImpl.point(for: field.southEast)
+            
+            let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+            
+            view.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
+            self.plottingView?.frame = frameRect
+        }
+    }
+
     func mapView(_ mapView: MGLMapView, regionDidChangeWith reason: MGLCameraChangeReason, animated: Bool) {
-        debugPrint("\(#function) - reason is: \(reason)")
+        guard let field = geoField else {
+            return
+        }
+        
+        let nwPt = mapViewImpl.point(for: field.northWest)
+        let sePt = mapViewImpl.point(for: field.southEast)
+
+        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+        if self.plottingView == nil {
+            self.plottingView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+            self.mglMapView.addSubview(self.plottingView!)
+        }
+        
+        self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
+        self.plottingView?.frame = frameRect
     }
     
     func createFirstImage(size: CGSize) -> UIImage {

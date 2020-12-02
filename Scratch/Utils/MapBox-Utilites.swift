@@ -83,6 +83,17 @@ class MBUtils {
         return pixelCoordinate
     }
     
+    class func getCoordRect(forZoomLevel zoom : UInt, northWest : CLLocationCoordinate2D,
+                            northEast : CLLocationCoordinate2D,
+                            southEast : CLLocationCoordinate2D) -> CGRect {
+        
+        let topLeft = createInfoWindowContent(latLng: northWest, zoom: zoom)
+        let topRight = createInfoWindowContent(latLng: northEast, zoom: zoom)
+        let bottomRight = createInfoWindowContent(latLng: southEast, zoom: zoom)
+        return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
+    }
+
+    
     /// Takes the CLLocationCoordinate2D for the location interested in and creates a CGPoint
     /// for the tile coordinate (coordinate in the grid): See
     /// https://developers.google.com/maps/documentation/javascript/examples/map-coordinates

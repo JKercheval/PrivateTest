@@ -14,10 +14,22 @@ import PINCache
 
 let TileSize : CGFloat = 512.0
 
+class GoogleMapViewImplementation: MapViewProtocol {
+    private var mapView : GMSMapView!
+    init(mapView : GMSMapView) {
+        self.mapView = mapView
+    }
+    func point(for coord: CLLocationCoordinate2D) -> CGPoint {
+        return mapView.projection.point(for: coord)
+    }
+}
+
 class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
+    @IBOutlet weak var headingTextField: UITextField!
+    @IBOutlet weak var stepperControl: UIStepper!
     
     var geoField : GeoJSONField?
     var gMapView : GMSMapView!
@@ -30,6 +42,11 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var imageSource : TileImageSourceServer?
     let serialQueue = DispatchQueue(label: "com.queue.serial")
     var stopWatch = Stopwatch()
+    var fieldView : PlotDrawingView?
+    var cheaterView : UIView!
+    var boundaryQuad : BoundaryQuad!
+    var mapViewImpl : GoogleMapViewImplementation!
+    
     
     fileprivate func initializeMapTileLayer(imageServer : TileImageSourceServer?) {
         guard let server = imageServer else {
@@ -47,6 +64,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         PINMemoryCache.shared.removeAllObjects()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
+        cheaterView = UIView(frame: CGRect.zero)
         
         // Do any additional setup after loading the view.
         
@@ -62,8 +80,13 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
         
         gMapView.delegate = self
+        gMapView.settings.allowScrollGesturesDuringRotateOrZoom = false
+//        gMapView.settings.rotateGestures = false
         gMapView.mapType = .satellite
-        gMapView.setMinZoom(10, maxZoom: 20)
+        gMapView.setMinZoom(10, maxZoom: 22)
+        
+        mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
+        
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
         
@@ -82,13 +105,15 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         }
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
-        let boundary = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        boundaryQuad = BoundaryQuad(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         
-        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundary, mapView: gMapView)
+        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
 
-        initializeMapTileLayer(imageServer: imageSource)
+//        initializeMapTileLayer(imageServer: imageSource)
         
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
+        gpsGenerator.speed = 6.0 // mph
+        self.headingTextField.text = "\(gpsGenerator.heading)"
 //        let nwMarker = GMSMarker(position: boundary.northWest)
 //        let seMarker = GMSMarker(position: boundary.southEast)
 //        let neMarker = GMSMarker(position: boundary.northEast)
@@ -122,7 +147,10 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         Maintain ZBuffer of space for draw coordinates, when required hand off the section
      */
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        let coord = notification.object as! CLLocationCoordinate2D
+        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRow else {
+            return
+        }
+        
         serialQueue.async { [weak self] in
             guard let strongSelf = self else {
                 return
@@ -130,27 +158,36 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             strongSelf.drawingManager.zoom = strongSelf.currentZoom
             // Passing in Zoom only to help with caching, which is not yet complete and commented out
             // in the TileImageSourceServer...
-            let _ = strongSelf.imageSource?.drawRow(at: coord, zoom: UInt(strongSelf.currentZoom))
+            let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
         }
+    }
+    @IBAction func onStepperValueChanged(_ sender: Any) {
+        guard let stepper = sender as? UIStepper else {
+            debugPrint("\(self)\(#function) Failed to get Stepper")
+            return
+        }
+        gpsGenerator.heading = Double(stepper.value)
+        self.headingTextField.text = "\(gpsGenerator.heading)"
+        debugPrint("\(self)\(#function) - Stepper value: \(stepper.value)")
     }
     
     @objc func onDidUpdateRow(_ notification:Notification) {
 //        debugPrint("\(self)\(#function)")
-        if stopWatch.elapsedTimeInterval().seconds < 1 {
-            return
-        }
-        self.stopWatch.reset()
-        DispatchQueue.main.async { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-
-            strongSelf.tileLayer.clearTileCache()
-        }
+//        if stopWatch.elapsedTimeInterval().seconds < 1 {
+//            return
+//        }
+//        self.stopWatch.reset()
+//        DispatchQueue.main.async { [weak self] in
+//            guard let strongSelf = self else {
+//                return
+//            }
+//
+//            strongSelf.tileLayer.clearTileCache()
+//        }
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
-        self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
+//        self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
         stopWatch.reset()
 //        gpsGenerator.step()
         gpsGenerator.start()
@@ -195,6 +232,22 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
+        debugPrint("\(#function) - bearing is: \(position.bearing)")
+        let nwPt = gMapView.projection.point(for: self.boundaryQuad.northWest)
+        let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
+        
+        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+        if self.fieldView == nil {
+            self.fieldView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+            self.gMapView.addSubview(self.fieldView!)
+            cheaterView.frame = frameRect
+        }
+        self.fieldView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
+        debugPrint("\(#function) - Frame is: \(frameRect)")
+        self.fieldView?.frame = frameRect
+//        debugPrint("\(#function) - PlottedRowView Frame is: \(self.fieldView?.frame)")
+//        debugPrint("\(#function) - PlottedRowView Bounds is: \(self.fieldView?.bounds)")
+
         let zoomFloor = UInt(floor(position.zoom))
         let zoomCeil = UInt(ceil(position.zoom))
         if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
@@ -216,7 +269,9 @@ extension GoogleMapsViewController {
         let geoJsonParser = GMUGeoJSONParser(url: url)
         geoJsonParser.parse()
         
+        let style = GMUStyle(styleID: "", stroke: UIColor.blue, fill: UIColor.white.withAlphaComponent(0.1), width: 1, scale: 1, heading: 1, anchor: CGPoint.zero, iconUrl: nil, title: nil, hasFill: true, hasStroke: false)
         let renderer = GMUGeometryRenderer(map: gMapView, geometries: geoJsonParser.features)
+        geoJsonParser.features.first?.style = style
         renderer.render()
     }
     
