@@ -9,20 +9,13 @@ import Foundation
 import GoogleMaps
 import PINCache
 
-protocol CWGMSTileLayerDelegate {
-    
-    func requestedZoomLevelChanged(with newZoom : UInt)
-}
-
 class CustomTileLayer: GMSTileLayer {
     var lastRequestedZoomLevel : UInt = 0
-    var delegate : CWGMSTileLayerDelegate?
-    var imageServer : TileImageSourceServer!
+    var imageServer : GoogleTileImageService!
     
-    init(imageServer : TileImageSourceServer) {
+    init(imageServer : GoogleTileImageService) {
         self.imageServer = imageServer
     }
-    
     
     /// requestTileForX:y:zoom:receiver: generates image tiles for GMSTileOverlay. It must be overridden
     /// by subclasses. The tile for the given |x|, |y| and |zoom| _must_ be later passed to |receiver|.
@@ -36,13 +29,6 @@ class CustomTileLayer: GMSTileLayer {
     ///   - zoom: zoom level for the tile
     ///   - receiver: GMSTileReceiver which is called when the tile is retreived.
     override func requestTileFor(x: UInt, y: UInt, zoom: UInt, receiver: GMSTileReceiver) {
-        if lastRequestedZoomLevel != zoom {
-            lastRequestedZoomLevel = zoom
-            guard let theDelegate = delegate else {
-                return
-            }
-            theDelegate.requestedZoomLevelChanged(with: lastRequestedZoomLevel)
-        }
         let tilePt = CGPoint(x: Int(x), y: Int(y))
         let northWest = MBUtils.topLeftCorner(with: tilePt, zoom)
         let southEast = MBUtils.topLeftCorner(with: CGPoint(x: tilePt.x + 1, y: tilePt.y + 1), zoom)

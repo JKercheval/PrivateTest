@@ -16,6 +16,7 @@ class FieldBoundaryCorners {
     var southEast : CLLocationCoordinate2D
     var northEast : CLLocationCoordinate2D
     var southWest : CLLocationCoordinate2D
+    private var gmsBoundary : GMSCoordinateBounds
 
     init(withCoordinates northWest : CLLocationCoordinate2D, southEast : CLLocationCoordinate2D,
          northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D) {
@@ -23,6 +24,11 @@ class FieldBoundaryCorners {
         self.southEast = southEast
         self.northEast = northEast
         self.southWest = southWest
+        gmsBoundary = GMSCoordinateBounds(coordinate: northWest, coordinate: southEast)
+    }
+    
+    func intersects(bounds : GMSCoordinateBounds) -> Bool {
+        return gmsBoundary.intersects(bounds)
     }
 }
 
@@ -42,42 +48,17 @@ struct MachineInfo {
     var rows : Int // number of rows on implement
 }
 
-// TODO: Caching started
-struct TileInfo {
-    var isDirty : Bool = false
-    var image : UIImage? = nil
-}
-typealias TileDictionary = [String : TileInfo]
-
-class TileCacheInfo {
-    var lastPlottedPoint : CLLocationCoordinate2D?
-    var tileCache : TileDictionary = TileDictionary()
-}
-// END CACHING STARTED code
-
-protocol MapViewProtocol {
-    func point(for coord : CLLocationCoordinate2D) -> CGPoint
-}
-
 /// This class handles all the code necessary to use on drawing surface, and create the tiles when
 /// needed.
-class TileImageSourceServer {
+class GoogleTileImageService {
 
-    let boundaryQuad : FieldBoundaryCorners
-    let sourceZoom : UInt // default to zoom level 20
+    let fieldBoundary : FieldBoundaryCorners
     var widthRatio : CGFloat = 0
     var hieghtRatio : CGFloat = 0
-    var metersPerPixel : Double = 1
-    var rowCount : Int = 54
 
     var mapView : MapViewProtocol!
-    var tileBitmapContext : CGContext?
-    var imageSize : CGSize = CGSize.zero
     var currentPlottedRowZoomLevel : UInt = 0
-    var lastPlottedRow : CLLocationCoordinate2D?
-    var lastDrawPt : CGPoint = CGPoint.zero
     var imageCanvas : PlottingImageCanvasProtocol!
-    
     
     /// Initialization method
     /// - Parameters:
@@ -86,34 +67,13 @@ class TileImageSourceServer {
     ///   - mapView: User Mode GMSMapView - this is the GMSMapView that represents what the user is actually seing on
     ///     the screen
     ///   - zoom: Zoom level which will be used to create default drawing surface.
-    init(with boundaryRect : CGRect, boundQuad : FieldBoundaryCorners, mapView : MapViewProtocol,  zoom : UInt = 20) {
+    init(with boundaryRect : CGRect, boundQuad : FieldBoundaryCorners, canvas : PlottingImageCanvasProtocol, mapView : MapViewProtocol,  zoom : UInt = 20) {
 
-        boundaryQuad = boundQuad
-        sourceZoom = zoom
+        fieldBoundary = boundQuad
         self.mapView = mapView
-        self.metersPerPixel = getMetersPerPixel(coord: boundQuad.northWest, zoom: 20)
-        // Get the distance in meters.
-        let widthDistance = boundaryQuad.northEast.distance(from: boundQuad.northWest)
-        let heightDistance = boundaryQuad.northWest.distance(from: boundQuad.southWest)
-
-        let imageWidth = widthDistance / self.metersPerPixel
-        let imageHeight = heightDistance / self.metersPerPixel
-
-        imageSize = CGSize(width: imageWidth, height: imageHeight)
-        imageCanvas = PlottingImageCanvasImpl(boundary: boundQuad, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54), mapView: mapView, zoomLevel: zoom)
+        imageCanvas = canvas
     }
         
-    var currentImage : UIImage? {
-        get {
-            return imageCanvas.currentImage
-//            guard let context = self.plottingBitmapContext,
-//                  let image = context.makeImage() else {
-//                return nil
-//            }
-//            return UIImage(cgImage: image)
-        }
-    }
-    
     /// This method will get the offset for the portion of the image that will be contained in the tile.
     /// - Parameters:
     ///   - tileLoc: TileCoordinate object that contains the Northwest and Southeast corners of the tile in CLLocationCoordinate@D
@@ -171,24 +131,25 @@ class TileImageSourceServer {
     /// - Returns: The CGRect of the image for the tile - a subimage of the main image.
     func getCroppedImageRectForTile(tileLoc : TileCoordinate, zoom : UInt, tileCorners : TileCornerPoints) -> CGRect {
         
+        let metersPerPixel = self.getMetersPerPixel(coord: tileLoc.northWest, zoom: 20)
         let convertedSouthWestCorner = CLLocationCoordinate2D(latitude: tileLoc.southEast.latitude, longitude: tileLoc.northWest.longitude)
         let convertedNorthEastCorner = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: tileLoc.southEast.longitude)
         
         let tileWidth = tileLoc.northWest.distance(from: convertedNorthEastCorner)
         let tileHeight = tileLoc.northWest.distance(from: convertedSouthWestCorner)
         
-        let convertedTileWidth = tileWidth / self.metersPerPixel
-        let convertedTileHeight = tileHeight / self.metersPerPixel
+        let convertedTileWidth = tileWidth / metersPerPixel
+        let convertedTileHeight = tileHeight / metersPerPixel
         
         // Distance from left edge of tile, to left edge of image
-        let northWestImageCornerLon = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: boundaryQuad.northWest.longitude)
-        let northWestImageCornerLat = CLLocationCoordinate2D(latitude: boundaryQuad.northWest.latitude, longitude: tileLoc.northWest.longitude)
+        let northWestImageCornerLon = CLLocationCoordinate2D(latitude: tileLoc.northWest.latitude, longitude: fieldBoundary.northWest.longitude)
+        let northWestImageCornerLat = CLLocationCoordinate2D(latitude: fieldBoundary.northWest.latitude, longitude: tileLoc.northWest.longitude)
 
         let xDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLon)
         let yDistanceFromCorner = tileLoc.northWest.distance(from: northWestImageCornerLat)
         
-        let convertedXDistanceFromCorner = xDistanceFromCorner / self.metersPerPixel
-        let convertedYDistanceFromCorner = yDistanceFromCorner / self.metersPerPixel
+        let convertedXDistanceFromCorner = xDistanceFromCorner / metersPerPixel
+        let convertedYDistanceFromCorner = yDistanceFromCorner / metersPerPixel
         var xPt : CGFloat = CGFloat(convertedXDistanceFromCorner)
         var yPt : CGFloat = CGFloat(convertedYDistanceFromCorner)
 
@@ -202,34 +163,34 @@ class TileImageSourceServer {
         let imageNWCornerLocationLat = CLLocation(latitude: northWestImageCornerLat.latitude, longitude: northWestImageCornerLat.longitude)
         let yBearing = getBearingBetweenTwoPoints(point1: tileNWCornerLocation, point2: imageNWCornerLocationLat)
         
-        var imageWidth = self.imageSize.width
-        var imageHeight = self.imageSize.height
+        var imageWidth = self.imageCanvas.imageSize.width
+        var imageHeight = self.imageCanvas.imageSize.height
         
         if imageCornerPt.x < tileCornerPt.x {
             
             if xBearing < 0.0 {
-                imageWidth = min(CGFloat(convertedTileWidth), self.imageSize.width - CGFloat(convertedXDistanceFromCorner))
+                imageWidth = min(CGFloat(convertedTileWidth), self.imageCanvas.imageSize.width - CGFloat(convertedXDistanceFromCorner))
             }
         }
         else {
             xPt = 0
-            if self.imageSize.width > CGFloat(convertedTileWidth - convertedXDistanceFromCorner) {
+            if self.imageCanvas.imageSize.width > CGFloat(convertedTileWidth - convertedXDistanceFromCorner) {
                 imageWidth = CGFloat(convertedTileWidth - convertedXDistanceFromCorner)
             }
         }
 
         if imageCornerPt.y < tileCornerPt.y {
             if yBearing.rounded() == 0.0 {
-                imageHeight = min(CGFloat(convertedTileHeight), self.imageSize.height - CGFloat(convertedYDistanceFromCorner))
+                imageHeight = min(CGFloat(convertedTileHeight), self.imageCanvas.imageSize.height - CGFloat(convertedYDistanceFromCorner))
             }
         }
         else {
             yPt = 0
             if yBearing.rounded() == 0.0 {
-                imageHeight = min(CGFloat(convertedTileHeight), self.imageSize.height - CGFloat(convertedYDistanceFromCorner))
+                imageHeight = min(CGFloat(convertedTileHeight), self.imageCanvas.imageSize.height - CGFloat(convertedYDistanceFromCorner))
             }
             else {
-                if self.imageSize.height > CGFloat(convertedTileHeight - convertedYDistanceFromCorner) {
+                if self.imageCanvas.imageSize.height > CGFloat(convertedTileHeight - convertedYDistanceFromCorner) {
                     imageHeight = CGFloat(convertedTileHeight - convertedYDistanceFromCorner)
                 }
             }
@@ -247,15 +208,19 @@ class TileImageSourceServer {
     ///   - zoom: The zoom level for the request.
     /// - Returns: A UIImage that contains the actual tile image to be displayed.
     func getImageForTile(tile : CGPoint, tileLoc : TileCoordinate, zoom : UInt) -> UIImage? {
-        var tileCorners : TileCornerPoints = TileCornerPoints(northWestTileOriginScreenPt: CGPoint.zero, southEastTileOriginScreenPt: CGPoint.zero, northWestImageOriginScreenPt: CGPoint.zero)
 
-        var nwImagePt : CGPoint = CGPoint.zero
-        var seImagePt : CGPoint = CGPoint.zero
-        let boundaryForZoom : CGRect = getCoordRect(coordinateQuad: self.boundaryQuad, forZoomLevel: zoom)
-        if boundaryForZoom.contains(tile) == false {
+        let gsmTileBoundary = GMSCoordinateBounds(coordinate: tileLoc.northWest, coordinate: tileLoc.southEast)
+        guard fieldBoundary.intersects(bounds: gsmTileBoundary) else {
             return kGMSTileLayerNoTile
         }
-        let imageQuad = createTileImageQuad(tileLoc: tileLoc, boundary: self.boundaryQuad)
+
+        var tileCorners : TileCornerPoints = TileCornerPoints(northWestTileOriginScreenPt: CGPoint.zero,
+                                                              southEastTileOriginScreenPt: CGPoint.zero,
+                                                              northWestImageOriginScreenPt: CGPoint.zero)
+        
+        var nwImagePt : CGPoint = CGPoint.zero
+        var seImagePt : CGPoint = CGPoint.zero
+        let imageQuad = createTileImageQuad(tileLoc: tileLoc, boundary: self.fieldBoundary)
 
         // Handle all required projection calls now at one time to avoid being on the main thread as much as possible.
         DispatchQueue.main.sync {
@@ -264,7 +229,7 @@ class TileImageSourceServer {
             
             let northWestTileOriginScreenPt = mapView.point(for: tileLoc.northWest)
             let southEastTileOriginScreenPt = mapView.point(for: tileLoc.southEast)
-            let northWestImageOriginScreenPt = mapView.point(for: self.boundaryQuad.northWest)
+            let northWestImageOriginScreenPt = mapView.point(for: self.fieldBoundary.northWest)
 
             tileCorners = TileCornerPoints(northWestTileOriginScreenPt: northWestTileOriginScreenPt, southEastTileOriginScreenPt: southEastTileOriginScreenPt, northWestImageOriginScreenPt: northWestImageOriginScreenPt)
         }
@@ -279,10 +244,6 @@ class TileImageSourceServer {
             debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
             return nil
         }
-//        guard let cropped = getSubImageFromCanvas(bitmapContext: self.plottingBitmapContext, rect: imageRect) else {
-//            debugPrint("\(self):\(#function) ERROR! No Image returned from crop !!!")
-//            return nil
-//        }
         guard let retValue = createTileImage(imageFrom: cropped, startPt: imagePt, drawSize: drawSize, size: CGSize(width: TileSize, height: TileSize)) else {
             debugPrint("\(self):\(#function) ERROR! No Image returned from createTileImage !!!")
             return nil
@@ -333,7 +294,7 @@ class TileImageSourceServer {
 
 }
 
-extension TileImageSourceServer {
+extension GoogleTileImageService {
     
     func getMetersPerPixel(coord : CLLocationCoordinate2D, zoom : UInt) -> Double {
         let mpp = (156543.03392 * cos(coord.latitude * Double.pi / 180) / pow(2, Double(zoom))).rounded(toPlaces: 4)

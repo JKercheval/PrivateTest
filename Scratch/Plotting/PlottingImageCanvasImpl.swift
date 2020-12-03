@@ -15,8 +15,10 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
     private var mapView : MapViewProtocol!
     private var machineInfo : MachineInfoProtocol!
     private var canvasZoom : UInt
+    private var canvasImageSize : CGSize = CGSize.zero
     private var metersPerPixel : Double = 0
     private var lastPlottedRow : PlottedRowInfoProtocol?
+
     var plottingBitmapContext : CGContext?
     
     init(boundary : FieldBoundaryCorners, machineInfo : MachineInfoProtocol,  mapView : MapViewProtocol,  zoomLevel : UInt = 20) {
@@ -33,8 +35,8 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         let imageWidth = widthDistance / self.metersPerPixel
         let imageHeight = heightDistance / self.metersPerPixel
         
-        let imageSize = CGSize(width: imageWidth, height: imageHeight)
-        self.plottingBitmapContext = createBitmapContext(size: imageSize)
+        self.canvasImageSize = CGSize(width: imageWidth, height: imageHeight)
+        self.plottingBitmapContext = createBitmapContext(size: canvasImageSize)
     }
     
     var currentImage: UIImage? {
@@ -45,6 +47,14 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return UIImage(cgImage: image)
     }
     
+    var imageSize: CGSize {
+        return self.canvasImageSize
+    }
+    
+    
+    /// Draws a row defined by the PlottedRowInfoProtocal
+    /// - Parameter plottedRow: PlottedRowInfoProtocol - contains the necessary information to draw a row
+    /// - Returns: Bool - true if successful, false otherwise
     func drawRow(with plottedRow : PlottedRowInfoProtocol) -> Bool {
         // Our image size is currently the size of the rectangle defined by the field coordinates
         // So, take the current draw coordinates and calculate the offset from our topleft point.
@@ -80,7 +90,15 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return true
     }
     
+    
+    /// Gets the subimage which is defined by the CGRect defined by the subImageRect
+    /// - Parameter subImageRect: CGRect of the image
+    /// - Returns: UIImage of the sub-image requested
     func getSubImageFromCanvas(with subImageRect: CGRect) -> UIImage? {
+        guard subImageRect.isEmpty == false else {
+            debugPrint("\(#function) - No CGRect defined, sub-image is invalid")
+            return nil
+        }
         guard let context = self.plottingBitmapContext else {
             return nil
         }

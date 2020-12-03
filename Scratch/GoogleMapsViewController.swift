@@ -34,8 +34,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBOutlet weak var headingTextField: UITextField!
     @IBOutlet weak var stepperControl: UIStepper!
     
-    // Set this to True to see our Google Tile implementation at work.
-    var useGoogleTiles : Bool = false
+    // Set this to 'true' to see our Google Tile implementation at work.
+    var useGoogleTiles : Bool = true
     
     var geoField : GeoJSONField?
     var gMapView : GMSMapView!
@@ -45,16 +45,17 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var tileLayer : CustomTileLayer!
     var gpsGenerator : FieldGpsGenerator!
     var drawingManager : DrawingManager!
-    var imageSource : TileImageSourceServer?
+    var imageSource : GoogleTileImageService?
     let serialQueue = DispatchQueue(label: "com.queue.serial")
     var stopWatch = Stopwatch()
     var fieldView : PlotDrawingView?
     var cheaterView : UIView!
     var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : GoogleMapViewImplementation!
+    var imageCanvas : PlottingImageCanvasProtocol!
     
     
-    fileprivate func initializeMapTileLayer(imageServer : TileImageSourceServer?) {
+    fileprivate func initializeMapTileLayer(imageServer : GoogleTileImageService?) {
         guard let server = imageServer else {
             return
         }
@@ -111,8 +112,8 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        
-        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54), mapView: mapViewImpl)
+        imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
 
         if self.useGoogleTiles {
             initializeMapTileLayer(imageServer: imageSource)
@@ -121,11 +122,11 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
         gpsGenerator.speed = 6.0 // mph
         self.headingTextField.text = "\(gpsGenerator.heading)"
-//        let nwMarker = GMSMarker(position: boundary.northWest)
+        let nwMarker = GMSMarker(position: boundaryQuad.southEast)
 //        let seMarker = GMSMarker(position: boundary.southEast)
 //        let neMarker = GMSMarker(position: boundary.northEast)
 //        let swMarker = GMSMarker(position: boundary.southWest)
-//        nwMarker.map = self.gMapView
+        nwMarker.map = self.gMapView
 //        seMarker.map = self.gMapView
 //        neMarker.map = self.gMapView
 //        swMarker.map = self.gMapView
@@ -242,7 +243,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             
             let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
             if self.fieldView == nil {
-                self.fieldView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+                self.fieldView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
                 self.gMapView.addSubview(self.fieldView!)
                 cheaterView.frame = frameRect
             }

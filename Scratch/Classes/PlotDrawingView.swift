@@ -13,17 +13,16 @@ import UIKit
 class PlotDrawingView: UIView {
     
     var imageView : UIImageView!
-    var imageSourceServer : TileImageSourceServer!
-    
+    var imageCanvas : PlottingImageCanvasProtocol!
     
     /// Convenience initializer that takes the frame and TileImageSourceServer; will set up the view to listen for updates
     /// to the plotting canvas
     /// - Parameters:
     ///   - frame: The frame rectangle for the view, measured in points. The origin of the frame is relative to the superview in which you plan to add it. This method uses the frame rectangle to set the center and bounds properties accordingly.
     ///   - imageServer: TileImageSourceServer which provides the image.
-    convenience init(frame: CGRect, imageServer: TileImageSourceServer) {
+    convenience init(frame: CGRect, canvas: PlottingImageCanvasProtocol) {
         self.init(frame: frame)
-        imageSourceServer = imageServer
+        self.imageCanvas = canvas
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
         debugPrint("\(self)\(#function)")
     }
@@ -52,7 +51,7 @@ class PlotDrawingView: UIView {
     /// - Parameter notification: Notification object
     @objc func onDidUpdateRow(_ notification:Notification) {
 //        debugPrint("\(self)\(#function)")
-        let plottingImage = self.imageSourceServer.currentImage
+        let plottingImage = self.imageCanvas.currentImage
         DispatchQueue.main.async {
             self.imageView.image = plottingImage
             self.imageView.setNeedsDisplay()

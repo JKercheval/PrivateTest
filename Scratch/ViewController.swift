@@ -36,9 +36,10 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
     var plottingView : PlotDrawingView?
-    var imageSource : TileImageSourceServer?
+    var imageSource : GoogleTileImageService?
     var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : MapboxMapViewImplementation!
+    var imageCanvas : PlottingImageCanvasProtocol!
     let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
     
     override func viewDidLoad() {
@@ -75,8 +76,10 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         }
         let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        
-        imageSource = TileImageSourceServer(with: boundsMaxZoom, boundQuad: boundaryQuad, mapView: mapViewImpl)
+        let machineInfo = MachineInfoProtocolImpl(with: 27.432, rowCount: 54)
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo, mapView: mapViewImpl, zoomLevel: 20)
+
+        imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
         gpsGenerator.speed = 6.0 // mph
 
@@ -120,7 +123,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 
         let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
         if self.plottingView == nil {
-            self.plottingView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
+            self.plottingView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
             self.mglMapView.addSubview(self.plottingView!)
         }
         self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
@@ -232,12 +235,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         let nwPt = mapViewImpl.point(for: field.northWest)
         let sePt = mapViewImpl.point(for: field.southEast)
 
-        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
-        if self.plottingView == nil {
-            self.plottingView = PlotDrawingView(frame: frameRect, imageServer: self.imageSource!)
-            self.mglMapView.addSubview(self.plottingView!)
-        }
-        
+        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))        
         self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
         self.plottingView?.frame = frameRect
     }
