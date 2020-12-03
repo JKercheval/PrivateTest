@@ -35,12 +35,12 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBOutlet weak var stepperControl: UIStepper!
     
     // Set this to 'true' to see our Google Tile implementation at work.
-    var useGoogleTiles : Bool = true
+    var useGoogleTiles : Bool = false
     
     var geoField : GeoJSONField?
     var gMapView : GMSMapView!
-    var boundingRect : CGRect = CGRect.zero
-    var tileMap : TileRectMap = TileRectMap()
+    var internalMapView : GMSMapView!
+
     var currentZoom : CGFloat = 16.0
     var tileLayer : CustomTileLayer!
     var gpsGenerator : FieldGpsGenerator!
@@ -48,9 +48,11 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var imageSource : GoogleTileImageService?
     let serialQueue = DispatchQueue(label: "com.queue.serial")
     var stopWatch = Stopwatch()
-    var fieldView : PlotDrawingView?
+//    var fieldView : PlotDrawingView?
+    var fieldView : LayerDrawingView?
     var cheaterView : UIView!
     var boundaryQuad : FieldBoundaryCorners!
+    var farmBoundary : FieldBoundaryCorners!
     var mapViewImpl : GoogleMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
     
@@ -66,6 +68,26 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         tileLayer.map = gMapView
     }
     
+    func initializeFarmBoundary() -> FieldBoundaryCorners {
+        var farmBoundary : GMSCoordinateBounds = GMSCoordinateBounds()
+        let plotE = GeoJSONField(fieldName: "FotF Plot E Boundary")
+        let plotA = GeoJSONField(fieldName: "FotF Plot A Boundary")
+        let plotD = GeoJSONField(fieldName: "FotF Plot D Boundary")
+        let plotC = GeoJSONField(fieldName: "FotF Plot C Boundary")
+        let plotF = GeoJSONField(fieldName: "FotF Plot F Boundary")
+        let plotB = GeoJSONField(fieldName: "FotF Plot B Boundary")
+        farmBoundary = GMSCoordinateBounds(coordinate: plotA.northWest, coordinate: plotA.southEast)
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotE.northWest, coordinate: plotE.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotD.northWest, coordinate: plotD.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotC.northWest, coordinate: plotC.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotF.northWest, coordinate: plotF.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotB.northWest, coordinate: plotB.southEast))
+        
+        let northWest = CLLocationCoordinate2D(latitude: farmBoundary.northEast.latitude, longitude: farmBoundary.southWest.longitude)
+        let southEast = CLLocationCoordinate2D(latitude: farmBoundary.southWest.latitude, longitude: farmBoundary.northEast.longitude)
+        let corners = FieldBoundaryCorners(withCoordinates: northWest, southEast: southEast, northEast: farmBoundary.northEast, southWest: farmBoundary.southWest)
+        return corners
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         PINMemoryCache.shared.removeAllObjects()
@@ -74,24 +96,30 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         cheaterView = UIView(frame: CGRect.zero)
         
         // Do any additional setup after loading the view.
-        
+        self.farmBoundary = initializeFarmBoundary()
         geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
         guard let field = geoField else {
             return
         }
+        
         // Do any additional setup after loading the view.
         // Create a GMSCameraPosition that tells the map to display the
         // coordinate and zoom that we want
         let camera = GMSCameraPosition.camera(withLatitude: field.southWest.latitude, longitude: field.southWest.longitude, zoom: Float(currentZoom))
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
         
+        // This is currently used to cheaat on map tile locations since I am currently using the mapview to find the coordinates
+        // of the tile corners for offsets in the Tile generator.
+        let internalCamera = GMSCameraPosition.camera(withLatitude: field.northWest.latitude, longitude: field.northWest.longitude, zoom: Float(20))
+        self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: internalCamera)
+
         gMapView.delegate = self
         gMapView.settings.allowScrollGesturesDuringRotateOrZoom = false
 //        gMapView.settings.rotateGestures = false
         gMapView.mapType = .satellite
         gMapView.setMinZoom(10, maxZoom: 22)
 
-        mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
+        mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
         
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
@@ -103,30 +131,24 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         let url = URL(fileURLWithPath: path)
         renderGeoJSON(withUrl: url)
         
-        boundingRect = getCoordRect(forZoomLevel: UInt(currentZoom))
-        tileMap.tileRectDictionary[UInt(currentZoom)] = boundingRect
-        debugPrint("\(#function) - Bounding tile rect is: \(boundingRect)")
-        guard let envelope = field.fieldEnvelope else {
-            return
-        }
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54), mapView: mapViewImpl)
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: boundaryQuad, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54))
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
 
         if self.useGoogleTiles {
             initializeMapTileLayer(imageServer: imageSource)
         }
         
-        gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
+        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
         gpsGenerator.speed = 6.0 // mph
         self.headingTextField.text = "\(gpsGenerator.heading)"
-        let nwMarker = GMSMarker(position: boundaryQuad.southEast)
-//        let seMarker = GMSMarker(position: boundary.southEast)
-//        let neMarker = GMSMarker(position: boundary.northEast)
-//        let swMarker = GMSMarker(position: boundary.southWest)
-        nwMarker.map = self.gMapView
+//        let nwMarker = GMSMarker(position: farmBoundary.northWest)
+//        let seMarker = GMSMarker(position: farmBoundary.southEast)
+//        let neMarker = GMSMarker(position: farmBoundary.northEast)
+//        let swMarker = GMSMarker(position: farmBoundary.southWest)
+//        nwMarker.map = self.gMapView
 //        seMarker.map = self.gMapView
 //        neMarker.map = self.gMapView
 //        swMarker.map = self.gMapView
@@ -184,7 +206,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
                 guard let strongSelf = self else {
                     return
                 }
-                
                 strongSelf.tileLayer.clearTileCache()
             }
         }
@@ -238,12 +259,13 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
 //        debugPrint("\(#function) - bearing is: \(position.bearing)")
         if self.useGoogleTiles == false {
-            let nwPt = gMapView.projection.point(for: self.boundaryQuad.northWest)
+            let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
             let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
             
             let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
             if self.fieldView == nil {
-                self.fieldView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
+//                self.fieldView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
+                self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas)
                 self.gMapView.addSubview(self.fieldView!)
                 cheaterView.frame = frameRect
             }
@@ -251,16 +273,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             self.fieldView?.frame = frameRect
         }
 
-        let zoomFloor = UInt(floor(position.zoom))
-        let zoomCeil = UInt(ceil(position.zoom))
-        if tileMap.tileRectDictionary.keys.contains(zoomCeil) == false {
-            let bounds = getCoordRect(forZoomLevel: zoomCeil)
-            tileMap.tileRectDictionary[zoomCeil] = bounds
-        }
-        if tileMap.tileRectDictionary.keys.contains(zoomFloor) == false {
-            let bounds = getCoordRect(forZoomLevel: zoomFloor)
-            tileMap.tileRectDictionary[zoomFloor] = bounds
-        }
         self.currentZoom = CGFloat(floor(position.zoom))
     }
 }

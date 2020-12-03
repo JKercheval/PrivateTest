@@ -59,6 +59,7 @@ class GoogleTileImageService {
     var mapView : MapViewProtocol!
     var currentPlottedRowZoomLevel : UInt = 0
     var imageCanvas : PlottingImageCanvasProtocol!
+    var currentTileZoom : UInt = 20
     
     /// Initialization method
     /// - Parameters:
@@ -213,6 +214,20 @@ class GoogleTileImageService {
         guard fieldBoundary.intersects(bounds: gsmTileBoundary) else {
             return kGMSTileLayerNoTile
         }
+        if self.currentTileZoom != zoom {
+            self.currentTileZoom = zoom
+            PINMemoryCache.shared.removeAllObjects()
+        }
+        
+        let tileKey = MBUtils.stringForCaching(withPoint: tile, zoomLevel: zoom)
+        if let tileImage = PINMemoryCache.shared.object(forKey: tileKey) as? UIImage {
+            if let lastBounds = self.imageCanvas.lastRowBound {
+                if gsmTileBoundary.intersects(lastBounds) == false {
+//                    debugPrint("\(#function) - Returning cached image for tile: \(tile)")
+                    return tileImage
+                }
+            }
+        }
 
         var tileCorners : TileCornerPoints = TileCornerPoints(northWestTileOriginScreenPt: CGPoint.zero,
                                                               southEastTileOriginScreenPt: CGPoint.zero,
@@ -248,6 +263,7 @@ class GoogleTileImageService {
             debugPrint("\(self):\(#function) ERROR! No Image returned from createTileImage !!!")
             return nil
         }
+        PINMemoryCache.shared.setObject(retValue, forKey: tileKey)
         return retValue
     }
     

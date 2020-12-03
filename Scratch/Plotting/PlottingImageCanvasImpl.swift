@@ -8,22 +8,22 @@
 import Foundation
 import UIKit
 import CoreLocation
+import GoogleMapsUtils
 
 class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
     private var fieldBoundary :FieldBoundaryCorners!
-    private var mapView : MapViewProtocol!
     private var machineInfo : MachineInfoProtocol!
     private var canvasZoom : UInt
     private var canvasImageSize : CGSize = CGSize.zero
     private var metersPerPixel : Double = 0
     private var lastPlottedRow : PlottedRowInfoProtocol?
+    private var lastRowBoundsDrawn : GMSCoordinateBounds?
 
     var plottingBitmapContext : CGContext?
     
-    init(boundary : FieldBoundaryCorners, machineInfo : MachineInfoProtocol,  mapView : MapViewProtocol,  zoomLevel : UInt = 20) {
+    init(boundary : FieldBoundaryCorners, machineInfo : MachineInfoProtocol,  zoomLevel : UInt = 20) {
         self.fieldBoundary = boundary
-        self.mapView = mapView
         self.canvasZoom = zoomLevel
         self.machineInfo = machineInfo
         self.metersPerPixel = getMetersPerPixel(coord: self.fieldBoundary.northWest, zoom: zoomLevel)
@@ -47,10 +47,27 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return UIImage(cgImage: image)
     }
     
+    var currentCGImage: CGImage? {
+        guard let context = self.plottingBitmapContext,
+              let image = context.makeImage() else {
+            return nil
+        }
+        return image
+    }
+    
+    var machineWidth: Double {
+        return self.machineInfo.machineWidth
+    }
+    
     var imageSize: CGSize {
         return self.canvasImageSize
     }
     
+    var lastRowBound: GMSCoordinateBounds? {
+        let bounds = self.lastRowBoundsDrawn
+        self.lastRowBoundsDrawn = nil
+        return bounds
+    }
     
     /// Draws a row defined by the PlottedRowInfoProtocal
     /// - Parameter plottedRow: PlottedRowInfoProtocol - contains the necessary information to draw a row
@@ -78,7 +95,14 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         if let lastRow = self.lastPlottedRow {
             // get the distance between the rows
             drawHeight = coord.distance(from: lastRow.plottingCoordinate) / mpp
+            if lastRowBoundsDrawn == nil {
+                lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: coord, coordinate: lastRow.plottingCoordinate)
+            }
+            else {
+                lastRowBoundsDrawn?.includingCoordinate(coord)
+            }
         }
+        
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         let radianHeading = radians(degrees: plottedRow.heading)
         guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint, metersPerPixel: mpp, drawHeight: drawHeight, heading: radianHeading) else {
@@ -86,7 +110,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
             return false
         }
         self.lastPlottedRow = plottedRow
-        postRowDrawCompleteNotification()
+        postRowDrawCompleteNotification(drawCoordinate: plottedRow)
         return true
     }
     
@@ -119,9 +143,9 @@ extension PlottingImageCanvasImpl {
     
     /// Post a notification that the row was plotted to the image...
     /// - Returns: Void
-    func postRowDrawCompleteNotification() -> Void {
+    func postRowDrawCompleteNotification(drawCoordinate : PlottedRowInfoProtocol) -> Void {
         DispatchQueue.main.async {
-            let notification = Notification(name: .didPlotRowNotification, object: nil, userInfo: nil)
+            let notification = Notification(name: .didPlotRowNotification, object: drawCoordinate, userInfo: nil)
             NotificationQueue.default.enqueue(notification, postingStyle: .whenIdle, coalesceMask: .onName, forModes: nil)
         }
     }
@@ -140,7 +164,10 @@ extension PlottingImageCanvasImpl {
         bitmapContext.setLineWidth(0.1)
         
         let partsWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
-        let startX : CGFloat = point.x
+        
+        // Starting point is the center of the implement, so we need to offset that soo that the starting point
+        // is actually to the left of that by half of the machine width.
+        let startX : CGFloat = point.x - ((partsWidth * CGFloat(machineInfo.numberOfRows)) / 2.0)
         
         // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state
         // when we are done.

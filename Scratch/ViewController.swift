@@ -77,10 +77,10 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         let machineInfo = MachineInfoProtocolImpl(with: 27.432, rowCount: 54)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo, mapView: mapViewImpl, zoomLevel: 20)
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
-        gpsGenerator = FieldGpsGenerator(fieldBoundary: envelope)
+        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
         gpsGenerator.speed = 6.0 // mph
 
     }
