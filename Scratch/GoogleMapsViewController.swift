@@ -51,12 +51,10 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var stopWatch = Stopwatch()
 
     var fieldView : LayerDrawingView?
-    var cheaterView : UIView!
-    var boundaryQuad : FieldBoundaryCorners!
+    var fieldBoundary : FieldBoundaryCorners!
     var farmBoundary : FieldBoundaryCorners!
     var mapViewImpl : GoogleMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
-    var originalZoom : CGFloat = 0
     
     fileprivate func initializeMapTileLayer(imageServer : GoogleTileImageService?) {
         guard let server = imageServer else {
@@ -69,32 +67,11 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         tileLayer.map = gMapView
     }
     
-    func initializeFarmBoundary() -> FieldBoundaryCorners {
-        var farmBoundary : GMSCoordinateBounds = GMSCoordinateBounds()
-        let plotE = GeoJSONField(fieldName: "FotF Plot E Boundary")
-        let plotA = GeoJSONField(fieldName: "FotF Plot A Boundary")
-        let plotD = GeoJSONField(fieldName: "FotF Plot D Boundary")
-        let plotC = GeoJSONField(fieldName: "FotF Plot C Boundary")
-        let plotF = GeoJSONField(fieldName: "FotF Plot F Boundary")
-        let plotB = GeoJSONField(fieldName: "FotF Plot B Boundary")
-        farmBoundary = GMSCoordinateBounds(coordinate: plotA.northWest, coordinate: plotA.southEast)
-        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotE.northWest, coordinate: plotE.southEast))
-        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotD.northWest, coordinate: plotD.southEast))
-        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotC.northWest, coordinate: plotC.southEast))
-        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotF.northWest, coordinate: plotF.southEast))
-        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotB.northWest, coordinate: plotB.southEast))
-        
-        let northWest = CLLocationCoordinate2D(latitude: farmBoundary.northEast.latitude, longitude: farmBoundary.southWest.longitude)
-        let southEast = CLLocationCoordinate2D(latitude: farmBoundary.southWest.latitude, longitude: farmBoundary.northEast.longitude)
-        let corners = FieldBoundaryCorners(withCoordinates: northWest, southEast: southEast, northEast: farmBoundary.northEast, southWest: farmBoundary.southWest)
-        return corners
-    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
-        cheaterView = UIView(frame: CGRect.zero)
         
         // Do any additional setup after loading the view.
         self.farmBoundary = initializeFarmBoundary()
@@ -111,17 +88,21 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
         // This is currently used to cheaat on map tile locations since I am currently using the mapview to find the coordinates
         // of the tile corners for offsets in the Tile generator.
-        let internalCamera = GMSCameraPosition.camera(withLatitude: field.northWest.latitude, longitude: field.northWest.longitude, zoom: Float(20))
-        self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: internalCamera)
 
         gMapView.delegate = self
         gMapView.settings.allowScrollGesturesDuringRotateOrZoom = false
-//        gMapView.settings.rotateGestures = false
         gMapView.mapType = .satellite
         gMapView.setMinZoom(Float(10), maxZoom: Float(20))
 
-//        mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
+        // Should we need to use the tiling version for any reason, we need to switch back to using the internal map view
         mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
+        if useGoogleTiles {
+            let internalCamera = GMSCameraPosition.camera(withLatitude: field.northWest.latitude, longitude: field.northWest.longitude, zoom: Float(20))
+            // this probably will have problems if the user rotates the device, but we are not actively
+            // updating the tiling solution.
+            self.internalMapView = GMSMapView.map(withFrame: UIScreen.screens.first!.bounds, camera: internalCamera)
+            mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
+        }
         
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         
@@ -133,24 +114,23 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         renderGeoJSON(for: "FotF Plot F Boundary")
 
 
-        let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
-        boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: boundaryQuad, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54))
-        imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
+        fieldBoundary = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
+        let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: fieldBoundary, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54))
+        imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: fieldBoundary, canvas: self.imageCanvas, mapView: mapViewImpl)
 
         if self.useGoogleTiles {
             initializeMapTileLayer(imageServer: imageSource)
         }
         
-        let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
-        let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
+        let nwPt = gMapView.projection.point(for: fieldBoundary.northWest)
+        let sePt = gMapView.projection.point(for: fieldBoundary.southEast)
         
         let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
-        originalZoom = currentZoom
         self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas, mapView: self.mapViewImpl)
         self.gMapView.addSubview(self.fieldView!)
 
-        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
+        gpsGenerator = FieldGpsGenerator(fieldBoundary: fieldBoundary)
         gpsGenerator.speed = 6.0 // mph
         self.headingTextField.text = "\(gpsGenerator.heading)"
 //        let nwMarker = GMSMarker(position: farmBoundary.northWest)
@@ -163,22 +143,9 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 //        swMarker.map = self.gMapView
     }
         
-    /*
-     // MARK: - Navigation
-     
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
-
     
-    /*
-     Notes:
-        Maintain ZBuffer of space for draw coordinates, when required hand off the section
-     */
+    /// Called when we have a new PlottedRow object
+    /// - Parameter notification: Notification that contains the PlottedRow info in the userInfo dictionary
     @objc func ondidUpdateLocation(_ notification:Notification) {
         guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRowInfoProtocol else {
             return
@@ -193,6 +160,10 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
         }
     }
+    
+    
+    /// The user pressed one of the stepper buttons
+    /// - Parameter sender: Should be the UIStepper
     @IBAction func onStepperValueChanged(_ sender: Any) {
         guard let stepper = sender as? UIStepper else {
             debugPrint("\(self)\(#function) Failed to get Stepper")
@@ -200,11 +171,12 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         }
         gpsGenerator.heading = Double(stepper.value)
         self.headingTextField.text = "\(gpsGenerator.heading)"
-        debugPrint("\(self)\(#function) - Stepper value: \(stepper.value)")
     }
     
+    
+    /// Used with the Google Tiles implementation, called after a row was drawn
+    /// - Parameter notification: Notification object
     @objc func onDidUpdateRow(_ notification:Notification) {
-//        debugPrint("\(self)\(#function)")
         if self.useGoogleTiles {
             if stopWatch.elapsedTimeInterval().seconds < 1 {
                 return
@@ -239,11 +211,12 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             // point in the LayerDrawingView class during init.
             let transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
 
-            let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
+            let nwPt = gMapView.projection.point(for: fieldBoundary.northWest)
             // get the distance in pixels using the coordinates so that we always have the correct
             // width for the view.
-            let meters = boundaryQuad.northWest.distance(from: boundaryQuad.northEast)
-            let distance = gMapView.projection.points(forMeters: meters, at: boundaryQuad.northWest)
+            let meters = fieldBoundary.northWest.distance(from: fieldBoundary.northEast)
+            // This method takes into account the current zoom level which is why we can always use this.
+            let distance = gMapView.projection.points(forMeters: meters, at: fieldBoundary.northWest)
 
             // Set up the frame with the new coordinate for origin, and the size based on x distance and aspect ratio
             let frameRect = CGRect(origin: nwPt, size: CGSize(width: distance, height: distance * view.aspectRatio))
@@ -263,6 +236,27 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
 extension GoogleMapsViewController {
     
+    func initializeFarmBoundary() -> FieldBoundaryCorners {
+        var farmBoundary : GMSCoordinateBounds = GMSCoordinateBounds()
+        let plotE = GeoJSONField(fieldName: "FotF Plot E Boundary")
+        let plotA = GeoJSONField(fieldName: "FotF Plot A Boundary")
+        let plotD = GeoJSONField(fieldName: "FotF Plot D Boundary")
+        let plotC = GeoJSONField(fieldName: "FotF Plot C Boundary")
+        let plotF = GeoJSONField(fieldName: "FotF Plot F Boundary")
+        let plotB = GeoJSONField(fieldName: "FotF Plot B Boundary")
+        farmBoundary = GMSCoordinateBounds(coordinate: plotA.northWest, coordinate: plotA.southEast)
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotE.northWest, coordinate: plotE.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotD.northWest, coordinate: plotD.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotC.northWest, coordinate: plotC.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotF.northWest, coordinate: plotF.southEast))
+        farmBoundary = farmBoundary.includingBounds(GMSCoordinateBounds(coordinate: plotB.northWest, coordinate: plotB.southEast))
+        
+        let northWest = CLLocationCoordinate2D(latitude: farmBoundary.northEast.latitude, longitude: farmBoundary.southWest.longitude)
+        let southEast = CLLocationCoordinate2D(latitude: farmBoundary.southWest.latitude, longitude: farmBoundary.northEast.longitude)
+        let corners = FieldBoundaryCorners(withCoordinates: northWest, southEast: southEast, northEast: farmBoundary.northEast, southWest: farmBoundary.southWest)
+        return corners
+    }
+    
     func renderGeoJSON(for jsonFile : String) {
         guard let path = Bundle.main.path(forResource: jsonFile, ofType: "geojson") else {
             return
@@ -276,55 +270,5 @@ extension GoogleMapsViewController {
         let renderer = GMUGeometryRenderer(map: gMapView, geometries: geoJsonParser.features)
         geoJsonParser.features.first?.style = style
         renderer.render()
-    }
-    
-    func getCoordRect(forZoomLevel zoom : UInt) -> CGRect {
-        guard let field = geoField else {
-            return CGRect.zero
-        }
-        
-        let topLeft = MBUtils.createInfoWindowContent(latLng: field.northWest, zoom: zoom)
-        let topRight = MBUtils.createInfoWindowContent(latLng: field.northEast, zoom: zoom)
-        let bottomRight = MBUtils.createInfoWindowContent(latLng: field.southEast, zoom: zoom)
-        //    let bottomLeft = createInfoWindowContent(latLng: field.bottomLeft, zoom: 16)
-//        debugPrint("Pts are: \(topLeft), \(topRight), \(bottomRight)")
-        return CGRect(x: topLeft.x, y: topLeft.y, width: topRight.x - topLeft.x + 1, height: bottomRight.y - topRight.y + 1)
-    }
-}
-
-public struct Stopwatch {
-    private var startTime: TimeInterval
-    
-    /// Initialize with current time as start point.
-    public init() {
-        startTime = CACurrentMediaTime()
-    }
-    
-    /// Reset start point to current time
-    public mutating func reset() {
-        startTime = CACurrentMediaTime()
-    }
-    
-    /// Calculate elapsed time since initialization or last call to `reset()`.
-    ///
-    /// - returns: `NSTimeInterval`
-    public func elapsedTimeInterval() -> TimeInterval {
-        return CACurrentMediaTime() - startTime
-    }
-    
-    /// Get elapsed time in textual form.
-    ///
-    /// If elapsed time is less than a second, it will be rendered as milliseconds.
-    /// Otherwise it will be rendered as seconds.
-    ///
-    /// - returns: `String`
-    public func elapsedTimeString() -> String {
-        let interval = elapsedTimeInterval()
-        if interval < 1.0 {
-            return NSString(format:"%.1f ms", Double(interval * 1000)) as String
-        }
-        else {
-            return NSString(format:"%.2f s", Double(interval)) as String
-        }
     }
 }

@@ -130,8 +130,45 @@ class MBUtils {
         let yPt = CGFloat(Double(TileSize) * (0.5 - log((1 + siny) / (1 - siny)) / (4 * Double.pi)))
         return CGPoint(x: xPt, y: yPt)
     }
-
 }
+
+public struct Stopwatch {
+    private var startTime: TimeInterval
+    
+    /// Initialize with current time as start point.
+    public init() {
+        startTime = CACurrentMediaTime()
+    }
+    
+    /// Reset start point to current time
+    public mutating func reset() {
+        startTime = CACurrentMediaTime()
+    }
+    
+    /// Calculate elapsed time since initialization or last call to `reset()`.
+    ///
+    /// - returns: `NSTimeInterval`
+    public func elapsedTimeInterval() -> TimeInterval {
+        return CACurrentMediaTime() - startTime
+    }
+    
+    /// Get elapsed time in textual form.
+    ///
+    /// If elapsed time is less than a second, it will be rendered as milliseconds.
+    /// Otherwise it will be rendered as seconds.
+    ///
+    /// - returns: `String`
+    public func elapsedTimeString() -> String {
+        let interval = elapsedTimeInterval()
+        if interval < 1.0 {
+            return NSString(format:"%.1f ms", Double(interval * 1000)) as String
+        }
+        else {
+            return NSString(format:"%.2f s", Double(interval)) as String
+        }
+    }
+}
+
 
 class GeoJSONField {
   private var jsonData : Data?
