@@ -19,7 +19,6 @@
 		CC00103225658EF900BAE4F9 /* FotF Plot F Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102C25658EF900BAE4F9 /* FotF Plot F Boundary.geojson */; };
 		CC00103325658EF900BAE4F9 /* FotF Plot B Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */; };
 		CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */; };
-		CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1281D22567F96500773444 /* DrawinngManager.swift */; };
 		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
 		CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200E0125672B57001759EC /* CustomTileLayer.swift */; };
 		CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
@@ -79,7 +78,6 @@
 		CC00102C25658EF900BAE4F9 /* FotF Plot F Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot F Boundary.geojson"; sourceTree = "<group>"; };
 		CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot B Boundary.geojson"; sourceTree = "<group>"; };
 		CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
-		CC1281D22567F96500773444 /* DrawinngManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawinngManager.swift; sourceTree = "<group>"; };
 		CC200DF225671F98001759EC /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
 		CC200E0125672B57001759EC /* CustomTileLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTileLayer.swift; sourceTree = "<group>"; };
 		CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleTileImageService.swift; sourceTree = "<group>"; };
@@ -268,7 +266,6 @@
 			children = (
 				CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */,
 				CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */,
-				CC1281D22567F96500773444 /* DrawinngManager.swift */,
 				CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */,
 				CC8D85322575A72A0024A250 /* PlottedRow.swift */,
 				CCBF6B302576AE38007EC9F3 /* PlotDrawingView.swift */,
@@ -570,7 +567,6 @@
 				CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */,
 				CCF3B48D25783DC200E55A2D /* PlottingImageCanvasImpl.swift in Sources */,
 				CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */,
-				CC1281D32567F96500773444 /* DrawinngManager.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */,
 				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,

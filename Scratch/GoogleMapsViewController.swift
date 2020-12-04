@@ -8,9 +8,6 @@
 import UIKit
 import GoogleMaps
 import GoogleMapsUtils
-import PINCache
-//import UIScreenExtension - if we need to use this, then uncomment the Podfile line that
-// declares UIScreenExtension
 
 let TileSize : CGFloat = 512.0
 
@@ -49,7 +46,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var currentZoom : CGFloat = 16.0
     var tileLayer : CustomTileLayer!
     var gpsGenerator : FieldGpsGenerator!
-    var drawingManager : DrawingManager!
     var imageSource : GoogleTileImageService?
     let serialQueue = DispatchQueue(label: "com.queue.serial")
     var stopWatch = Stopwatch()
@@ -60,7 +56,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var farmBoundary : FieldBoundaryCorners!
     var mapViewImpl : GoogleMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
-    
+    var originalZoom : CGFloat = 0
     
     fileprivate func initializeMapTileLayer(imageServer : GoogleTileImageService?) {
         guard let server = imageServer else {
@@ -95,7 +91,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        PINMemoryCache.shared.removeAllObjects()
+
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
         cheaterView = UIView(frame: CGRect.zero)
@@ -112,7 +108,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         // coordinate and zoom that we want
         let camera = GMSCameraPosition.camera(withLatitude: field.southWest.latitude, longitude: field.southWest.longitude, zoom: Float(currentZoom))
         gMapView = GMSMapView.map(withFrame: self.view.frame, camera: camera)
-        
+
         // This is currently used to cheaat on map tile locations since I am currently using the mapview to find the coordinates
         // of the tile corners for offsets in the Tile generator.
         let internalCamera = GMSCameraPosition.camera(withLatitude: field.northWest.latitude, longitude: field.northWest.longitude, zoom: Float(20))
@@ -122,13 +118,12 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gMapView.settings.allowScrollGesturesDuringRotateOrZoom = false
 //        gMapView.settings.rotateGestures = false
         gMapView.mapType = .satellite
-        gMapView.setMinZoom(10, maxZoom: 22)
+        gMapView.setMinZoom(Float(10), maxZoom: Float(20))
 
 //        mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
         mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
         
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
-        self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
         
         renderGeoJSON(for: "FotF Plot E Boundary")
         renderGeoJSON(for: "FotF Plot A Boundary")
@@ -147,6 +142,14 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             initializeMapTileLayer(imageServer: imageSource)
         }
         
+        let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
+        let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
+        
+        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
+        originalZoom = currentZoom
+        self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas, mapView: self.mapViewImpl)
+        self.gMapView.addSubview(self.fieldView!)
+
         gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
         gpsGenerator.speed = 6.0 // mph
         self.headingTextField.text = "\(gpsGenerator.heading)"
@@ -185,7 +188,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             guard let strongSelf = self else {
                 return
             }
-            strongSelf.drawingManager.zoom = strongSelf.currentZoom
             // Passing in Zoom only to help with caching, which is not yet complete and commented out
             // in the TileImageSourceServer...
             let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
@@ -218,7 +220,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
-//        self.imageSource?.setCenterCoordinate(coord: gpsGenerator.startLocation)
         stopWatch.reset()
 //        gpsGenerator.step()
         gpsGenerator.start()
@@ -229,19 +230,31 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     }
 
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-//        debugPrint("\(#function) - bearing is: \(position.bearing)")
+
         if self.useGoogleTiles == false {
-            let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
-            let sePt = gMapView.projection.point(for: boundaryQuad.southEast)
-            
-            let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
-            if self.fieldView == nil {
-                self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas, mapView: self.mapViewImpl)
-                self.gMapView.addSubview(self.fieldView!)
-                cheaterView.frame = frameRect
+            guard let view = self.fieldView else {
+                return
             }
-            self.fieldView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
+            // this transform rotates out view around the top left edge, which has been set using an Anchor
+            // point in the LayerDrawingView class during init.
+            let transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-position.bearing)))
+
+            let nwPt = gMapView.projection.point(for: boundaryQuad.northWest)
+            // get the distance in pixels using the coordinates so that we always have the correct
+            // width for the view.
+            let meters = boundaryQuad.northWest.distance(from: boundaryQuad.northEast)
+            let distance = gMapView.projection.points(forMeters: meters, at: boundaryQuad.northWest)
+
+            // Set up the frame with the new coordinate for origin, and the size based on x distance and aspect ratio
+            let frameRect = CGRect(origin: nwPt, size: CGSize(width: distance, height: distance * view.aspectRatio))
+            if self.fieldView != nil {
+                self.gMapView.bringSubviewToFront(self.fieldView!)
+            }
+            // To set the frame of the UIView correctly, we first have to set the transform back to the identity
+            self.fieldView?.transform = CGAffineTransform.identity
             self.fieldView?.frame = frameRect
+            // now we set the transform to the rotated positiond
+            self.fieldView?.transform = transform
         }
 
         self.currentZoom = CGFloat(floor(position.zoom))

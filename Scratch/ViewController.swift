@@ -223,12 +223,14 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         //        debugPrint("\(#function)")
         if let view = self.plottingView, let field = geoField {
             let nwPt = mapViewImpl.point(for: field.northWest)
-            let sePt = mapViewImpl.point(for: field.southEast)
             
-            let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
-            
+            let meters = boundaryQuad.northWest.distance(from: boundaryQuad.northEast)
+            let distance = mapViewImpl.points(for: meters, at: boundaryQuad.northWest)
+
+            let frameRect = CGRect(origin: nwPt, size: CGSize(width: distance, height: distance * view.aspectRatio))
+            view.transform = CGAffineTransform.identity
+            view.frame = frameRect
             view.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
-            self.plottingView?.frame = frameRect
         }
     }
 

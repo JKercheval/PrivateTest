@@ -7,7 +7,6 @@
 
 import Foundation
 import GoogleMaps
-import PINCache
 
 class CustomTileLayer: GMSTileLayer {
     var lastRequestedZoomLevel : UInt = 0

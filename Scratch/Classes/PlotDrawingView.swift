@@ -13,6 +13,7 @@ class LayerDrawingView : UIView {
     var viewLayer : CGLayer!
     var imageCanvas : PlottingImageCanvasProtocol!
     var mapView : MapViewProtocol!
+    let aspectRatio : CGFloat
     
     /// Convenience initializer that takes the frame and TileImageSourceServer; will set up the view to listen for updates
     /// to the plotting canvas
@@ -28,9 +29,10 @@ class LayerDrawingView : UIView {
     }
     
     override init(frame: CGRect) {
+        self.aspectRatio = frame.height / frame.width
         super.init(frame: frame)
         debugPrint("\(self)\(#function)")
-        
+
         self.backgroundColor = UIColor.red.withAlphaComponent(0.07)
         self.borderColor = UIColor.black
         self.borderWidth = 1
