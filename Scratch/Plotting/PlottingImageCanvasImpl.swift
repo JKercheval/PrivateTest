@@ -21,6 +21,8 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
     private var lastRowBoundsDrawn : GMSCoordinateBounds?
 
     var plottingBitmapContext : CGContext?
+    var colorComponents : [CGFloat] = [CGFloat]()
+    var locations : [CGFloat] = [CGFloat]()
     
     init(boundary : FieldBoundaryCorners, machineInfo : MachineInfoProtocol,  zoomLevel : UInt = 20) {
         self.fieldBoundary = boundary
@@ -37,6 +39,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         
         self.canvasImageSize = CGSize(width: imageWidth, height: imageHeight)
         self.plottingBitmapContext = createBitmapContext(size: canvasImageSize)
+        createGradientInfo()
     }
     
     var currentImage: UIImage? {
@@ -77,12 +80,11 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         // So, take the current draw coordinates and calculate the offset from our topleft point.
 
         let coord = plottedRow.plottingCoordinate
-        
-        let mpp = getMetersPerPixel(coord: coord, zoom: 20)
+    
         let horDistance = coord.distance(from: CLLocationCoordinate2D(latitude: coord.latitude, longitude: self.fieldBoundary.northWest.longitude))
         let verDistance = coord.distance(from: CLLocationCoordinate2D(latitude: self.fieldBoundary.northWest.latitude, longitude: coord.longitude))
-        let verOffset = verDistance / mpp
-        let horOffset = horDistance / mpp
+        let verOffset = verDistance / self.metersPerPixel
+        let horOffset = horDistance / self.metersPerPixel
         
         let drawPoint = CGPoint(x: horOffset, y: verOffset)
         guard let canvas = self.plottingBitmapContext else {
@@ -91,10 +93,10 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         // This default value is taken directly from the knowledge of how often the GPS Generator is creating points - the 5 below
         // is from the fact that we are measuring distance in meters per second, and we are generating a new coordinate 5 times per
         // second.
-        var drawHeight = (Measurement(value: 6, unit: UnitSpeed.milesPerHour).converted(to: .metersPerSecond).value / 5) / mpp
+        var drawHeight = (Measurement(value: 6, unit: UnitSpeed.milesPerHour).converted(to: .metersPerSecond).value / 5) / self.metersPerPixel
         if let lastRow = self.lastPlottedRow {
             // get the distance between the rows
-            drawHeight = coord.distance(from: lastRow.plottingCoordinate) / mpp
+            drawHeight = coord.distance(from: lastRow.plottingCoordinate) / self.metersPerPixel
             if lastRowBoundsDrawn == nil {
                 lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: coord, coordinate: lastRow.plottingCoordinate)
             }
@@ -105,7 +107,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         let radianHeading = radians(degrees: plottedRow.heading)
-        guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint, metersPerPixel: mpp, drawHeight: drawHeight, heading: radianHeading) else {
+        guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint, rowValues: plottedRow.rowInfo, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, heading: radianHeading) else {
             debugPrint("Failed to draw into image")
             return false
         }
@@ -158,11 +160,12 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-    func drawRowIntoContext(bitmapContext : CGContext, atPoint point : CGPoint, metersPerPixel : Double, drawHeight : Double, heading : Double) -> Bool {
+    func drawRowIntoContext(bitmapContext : CGContext, atPoint point : CGPoint, rowValues : [CGFloat],  metersPerPixel : Double, drawHeight : Double, heading : Double) -> Bool {
         
+        assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
         bitmapContext.setStrokeColor(UIColor.black.cgColor)
         bitmapContext.setLineWidth(0.1)
-        
+
         let partsWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
         
         // Starting point is the center of the implement, so we need to offset that soo that the starting point
@@ -176,7 +179,6 @@ extension PlottingImageCanvasImpl {
         // calculate the rectangle of the whole section we are creating (all row rects created below) so that we can correctly
         // rotate the plotted row.
         let rect = CGRect(x: startX, y: point.y, width: CGFloat(self.machineInfo.machineWidth / metersPerPixel), height: CGFloat(drawHeight))
-        let path :CGMutablePath  = CGMutablePath();
         let midX : CGFloat = rect.midX;
         let midY : CGFloat = rect.midY
         let transfrom: CGAffineTransform =
@@ -184,19 +186,30 @@ extension PlottingImageCanvasImpl {
                 CGAffineTransform(translationX: midX, y: midY))
         
         // go through each planter row and create the rect and fill the color value in depending on what we are displaying...
-        for n in 0..<self.self.machineInfo.numberOfRows {
-            var color = UIColor.green.cgColor
-            if n % 2 == 0 {
-                color = UIColor.red.cgColor
-            }
-            bitmapContext.setFillColor(color)
-            
-            let rect = CGRect(x: startX + (partsWidth * CGFloat(n)), y: point.y, width: partsWidth, height: CGFloat(drawHeight))
+        for (index, value) in rowValues.enumerated() {
+            let path = CGMutablePath();
+
+            let rect = CGRect(x: startX + (partsWidth * CGFloat(index)), y: point.y, width: partsWidth, height: CGFloat(drawHeight))
             // add the small row rect in...
             path.addRect(rect, transform: transfrom)
+
+            let startPoint = CGPoint(x: rect.midX, y: rect.minY)
+            let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
             
             // Add the path again.
             bitmapContext.addPath(path)
+            bitmapContext.closePath()
+            bitmapContext.saveGState()
+            bitmapContext.clip()
+            let normalizedNumber : CGFloat = value.normalize(min: 0.15, max: 0.25, from: 0, to: 0.8)
+            let locations : [CGFloat] = [max(0, normalizedNumber - 0.2), normalizedNumber, min(normalizedNumber + 0.2, 1)]
+
+            if let colorSpace = bitmapContext.colorSpace,
+               let gradient = CGGradient(colorSpace: colorSpace, colorComponents: colorComponents, locations: locations, count: 3) {
+                bitmapContext.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
+            }
+
+            bitmapContext.restoreGState()
             // this will not only draw (fill) the path, but it also clears it.
             bitmapContext.fillPath()
         }
@@ -238,6 +251,30 @@ extension PlottingImageCanvasImpl {
         
         return bitmapContext
     }
+    
+    func createGradientInfo() {
+
+        let startColor = UIColor.green
+        guard let startColorComponents = startColor.cgColor.components else { return }
+
+        let secondColor = UIColor.yellow
+        guard let secondColorComponents = secondColor.cgColor.components else { return }
+
+        let endColor = UIColor.red
+        guard let endColorComponents = endColor.cgColor.components else { return }
+
+        self.colorComponents = [startColorComponents[0], startColorComponents[1], startColorComponents[2], startColorComponents[3],
+                                secondColorComponents[0], secondColorComponents[1], secondColorComponents[2], secondColorComponents[3],
+                                endColorComponents[0], endColorComponents[1], endColorComponents[2], endColorComponents[3]]
+    }
+    
+}
+extension CGFloat {
+    
+    func normalize(min: CGFloat, max: CGFloat, from a: CGFloat = 0, to b: CGFloat = 1) -> CGFloat {
+        return (b - a) * ((self - min) / (max - min)) + a
+    }
+    
 }
 
 class MachineInfoProtocolImpl : MachineInfoProtocol {

@@ -92,7 +92,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gMapView.delegate = self
         gMapView.settings.allowScrollGesturesDuringRotateOrZoom = false
         gMapView.mapType = .satellite
-        gMapView.setMinZoom(Float(10), maxZoom: Float(20))
+        gMapView.setMinZoom(Float(10), maxZoom: Float(21))
 
         // Should we need to use the tiling version for any reason, we need to switch back to using the internal map view
         mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
@@ -116,7 +116,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
         fieldBoundary = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: fieldBoundary, machineInfo: MachineInfoProtocolImpl(with: 27.432, rowCount: 54))
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: fieldBoundary, machineInfo: MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount))
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: fieldBoundary, canvas: self.imageCanvas, mapView: mapViewImpl)
 
         if self.useGoogleTiles {
@@ -147,7 +147,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     /// Called when we have a new PlottedRow object
     /// - Parameter notification: Notification that contains the PlottedRow info in the userInfo dictionary
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRowInfoProtocol else {
+        guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
         }
         

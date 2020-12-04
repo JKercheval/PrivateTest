@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import UIKit
 import CoreLocation
 
-typealias PlottedRowValues = Array<Double>
+typealias PlottedRowValues = Array<CGFloat>
 
 protocol PlottedRowInfoProtocol {
     var plottingCoordinate : CLLocationCoordinate2D { get }

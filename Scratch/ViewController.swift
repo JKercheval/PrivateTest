@@ -76,7 +76,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 
         let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        let machineInfo = MachineInfoProtocolImpl(with: 27.432, rowCount: 54)
+        let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
@@ -154,7 +154,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        guard let plottedRow = notification.userInfo?["plottedRow"] as? PlottedRowInfoProtocol else {
+        guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
         }
         serialQueue.async { [weak self] in

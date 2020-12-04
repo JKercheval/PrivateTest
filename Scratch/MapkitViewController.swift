@@ -28,7 +28,7 @@ class MapkitViewController: UIViewController, MKMapViewDelegate {
             return
         }
         fieldBoundary = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        let machineInfo = MachineInfoProtocolImpl(with: 27.432, rowCount: 54)
+        let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.fieldBoundary, machineInfo: machineInfo)
         self.plottingOverlay = PlottingMapOverlay(with: fieldBoundary)
         self.mapView.delegate = self
