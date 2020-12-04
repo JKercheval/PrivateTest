@@ -20,6 +20,11 @@ class MapboxMapViewImplementation: MapViewProtocol {
     func point(for coord: CLLocationCoordinate2D) -> CGPoint {
         return mapView.convert(coord, toPointTo: self.parentView)
     }
+    
+    func points(for meters: Double, at location: CLLocationCoordinate2D) -> CGFloat {
+        let metersPerPoint = mapView.metersPerPoint(atLatitude: location.latitude)
+        return CGFloat(meters / metersPerPoint)
+    }
 }
 
 class ViewController: UIViewController, MGLMapViewDelegate {
@@ -35,7 +40,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var currentZoom : Double = 16.0
     var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
-    var plottingView : PlotDrawingView?
+    var plottingView : LayerDrawingView?
     var imageSource : GoogleTileImageService?
     var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : MapboxMapViewImplementation!
@@ -123,7 +128,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 
         let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
         if self.plottingView == nil {
-            self.plottingView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
+            self.plottingView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas, mapView: self.mapViewImpl)
             self.mglMapView.addSubview(self.plottingView!)
         }
         self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))

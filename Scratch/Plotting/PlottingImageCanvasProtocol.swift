@@ -22,6 +22,7 @@ protocol PlottingImageCanvasProtocol {
 
 protocol MapViewProtocol {
     func point(for coord : CLLocationCoordinate2D) -> CGPoint
+    func points(for meters: Double, at location: CLLocationCoordinate2D) -> CGFloat
 }
 
 protocol MachineInfoProtocol {

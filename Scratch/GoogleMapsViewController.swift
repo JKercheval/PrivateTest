@@ -15,7 +15,7 @@ import PINCache
 let TileSize : CGFloat = 512.0
 
 class GoogleMapViewImplementation: MapViewProtocol {
-    
+
     private var mapView : GMSMapView!
 
     init(mapView : GMSMapView) {
@@ -25,6 +25,11 @@ class GoogleMapViewImplementation: MapViewProtocol {
     func point(for coord: CLLocationCoordinate2D) -> CGPoint {
         return mapView.projection.point(for: coord)
     }
+    
+    func points(for meters: Double, at location: CLLocationCoordinate2D) -> CGFloat {
+        return mapView.projection.points(forMeters: meters, at: location)
+    }
+
 }
 
 class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
@@ -48,7 +53,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     var imageSource : GoogleTileImageService?
     let serialQueue = DispatchQueue(label: "com.queue.serial")
     var stopWatch = Stopwatch()
-//    var fieldView : PlotDrawingView?
+
     var fieldView : LayerDrawingView?
     var cheaterView : UIView!
     var boundaryQuad : FieldBoundaryCorners!
@@ -119,18 +124,19 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gMapView.mapType = .satellite
         gMapView.setMinZoom(10, maxZoom: 22)
 
-        mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
+//        mapViewImpl = GoogleMapViewImplementation(mapView: internalMapView)
+        mapViewImpl = GoogleMapViewImplementation(mapView: gMapView)
         
         self.view.insertSubview(gMapView, belowSubview: self.startButton)
         self.drawingManager = DrawingManager(with: CGFloat(54.0 * (3.0/inchesPerMeter)), rowCount: 54, mapView: gMapView)
         
-        guard let path = Bundle.main.path(forResource: "FotF Plot E Boundary", ofType: "geojson") else {
-            return
-        }
-        
-        let url = URL(fileURLWithPath: path)
-        renderGeoJSON(withUrl: url)
-        
+        renderGeoJSON(for: "FotF Plot E Boundary")
+        renderGeoJSON(for: "FotF Plot A Boundary")
+        renderGeoJSON(for: "FotF Plot B Boundary")
+        renderGeoJSON(for: "FotF Plot C Boundary")
+        renderGeoJSON(for: "FotF Plot D Boundary")
+        renderGeoJSON(for: "FotF Plot F Boundary")
+
 
         let boundsMaxZoom = getCoordRect(forZoomLevel: UInt(20))
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
@@ -222,40 +228,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
         gpsGenerator.stop()
     }
 
-    /// Test method to add and remove markers for visual aid
-    @IBAction func onMarkersButtonSelected(_ sender: Any) {
-        struct StaticMarkerInfo {
-            static var selected = false
-            static var nwMarker : GMSMarker?
-            static var seMarker : GMSMarker?
-            static var currentLocMarker : GMSMarker?
-        }
-        let zoom = UInt(self.currentZoom)
-        let tilePt = MBUtils.createInfoWindowContent(latLng: gpsGenerator.startLocation, zoom: zoom)
-        let key = MBUtils.stringForCaching(withPoint: tilePt, zoomLevel: zoom)
-        guard let cachedTile = PINMemoryCache.shared.object(forKey: key) as? ICEMapTile else {
-            return
-        }
-
-        guard StaticMarkerInfo.selected else {
-            StaticMarkerInfo.selected = true
-            StaticMarkerInfo.nwMarker = GMSMarker(position: cachedTile.northWest)
-            StaticMarkerInfo.seMarker = GMSMarker(position: cachedTile.southEast)
-            StaticMarkerInfo.currentLocMarker = GMSMarker(position: gpsGenerator.startLocation)
-            StaticMarkerInfo.currentLocMarker?.map = self.gMapView
-            StaticMarkerInfo.seMarker?.map = self.gMapView
-            StaticMarkerInfo.nwMarker?.map = self.gMapView
-            return
-        }
-        StaticMarkerInfo.selected = false
-        StaticMarkerInfo.seMarker?.map = nil
-        StaticMarkerInfo.nwMarker?.map = nil
-        StaticMarkerInfo.currentLocMarker?.map = nil
-        StaticMarkerInfo.currentLocMarker = nil
-        StaticMarkerInfo.seMarker = nil
-        StaticMarkerInfo.nwMarker = nil
-    }
-
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
 //        debugPrint("\(#function) - bearing is: \(position.bearing)")
         if self.useGoogleTiles == false {
@@ -264,8 +236,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             
             let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))
             if self.fieldView == nil {
-//                self.fieldView = PlotDrawingView(frame: frameRect, canvas: self.imageCanvas)
-                self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas)
+                self.fieldView = LayerDrawingView(frame: frameRect, canvas: self.imageCanvas, mapView: self.mapViewImpl)
                 self.gMapView.addSubview(self.fieldView!)
                 cheaterView.frame = frameRect
             }
@@ -279,12 +250,16 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
 
 extension GoogleMapsViewController {
     
-    func renderGeoJSON(withUrl url : URL) {
+    func renderGeoJSON(for jsonFile : String) {
+        guard let path = Bundle.main.path(forResource: jsonFile, ofType: "geojson") else {
+            return
+        }
         
+        let url = URL(fileURLWithPath: path)
         let geoJsonParser = GMUGeoJSONParser(url: url)
         geoJsonParser.parse()
         
-        let style = GMUStyle(styleID: "", stroke: UIColor.blue, fill: UIColor.white.withAlphaComponent(0.1), width: 1, scale: 1, heading: 1, anchor: CGPoint.zero, iconUrl: nil, title: nil, hasFill: true, hasStroke: false)
+        let style = GMUStyle(styleID: "", stroke: UIColor.blue, fill: UIColor.white.withAlphaComponent(0.1), width: 1, scale: 1, heading: 1, anchor: CGPoint.zero, iconUrl: nil, title: nil, hasFill: true, hasStroke: true)
         let renderer = GMUGeometryRenderer(map: gMapView, geometries: geoJsonParser.features)
         geoJsonParser.features.first?.style = style
         renderer.render()
