@@ -15,14 +15,16 @@ protocol PlottedRowInfoProtocol {
     var plottingCoordinate : CLLocationCoordinate2D { get }
     var heading : Double { get }
     var rowInfo : PlottedRowValues { get }
+    var nextPlottedRow : PlottedRowInfoProtocol? { get set }
 }
 
 class PlottedRow : PlottedRowInfoProtocol {
-    
     private var plottedRowLocation : CLLocationCoordinate2D!
     private var rowInfoArr : PlottedRowValues!
     private var rowHeading : Double = 0
     
+    var nextPlottedRow: PlottedRowInfoProtocol?
+
     init(plotCoord : CLLocationCoordinate2D, heading : Double, rowValues : PlottedRowValues) {
         plottedRowLocation = plotCoord
         rowInfoArr = rowValues

@@ -35,6 +35,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var headingTextField: UITextField!
     @IBOutlet weak var stepperControl: UIStepper!
+    let plottingManager : PlottingManager = PlottingManager()
     
     // Set this to 'true' to see our Google Tile implementation at work.
     var useGoogleTiles : Bool = false
@@ -70,7 +71,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.newPlottedRow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
         
         // Do any additional setup after loading the view.
@@ -157,7 +158,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             }
             // Passing in Zoom only to help with caching, which is not yet complete and commented out
             // in the TileImageSourceServer...
-            let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
+            let _ = strongSelf.imageCanvas.drawRow(with: plottedRow)
         }
     }
     

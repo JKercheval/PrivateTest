@@ -15,7 +15,8 @@ func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
 extension Notification.Name {
-    static let didUpdateLocation = Notification.Name("didUpdateLocation")
+    static let newPlottedRow = Notification.Name("newPlottedRow")
+    static let plotNewRow = Notification.Name("plotNewRow")
     static let didPlotRowNotification = Notification.Name("didPlotRow")
 }
 

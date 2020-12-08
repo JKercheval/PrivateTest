@@ -76,7 +76,7 @@ class FieldGpsGenerator {
     func start() {
         debugPrint("\(self):\(#function) - Curent location is: \(currentLocation)")
         let plottedRow = createMockPlottedRow(coord: self.currentLocation, heading: self.currentHeading)
-        NotificationCenter.default.post(name: NSNotification.Name.didUpdateLocation, object: self, userInfo: [userInfoPlottedRowKey : plottedRow])
+        NotificationCenter.default.post(name: NSNotification.Name.newPlottedRow, object: self, userInfo: [userInfoPlottedRowKey : plottedRow])
         timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(updateNextCoord), userInfo: nil, repeats: true)
     }
     
@@ -102,7 +102,7 @@ class FieldGpsGenerator {
         }
         // calculateCoordinateFrom(self.currentLocation, 0, 1)
         let plottedRow = createMockPlottedRow(coord: nextLoc, heading: self.currentHeading)
-        NotificationCenter.default.post(name: NSNotification.Name.didUpdateLocation, object: self, userInfo: [userInfoPlottedRowKey : plottedRow])
+        NotificationCenter.default.post(name: NSNotification.Name.newPlottedRow, object: self, userInfo: [userInfoPlottedRowKey : plottedRow])
         currentLocation = nextLoc
 //        debugPrint("\(#function) - new curent location is: \(currentLocation)")
         if currentLocation.latitude > endLocation.latitude {

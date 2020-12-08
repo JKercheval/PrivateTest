@@ -272,7 +272,7 @@ class PlottedImageAnnotationView: MGLAnnotationView {
     imageView.frame = CGRect(origin: CGPoint(x: 0, y: 0), size: size)
     self.addSubview(imageView)
     
-    NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.didUpdateLocation, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.newPlottedRow, object: nil)
 
   }
   
