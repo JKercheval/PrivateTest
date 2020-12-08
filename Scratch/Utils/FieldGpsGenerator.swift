@@ -17,7 +17,7 @@ let userInfoPlottedRowKey = "plottedRow"
 class FieldGpsGenerator {
     var timer = Timer()
     private var fieldBoundary : FieldBoundaryCorners!
-    private var currentLocation: CLLocationCoordinate2D = CLLocationCoordinate2D()
+    var currentLocation: CLLocationCoordinate2D = CLLocationCoordinate2D()
     // Default value for the MPH Measurement will be six...
     private var milesPerHourMeasurement = Measurement(value: 6, unit: UnitSpeed.milesPerHour)
     private var currentHeading : Double = 0

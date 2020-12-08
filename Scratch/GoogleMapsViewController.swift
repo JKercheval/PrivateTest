@@ -23,7 +23,7 @@ class GoogleMapViewImplementation: MapViewProtocol {
         return mapView.projection.point(for: coord)
     }
     
-    func points(for meters: Double, at location: CLLocationCoordinate2D) -> CGFloat {
+    func points(forMeters meters: Double, at location: CLLocationCoordinate2D) -> CGFloat {
         return mapView.projection.points(forMeters: meters, at: location)
     }
 

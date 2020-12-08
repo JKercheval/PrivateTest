@@ -188,28 +188,36 @@ extension PlottingImageCanvasImpl {
         // go through each planter row and create the rect and fill the color value in depending on what we are displaying...
         for (index, value) in rowValues.enumerated() {
             let path = CGMutablePath();
-
+            var color = UIColor.green.cgColor
+            if value < 0.19 {
+                color = UIColor.yellow.cgColor
+            }
+            else if value > 0.21 {
+                color = UIColor.red.cgColor
+            }
+            bitmapContext.setFillColor(color)
+            bitmapContext.beginPath()
             let rect = CGRect(x: startX + (partsWidth * CGFloat(index)), y: point.y, width: partsWidth, height: CGFloat(drawHeight))
             // add the small row rect in...
             path.addRect(rect, transform: transfrom)
-
-            let startPoint = CGPoint(x: rect.midX, y: rect.minY)
-            let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
             
             // Add the path again.
             bitmapContext.addPath(path)
             bitmapContext.closePath()
-            bitmapContext.saveGState()
-            bitmapContext.clip()
-            let normalizedNumber : CGFloat = value.normalize(min: 0.15, max: 0.25, from: 0, to: 0.8)
-            let locations : [CGFloat] = [max(0, normalizedNumber - 0.2), normalizedNumber, min(normalizedNumber + 0.2, 1)]
-
-            if let colorSpace = bitmapContext.colorSpace,
-               let gradient = CGGradient(colorSpace: colorSpace, colorComponents: colorComponents, locations: locations, count: 3) {
-                bitmapContext.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
-            }
-
-            bitmapContext.restoreGState()
+            // An attempt at using a gradient... doesn't work on an angle.
+//            let startPoint = CGPoint(x: rect.midX, y: rect.minY)
+//            let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
+//            bitmapContext.saveGState()
+//            bitmapContext.clip()
+//            let normalizedNumber : CGFloat = value.normalize(min: 0.15, max: 0.25, from: 0, to: 0.8)
+//            let locations : [CGFloat] = [max(0, normalizedNumber - 0.2), normalizedNumber, min(normalizedNumber + 0.2, 1)]
+//
+//            if let colorSpace = bitmapContext.colorSpace,
+//               let gradient = CGGradient(colorSpace: colorSpace, colorComponents: colorComponents, locations: locations, count: 3) {
+//                bitmapContext.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
+//            }
+//
+//            bitmapContext.restoreGState()
             // this will not only draw (fill) the path, but it also clears it.
             bitmapContext.fillPath()
         }
@@ -217,6 +225,27 @@ extension PlottingImageCanvasImpl {
         bitmapContext.restoreGState()
         
         return true
+    }
+    
+    // rotates a point with a top left origin  around point pivot with 'degrees' in a clockwise fashion
+    func rotatePointAroundPivot(point : CGPoint, pivot : CGPoint, degrees : Double) -> CGPoint {
+        
+        var destPoint : CGPoint = CGPoint.zero
+        
+        // subtract pivot
+        let dx : Double = Double(point.x - pivot.x)
+        let dy : Double = Double(point.y - pivot.y)
+        
+        let angle : Double = radians(degrees: degrees)
+        
+        let s : Double = sin(angle);
+        let c : Double = cos(angle);
+        
+        // rotate around origin
+        destPoint.x = CGFloat(dx * c - dy * s) + pivot.x;
+        destPoint.y = CGFloat(dx * s + dy * c) + pivot.y;
+        
+        return destPoint;
     }
 
     /// Takes a coordinate and calculates the how many meters per pixel for current zoom.

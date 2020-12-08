@@ -74,7 +74,7 @@ class LayerDrawingView : UIView {
         // And where is this point in our view.
         let localPoint = self.convert(point, from: self.superview)
         // How many points does this implement span? (machineWidth is in meters)
-        let xPoints = mapView.points(for: self.imageCanvas.machineWidth, at: plottedRow.plottingCoordinate)
+        let xPoints = mapView.points(forMeters: self.imageCanvas.machineWidth, at: plottedRow.plottingCoordinate)
         
         // adjust the x and y to account for the width of the row draw (we just use the same value for height because
         // it may be drawn vertically).
