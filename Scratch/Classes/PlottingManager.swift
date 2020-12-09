@@ -21,6 +21,8 @@ class PlottingManager : PlottingManagerProtocol {
         NotificationCenter.default.addObserver(self, selector: #selector(onDidPlotRowRecieved(notification:)), name:.didPlotRowNotification, object: nil)
     }
     
+    /// This is called when we receive a new PlottedRowInfoProtocol from the system
+    /// - Parameter notification: Notification object containing the PlottedRowInfoProtocol
     @objc func onNewPlottedRowRecieved(notification : Notification) {
         guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
@@ -39,9 +41,12 @@ class PlottingManager : PlottingManagerProtocol {
         }
     }
     
+    
+    /// This is called when a plotted row has been drawn to the canvas.
+    /// - Parameter notification: Notification object containing the PlottedRowInfoProtocol
     @objc func onDidPlotRowRecieved(notification : Notification) {
-        guard let plottedRow = notification.object as? PlottedRowInfoProtocol else {
-            assert(notification.object != nil, "There was no object passed")
+        guard let plottedRow = notification.userInfo?[userInfoPlottedCoordinateKey] as? PlottedRowInfoProtocol else {
+            assert(notification.userInfo != nil, "There was no userInfo dictionary passed")
             return
         }
 
@@ -56,6 +61,8 @@ class PlottingManager : PlottingManagerProtocol {
         }
     }
     
+    
+    /// Called when we are resetting our plotting for any reason.
     func reset() {
         serialQueue.sync {
             self.plottedRowsArray.removeAll()

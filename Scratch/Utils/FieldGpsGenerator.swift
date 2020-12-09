@@ -12,7 +12,6 @@ import GEOSwift
 let defaultMachineWidth : Double = 120 // feet
 let defaultMachineWidthMeters : Double = 27.432
 let defaultRowCount : UInt = 54
-let userInfoPlottedRowKey = "plottedRow"
 
 class FieldGpsGenerator {
     var timer = Timer()

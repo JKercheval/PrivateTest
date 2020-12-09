@@ -1,5 +1,5 @@
 //
-//  PlotDrawingView.swift
+//  LayerDrawingView.swift
 //  Scratch
 //
 //  Created by Jeremy Kercheval on 12/1/20.
@@ -44,6 +44,11 @@ class LayerDrawingView : UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    /// The main draw method that just blits the image from the ImageCanvas into the layer.
+    /// - Parameters:
+    ///   - layer: CALayer which the drawing will go into.
+    ///   - ctx: CGContext to use
     override func draw(_ layer: CALayer, in ctx: CGContext) {
         super.draw(layer, in: ctx)
         // account for the cgImage being flipped.
@@ -59,12 +64,15 @@ class LayerDrawingView : UIView {
         ctx.draw(image, in: layer.bounds)
     }
     
+    
+    /// This is the Notification message method that is called when a didPlotRowNotification message is posted.
+    /// - Parameter notification: Notification object that contains the PlottedRowInfoProtocol object.
     @objc func onDidUpdateRow(_ notification:Notification) {
 
         // get the plotted row object - if there is no plotted point then there is a problem
         // TODO: Currently we are just passing the PlottedRowInfoProtocol in the object for the
         // notification, but it should be put in the dictionary.
-        guard let plottedRow = notification.object as? PlottedRowInfoProtocol else {
+        guard let plottedRow = notification.userInfo?[userInfoPlottedCoordinateKey] as? PlottedRowInfoProtocol else {
             assert(notification.object != nil, "There was no object passed")
             return
         }

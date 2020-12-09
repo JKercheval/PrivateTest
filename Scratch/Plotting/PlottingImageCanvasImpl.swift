@@ -183,7 +183,7 @@ extension PlottingImageCanvasImpl {
     /// - Returns: Void
     func postRowDrawCompleteNotification(drawCoordinate : PlottedRowInfoProtocol) -> Void {
         DispatchQueue.main.async {
-            let notification = Notification(name: .didPlotRowNotification, object: drawCoordinate, userInfo: nil)
+            let notification = Notification(name: .didPlotRowNotification, object: self, userInfo: [userInfoPlottedCoordinateKey : drawCoordinate])
             NotificationQueue.default.enqueue(notification, postingStyle: .whenIdle, coalesceMask: .onName, forModes: nil)
         }
     }

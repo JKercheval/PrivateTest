@@ -14,6 +14,9 @@ let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
 func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
+let userInfoPlottedCoordinateKey = "PlottedCoordinate"
+let userInfoPlottedRowKey = "plottedRow"
+
 extension Notification.Name {
     static let newPlottedRow = Notification.Name("newPlottedRow")
     static let plotNewRow = Notification.Name("plotNewRow")

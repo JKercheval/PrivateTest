@@ -85,6 +85,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
         gpsGenerator.speed = 6.0 // mph
+        self.headingTextField.text = "\(gpsGenerator.heading)"
 
     }
     
