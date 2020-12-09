@@ -210,32 +210,26 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         
     }
     
-    func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {
-        //        debugPrint("\(#function)")
+    func setPlottingViewFrame(withHeading heading : Double) {
         if let view = self.plottingView, let field = geoField {
             let nwPt = mapViewImpl.point(for: field.northWest)
             
             let meters = boundaryQuad.northWest.distance(from: boundaryQuad.northEast)
             let distance = mapViewImpl.points(forMeters: meters, at: boundaryQuad.northWest)
-
+            
             let frameRect = CGRect(origin: nwPt, size: CGSize(width: distance, height: distance * view.aspectRatio))
             view.transform = CGAffineTransform.identity
             view.frame = frameRect
-            view.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
+            view.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: heading)))
         }
+    }
+    
+    func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {
+        self.setPlottingViewFrame(withHeading: 360-mapView.camera.heading)
     }
 
     func mapView(_ mapView: MGLMapView, regionDidChangeWith reason: MGLCameraChangeReason, animated: Bool) {
-        guard let field = geoField else {
-            return
-        }
-        
-        let nwPt = mapViewImpl.point(for: field.northWest)
-        let sePt = mapViewImpl.point(for: field.southEast)
-
-        let frameRect = CGRect(origin: nwPt, size: CGSize(width: abs(sePt.x - nwPt.x), height: abs(sePt.y - nwPt.y)))        
-        self.plottingView?.transform = CGAffineTransform(rotationAngle: CGFloat(radians(degrees: 360-mapView.camera.heading)))
-        self.plottingView?.frame = frameRect
+        self.setPlottingViewFrame(withHeading: 360-mapView.camera.heading)
     }
     
     func createFirstImage(size: CGSize) -> UIImage {
