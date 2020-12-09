@@ -88,7 +88,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="onMarkersButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="tak-XT-S2p"/>
+                                    <action selector="onResetButtonSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QZI-xK-4Zf"/>
                                 </connections>
                             </button>
                             <view clipsSubviews="YES" alpha="0.60000002384185791" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="f00-yK-J3J">
@@ -266,7 +266,7 @@
                                     <constraint firstAttribute="height" constant="35" id="8Mx-mX-FU2"/>
                                     <constraint firstAttribute="width" constant="60" id="Mlg-EQ-vsf"/>
                                 </constraints>
-                                <state key="normal" title="Makers">
+                                <state key="normal" title="Reset">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
@@ -281,7 +281,7 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="onMarkersButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="ZBG-i0-7pg"/>
+                                    <action selector="onResetButtonSelected:" destination="JuP-8Z-8lW" eventType="touchUpInside" id="BQr-Iy-krr"/>
                                 </connections>
                             </button>
                             <view clipsSubviews="YES" alpha="0.59999999999999998" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2T-vj-ZBb">

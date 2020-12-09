@@ -101,15 +101,16 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     @IBAction func onResetButtonSelected(_ sender: Any) {
-        guard let style = self.mglMapView.style,
-              let layer =  self.mglMapView.style?.layer(withIdentifier: self.layerIdentifier),
-              let source = self.mglMapView.style?.source(withIdentifier: self.layerIdentifier) else {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        
-        // TODO: This does NOT work, haven't spent time to figure out why
-        style.removeSource(source)
-        style.removeLayer(layer)
+        self.gpsGenerator.reset()
+        appDelegate.plottingRowManager.reset()
+        self.imageCanvas.reset()
+        guard let view = self.plottingView else {
+            return
+        }
+        view.layer.setNeedsDisplay(view.layer.bounds)
     }
     
     /// The user pressed one of the stepper buttons

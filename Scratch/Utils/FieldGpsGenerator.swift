@@ -84,6 +84,13 @@ class FieldGpsGenerator {
         updateNextCoord()
     }
     
+    func reset() {
+        self.stop()
+        self.currentHeading = 0
+        let centerOffset = Measurement(value: defaultMachineWidth, unit: UnitLength.feet).converted(to: UnitLength.meters).value / 2
+        self.currentLocation = self.startLocation.locationWithBearing(bearingRadians: 90, distanceMeters: centerOffset).locationWithBearing(bearingRadians: 0, distanceMeters: 10)
+    }
+    
     @objc func updateNextCoord() {
 //        var heading : Double = 45
         let metersPerSec = milesPerHourMeasurement.converted(to: UnitSpeed.metersPerSecond)

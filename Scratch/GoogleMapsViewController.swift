@@ -201,7 +201,20 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBAction func onStopButtonSelected(_ sender: Any) {
         gpsGenerator.stop()
     }
-
+    
+    @IBAction func onResetButtonSelected(_ sender: Any) {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        self.gpsGenerator.reset()
+        appDelegate.plottingRowManager.reset()
+        self.imageCanvas.reset()
+        guard let view = self.fieldView else {
+            return
+        }
+        view.layer.setNeedsDisplay(view.layer.bounds)
+    }
+    
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
 
         if self.useGoogleTiles == false {

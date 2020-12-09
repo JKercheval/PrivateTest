@@ -18,6 +18,7 @@ protocol PlottingImageCanvasProtocol {
     var lastRowBound : GMSCoordinateBounds? { get }
     func drawRow(with plottedRow : PlottedRowInfoProtocol) -> Bool
     func getSubImageFromCanvas(with subImageRect : CGRect) -> UIImage?
+    func reset()
 }
 
 protocol MapViewProtocol {

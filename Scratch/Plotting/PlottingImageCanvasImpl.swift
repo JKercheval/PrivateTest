@@ -83,6 +83,14 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return bounds
     }
     
+    func reset() {
+        guard let bitmapContext = self.plottingBitmapContext else {
+            return
+        }
+        let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: self.imageSize)
+        bitmapContext.clear(imageRect)
+    }
+    
     @objc func onPlotNewRowReceived(notification : Notification) {
         guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
@@ -189,104 +197,6 @@ extension PlottingImageCanvasImpl {
         return rect.applying(transform)
     }
     
-//    func drawRowsIntoContext(bitmapContext : CGContext, atPoint nextPoint : CGPoint, currentPoint : CGPoint, rowValues : [CGFloat],  metersPerPixel : Double, drawHeight : Double, nextPointHeading : Double, currentPointHeading : Double) -> Bool {
-//
-//        assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
-//        bitmapContext.setStrokeColor(UIColor.black.cgColor)
-//        bitmapContext.setLineWidth(0.1)
-//
-//        let nextPointMachineWidth = CGFloat(self.machineInfo.machineWidth)
-//        let currentPointMachineWidth = CGFloat(self.machineInfo.machineWidth)
-//        let rowCellWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
-//
-//        // Starting point is the center of the implement, so we need to offset that so that the starting point
-//        // is actually to the left of that by half of the machine width.
-//        let startX : CGFloat = nextPoint.x - ((rowCellWidth * CGFloat(machineInfo.numberOfRows)) / 2.0)
-//        let currentStartX : CGFloat = currentPoint.x - ((rowCellWidth * CGFloat(machineInfo.numberOfRows)) / 2.0)
-//        // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state
-//        // when we are done.
-//        bitmapContext.saveGState()
-//
-//        // calculate the rectangle of the whole section we are creating (all row rects created below) so that we can correctly
-//        // rotate the plotted row.
-//        let rect = CGRect(x: startX, y: nextPoint.y, width: CGFloat(self.machineInfo.machineWidth / metersPerPixel), height: CGFloat(drawHeight))
-//        let currentRect = CGRect(x: currentStartX, y: currentPoint.y, width: CGFloat(self.machineInfo.machineWidth / metersPerPixel), height: CGFloat(drawHeight))
-//        let nextPointTransfrom: CGAffineTransform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
-//            .rotated(by: CGFloat(radians(degrees: 5)))
-//            .translatedBy(x: -rect.midX, y: -rect.midY)
-//        let currentPointTransfrom: CGAffineTransform = CGAffineTransform(translationX: currentRect.midX, y: currentRect.midY)
-//            .rotated(by: CGFloat(currentPointHeading))
-//            .translatedBy(x: -currentRect.midX, y: -currentRect.midY)
-//
-//        // go through each planter row and create the rect and fill the color value in depending on what we are displaying...
-//        debugPrint("Drawing Row")
-//
-//        for (index, value) in rowValues.enumerated() {
-//            let path = CGMutablePath();
-//
-////            let xOffset = (nextPointMachineWidth / 2.0) + CGFloat(CGFloat(index) * rowCellWidth)
-////            let nextXOffset = (nextPointMachineWidth / 2.0) + CGFloat(index+1) * rowCellWidth
-////
-////            // determine 4 points
-////            let mpTopLeftOrig : CGPoint = CGPoint(x: nextPoint.x - xOffset, y: nextPoint.y);
-////            let  mpTopLeftRotated = rotatePointAroundPivot(point: mpTopLeftOrig, pivot: nextPoint, degrees: nextPointHeading);
-////            let tl : CGPoint = CGPoint(x: mpTopLeftRotated.x, y: mpTopLeftRotated.y)
-////
-////            let mpTopRightOrig : CGPoint = CGPoint(x: nextPoint.x - nextXOffset, y: nextPoint.y)
-////            let mpTopRightRotated = rotatePointAroundPivot(point: mpTopRightOrig, pivot: nextPoint, degrees: nextPointHeading)
-////            let tr = CGPoint(x: mpTopRightRotated.x, y: mpTopRightRotated.y)
-////
-////            let mpBottomLeftOrig = CGPoint(x: currentPoint.x - xOffset, y: currentPoint.y);
-////            let mpBottomLeftRotated = rotatePointAroundPivot(point: mpBottomLeftOrig, pivot: currentPoint, degrees: currentPointHeading);
-////            let bl = CGPoint(x: mpBottomLeftRotated.x, y: mpBottomLeftRotated.y)
-////
-////            let mpBottomRightOrig = CGPoint(x: currentPoint.x - nextXOffset, y: currentPoint.y);
-////            let mpBottomRightRotated = rotatePointAroundPivot(point: mpBottomRightOrig, pivot: currentPoint, degrees: currentPointHeading);
-////            let br = CGPoint(x: mpBottomRightRotated.x, y: mpBottomRightRotated.y)
-//
-////            debugPrint(" - Points are: \(tl), \(tr), \(br), \(bl)")
-//            let topLeft = CGPoint(x: startX + (rowCellWidth * CGFloat(index)), y: nextPoint.y).applying(nextPointTransfrom)
-//            let topCurrentLeft = CGPoint(x: currentStartX + (rowCellWidth * CGFloat(index)), y: currentPoint.y).applying(currentPointTransfrom)
-//
-//            let rect = CGRect(x: startX + (rowCellWidth * CGFloat(index)), y: nextPoint.y, width: rowCellWidth, height: CGFloat(drawHeight)).applying(nextPointTransfrom)
-//            let rectNext = CGRect(x: startX + (rowCellWidth * CGFloat(index + 1)), y: nextPoint.y, width: rowCellWidth, height: CGFloat(drawHeight)).applying(nextPointTransfrom)
-//            let currentRect = CGRect(x: currentStartX + (rowCellWidth * CGFloat(index)), y: currentPoint.y, width: rowCellWidth, height: CGFloat(drawHeight)).applying(currentPointTransfrom)
-//            let currentRectNext = CGRect(x: currentStartX + (rowCellWidth * CGFloat(index + 1)), y: currentPoint.y, width: rowCellWidth, height: CGFloat(drawHeight)).applying(currentPointTransfrom)
-//
-//            var color = UIColor.green.cgColor
-//            if value < 0.19 {
-//                color = UIColor.yellow.cgColor
-//            }
-//            else if value > 0.21 {
-//                color = UIColor.red.cgColor
-//            }
-//            bitmapContext.setFillColor(color)
-//            bitmapContext.beginPath()
-//
-//            path.move(to: rect.origin)
-//            path.addLine(to: rectNext.origin)
-//            path.addLine(to: currentRectNext.origin)
-//            path.addLine(to: currentRect.origin)
-//            bitmapContext.addPath(path)
-//            bitmapContext.closePath();
-//            // set context colors
-////            CGContextSetRGBFillColor(bitmapContext, red, green, blue, 1.0f);
-////            bitmapContext.setLineWidth(1.0);
-////            CGContextSetRGBStrokeColor(bitmapContext, red, green, blue, 1.0f);
-//            // draw path
-////            bitmapContext.setStrokeColor(color)
-////            bitmapContext.drawPath(using: .fill)
-//
-////            bitmapContext.setFillColor(color)
-////            bitmapContext.beginPath()
-//            bitmapContext.fillPath()
-//        }
-//        // Restore previous CGState (pop).
-//        bitmapContext.restoreGState()
-//
-//        return true
-//    }
-    
     /// Draws an actual row of seed information to the bitmap context.
     /// - Parameters:
     ///   - bitmapContext: CGContext to draw into
@@ -307,7 +217,7 @@ extension PlottingImageCanvasImpl {
         let cellRowWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
         // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state
         // when we are done.
-        bitmapContext.saveGState()
+//        bitmapContext.saveGState()
         
         // This is the machine width adjusted to our canvas
         let pixelMachineWidth = CGFloat(self.machineInfo.machineWidth / metersPerPixel)
@@ -357,7 +267,7 @@ extension PlottingImageCanvasImpl {
             bitmapContext.fillPath()
         }
         // Restore previous CGState (pop).
-        bitmapContext.restoreGState()
+//        bitmapContext.restoreGState()
         
         return true
     }

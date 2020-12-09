@@ -7,7 +7,11 @@
 
 import Foundation
 
-class PlottingManager {
+protocol PlottingManagerProtocol {
+    func reset()
+}
+
+class PlottingManager : PlottingManagerProtocol {
     
     let serialQueue = DispatchQueue(label: "com.queue.plottingManager.serial")
     var plottedRowsArray : Array<PlottedRowInfoProtocol> = Array<PlottedRowInfoProtocol>()
@@ -51,4 +55,11 @@ class PlottingManager {
             }
         }
     }
+    
+    func reset() {
+        serialQueue.sync {
+            self.plottedRowsArray.removeAll()
+        }
+    }
+
 }
