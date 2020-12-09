@@ -10,6 +10,16 @@ import UIKit
 import CoreLocation
 import GoogleMapsUtils
 
+struct StartingPoints {
+    var currentStartingPoint : CGPoint = CGPoint.zero
+    var nextStartingPoint : CGPoint = CGPoint.zero
+}
+
+struct PlottedRowHeadings {
+    var currentHeading : Double = 0
+    var nextHeading : Double = 0
+}
+
 class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
     private var fieldBoundary :FieldBoundaryCorners!
@@ -77,7 +87,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
         }
-        self.drawRow(with: plottedRow)
+        let _ = self.drawRow(with: plottedRow)
     }
     
     func getStartPt(fromCoord coord : CLLocationCoordinate2D) -> CGPoint {
@@ -99,28 +109,23 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
         let coord = plottedRow.plottingCoordinate
     
-//        let horDistance = coord.distance(from: CLLocationCoordinate2D(latitude: coord.latitude, longitude: self.fieldBoundary.northWest.longitude))
-//        let verDistance = coord.distance(from: CLLocationCoordinate2D(latitude: self.fieldBoundary.northWest.latitude, longitude: coord.longitude))
-//        let verOffset = verDistance / self.metersPerPixel
-//        let horOffset = horDistance / self.metersPerPixel
-//
-//        let drawPoint = CGPoint(x: horOffset, y: verOffset)
-        let drawPoint = getStartPt(fromCoord: coord)
-        guard let previousPlottedRow = plottedRow.nextPlottedRow else {
+        let currentStartingPt = getStartPt(fromCoord: coord)
+        guard let nextPlottedRow = plottedRow.nextPlottedRow else {
             return false
         }
         
-        let previousDrawPt = getStartPt(fromCoord: previousPlottedRow.plottingCoordinate)
-        guard let canvas = self.plottingBitmapContext else {
-            return false
-        }
+        let nextStartingPoint = getStartPt(fromCoord: nextPlottedRow.plottingCoordinate)
+        let startingPoints = StartingPoints(currentStartingPoint: currentStartingPt, nextStartingPoint: nextStartingPoint)
+        
+        let plottedRowHeadings = PlottedRowHeadings(currentHeading: plottedRow.heading, nextHeading: nextPlottedRow.heading)
+        
         // This default value is taken directly from the knowledge of how often the GPS Generator is creating points - the 5 below
         // is from the fact that we are measuring distance in meters per second, and we are generating a new coordinate 5 times per
         // second.
         var drawHeight = (Measurement(value: 6, unit: UnitSpeed.milesPerHour).converted(to: .metersPerSecond).value / 5) / self.metersPerPixel
         if let lastRow = self.lastPlottedRow {
             // get the distance between the rows
-            drawHeight = coord.distance(from: lastRow.plottingCoordinate) / self.metersPerPixel
+            drawHeight = coord.distance(from: nextPlottedRow.plottingCoordinate) / self.metersPerPixel
             if lastRowBoundsDrawn == nil {
                 lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: coord, coordinate: lastRow.plottingCoordinate)
             }
@@ -130,8 +135,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         }
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
-        let radianHeading = radians(degrees: plottedRow.heading)
-        guard drawRowIntoContext(bitmapContext: canvas, atPoint: drawPoint, rowValues: plottedRow.rowInfo, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, heading: radianHeading) else {
+        guard drawRowIntoContext(withPoints: startingPoints, rowValues: plottedRow.rowInfo, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings) else {
             debugPrint("Failed to draw into image")
             return false
         }
@@ -291,35 +295,34 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-    func drawRowIntoContext(bitmapContext : CGContext, atPoint point : CGPoint, rowValues : [CGFloat],  metersPerPixel : Double, drawHeight : Double, heading : Double) -> Bool {
+    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [CGFloat],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+        guard let bitmapContext = self.plottingBitmapContext else {
+            return false
+        }
         
         assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
         bitmapContext.setStrokeColor(UIColor.black.cgColor)
         bitmapContext.setLineWidth(0.1)
 
-        let partsWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
-        
-        // Starting point is the center of the implement, so we need to offset that soo that the starting point
-        // is actually to the left of that by half of the machine width.
-        let startX : CGFloat = point.x - ((partsWidth * CGFloat(machineInfo.numberOfRows)) / 2.0)
-        
+        let cellRowWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
         // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state
         // when we are done.
         bitmapContext.saveGState()
         
+        // This is the machine width adjusted to our canvas
+        let pixelMachineWidth = CGFloat(self.machineInfo.machineWidth / metersPerPixel)
+        
         // calculate the rectangle of the whole section we are creating (all row rects created below) so that we can correctly
         // rotate the plotted row.
-        let rect = CGRect(x: startX, y: point.y, width: CGFloat(self.machineInfo.machineWidth / metersPerPixel), height: CGFloat(drawHeight))
-        let transfrom: CGAffineTransform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
-                    .rotated(by: CGFloat(heading))
-                    .translatedBy(x: -rect.midX, y: -rect.midY)
-//        let transfrom: CGAffineTransform =
-//            CGAffineTransform(translationX: -midX, y: -midY).concatenating(CGAffineTransform(rotationAngle: CGFloat(heading))).concatenating(
-//                CGAffineTransform(translationX: midX, y: midY))
+//        let rect = CGRect(x: startX, y: points.currentStartingPoint.y, width: pixelMachineWidth, height: rowHeight)
+//        let transfrom: CGAffineTransform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
+//            .rotated(by: CGFloat(radians(degrees: headings.currentHeading)))
+//                    .translatedBy(x: -rect.midX, y: -rect.midY)
 
         // go through each planter row and create the rect and fill the color value in depending on what we are displaying...
         for (index, value) in rowValues.enumerated() {
-            let path = CGMutablePath();
+            
+            let cellRowPath = CGMutablePath();
             var color = UIColor.green.cgColor
             if value < 0.19 {
                 color = UIColor.yellow.cgColor
@@ -329,27 +332,27 @@ extension PlottingImageCanvasImpl {
             }
             bitmapContext.setFillColor(color)
             bitmapContext.beginPath()
-            let rect = CGRect(x: startX + (partsWidth * CGFloat(index)), y: point.y, width: partsWidth, height: CGFloat(drawHeight))
-            // add the small row rect in...
-            path.addRect(rect, transform: transfrom)
+            let topLeftOrig : CGPoint = CGPoint(x: points.nextStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index) * cellRowWidth), y: points.nextStartingPoint.y)
+            let  topLeftRotated = rotatePointAroundPivot(point: topLeftOrig, pivot: points.nextStartingPoint, degrees: headings.nextHeading)
             
+            let topRightOrig : CGPoint = CGPoint(x: points.nextStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index + 1) * cellRowWidth), y: points.nextStartingPoint.y)
+            let topRightRotated = rotatePointAroundPivot(point: topRightOrig, pivot: points.nextStartingPoint, degrees: headings.nextHeading)
+            
+            let bottomLeftOrig = CGPoint(x: points.currentStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index) * cellRowWidth), y: points.currentStartingPoint.y)
+            let bottomLeftRotated = rotatePointAroundPivot(point: bottomLeftOrig, pivot: points.currentStartingPoint, degrees: headings.currentHeading)
+
+            let bottomRightOrig = CGPoint(x: points.currentStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index + 1) * cellRowWidth), y: points.currentStartingPoint.y)
+            let bottomRightRotated = rotatePointAroundPivot(point: bottomRightOrig, pivot: points.currentStartingPoint, degrees: headings.currentHeading)
+
+            cellRowPath.move(to: topLeftRotated)
+            cellRowPath.addLine(to: topRightRotated)
+            cellRowPath.addLine(to: bottomRightRotated)
+            cellRowPath.addLine(to: bottomLeftRotated)
+
             // Add the path again.
-            bitmapContext.addPath(path)
+            bitmapContext.addPath(cellRowPath)
             bitmapContext.closePath()
-            // An attempt at using a gradient... doesn't work on an angle.
-//            let startPoint = CGPoint(x: rect.midX, y: rect.minY)
-//            let endPoint = CGPoint(x: rect.midX, y: rect.maxY)
-//            bitmapContext.saveGState()
-//            bitmapContext.clip()
-//            let normalizedNumber : CGFloat = value.normalize(min: 0.15, max: 0.25, from: 0, to: 0.8)
-//            let locations : [CGFloat] = [max(0, normalizedNumber - 0.2), normalizedNumber, min(normalizedNumber + 0.2, 1)]
-//
-//            if let colorSpace = bitmapContext.colorSpace,
-//               let gradient = CGGradient(colorSpace: colorSpace, colorComponents: colorComponents, locations: locations, count: 3) {
-//                bitmapContext.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
-//            }
-//
-//            bitmapContext.restoreGState()
+
             // this will not only draw (fill) the path, but it also clears it.
             bitmapContext.fillPath()
         }

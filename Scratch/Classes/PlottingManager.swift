@@ -18,7 +18,7 @@ class PlottingManager {
     }
     
     @objc func onNewPlottedRowRecieved(notification : Notification) {
-        guard var plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
+        guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
         }
 

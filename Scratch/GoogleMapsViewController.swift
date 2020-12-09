@@ -35,7 +35,6 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
     @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var headingTextField: UITextField!
     @IBOutlet weak var stepperControl: UIStepper!
-    let plottingManager : PlottingManager = PlottingManager()
     
     // Set this to 'true' to see our Google Tile implementation at work.
     var useGoogleTiles : Bool = false
@@ -170,6 +169,7 @@ class GoogleMapsViewController: UIViewController, GMSMapViewDelegate {
             debugPrint("\(self)\(#function) Failed to get Stepper")
             return
         }
+
         gpsGenerator.heading = Double(stepper.value)
         self.headingTextField.text = "\(gpsGenerator.heading)"
     }

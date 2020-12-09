@@ -31,7 +31,9 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     @IBOutlet weak var mapView: UIView!
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
-    
+    @IBOutlet weak var headingTextField: UITextField!
+    @IBOutlet weak var stepperControl: UIStepper!
+
     var geoField : GeoJSONField?
     var mglMapView: MGLMapView!
     var preciseButton: UIButton?
@@ -46,6 +48,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var mapViewImpl : MapboxMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
     let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,6 +111,18 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         style.removeSource(source)
         style.removeLayer(layer)
     }
+    
+    /// The user pressed one of the stepper buttons
+    /// - Parameter sender: Should be the UIStepper
+    @IBAction func onStepperValueChanged(_ sender: Any) {
+        guard let stepper = sender as? UIStepper else {
+            debugPrint("\(self)\(#function) Failed to get Stepper")
+            return
+        }
+        
+        gpsGenerator.heading = Double(stepper.value)
+        self.headingTextField.text = "\(gpsGenerator.heading)"
+    }
         
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {
         guard let field = geoField else {
@@ -154,15 +169,15 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     @objc func ondidUpdateLocation(_ notification:Notification) {
-        guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
-            return
-        }
-        serialQueue.async { [weak self] in
-            guard let strongSelf = self else {
-                return
-            }
-            let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
-        }
+//        guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
+//            return
+//        }
+//        serialQueue.async { [weak self] in
+//            guard let strongSelf = self else {
+//                return
+//            }
+////            let _ = strongSelf.imageSource?.drawRow(with: plottedRow, zoom: UInt(strongSelf.currentZoom))
+//        }
     }
     
     func addQuadToShapeLayer(withMap mapView : MGLMapView, originalCoordinate: CLLocationCoordinate2D, coordinates : [CLLocationCoordinate2D]) {
