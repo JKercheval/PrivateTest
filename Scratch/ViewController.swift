@@ -40,7 +40,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     let locationManager = CLLocationManager()
     var currentYlocation : CGFloat = 10
     var currentZoom : Double = 16.0
-    var gpsGenerator : FieldGpsGenerator!
+//    var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
     var plottingView : LayerDrawingView?
     var imageSource : GoogleTileImageService?
@@ -83,29 +83,33 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
         imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
-        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
-        gpsGenerator.speed = 6.0 // mph
-        self.headingTextField.text = "\(gpsGenerator.heading)"
+//        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
+//        gpsGenerator.speed = 6.0 // mph
+//        self.headingTextField.text = "\(gpsGenerator.heading)"
 
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        appDelegate.plottingRowManager.connect()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        self.gpsGenerator.stop()
+//        self.gpsGenerator.stop()
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
-        self.gpsGenerator.start()
+//        self.gpsGenerator.start()
     }
     
     @IBAction func onStopButtonSelected(_ sender: Any) {
-        self.gpsGenerator.stop()
+//        self.gpsGenerator.stop()
     }
     
     @IBAction func onResetButtonSelected(_ sender: Any) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        self.gpsGenerator.reset()
+//        self.gpsGenerator.reset()
         appDelegate.plottingRowManager.reset()
         self.imageCanvas.reset()
         guard let view = self.plottingView else {
@@ -122,8 +126,8 @@ class ViewController: UIViewController, MGLMapViewDelegate {
             return
         }
         
-        gpsGenerator.heading = Double(stepper.value)
-        self.headingTextField.text = "\(gpsGenerator.heading)"
+//        gpsGenerator.heading = Double(stepper.value)
+//        self.headingTextField.text = "\(gpsGenerator.heading)"
     }
         
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {

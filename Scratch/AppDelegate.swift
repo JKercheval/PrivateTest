@@ -11,7 +11,7 @@ import GoogleMaps
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    private let plottingManager = PlottingManager()
+    private let plottingManager : PlottingManagerProtocol = MqttPlottingManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
