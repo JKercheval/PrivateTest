@@ -43,7 +43,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
     var plottingView : LayerDrawingView?
-    var imageSource : GoogleTileImageService?
     var boundaryQuad : FieldBoundaryCorners!
     var mapViewImpl : MapboxMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
@@ -82,7 +81,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
-        imageSource = GoogleTileImageService(with: boundsMaxZoom, boundQuad: boundaryQuad, canvas: self.imageCanvas, mapView: mapViewImpl)
         gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
         gpsGenerator.speed = 6.0 // mph
         self.headingTextField.text = "\(gpsGenerator.heading)"
