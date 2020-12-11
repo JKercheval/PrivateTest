@@ -73,7 +73,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         self.view.insertSubview(mglMapView, belowSubview: startButton)
         mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.view)
 
-        let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
