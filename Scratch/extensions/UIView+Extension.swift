@@ -1,10 +1,3 @@
-//
-//  UIView+Extension.swift
-//  SeedSelector
-//
-//  Created by Jeremy Kercheval on 11/6/20.
-//
-
 import Foundation
 import CoreLocation
 import UIKit

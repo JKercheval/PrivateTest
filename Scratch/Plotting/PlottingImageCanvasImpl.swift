@@ -1,10 +1,3 @@
-//
-//  PlottingImageCanvasImpl.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 12/2/20.
-//
-
 import Foundation
 import UIKit
 import CoreLocation
@@ -344,11 +337,9 @@ extension PlottingImageCanvasImpl {
     
 }
 extension CGFloat {
-    
     func normalize(min: CGFloat, max: CGFloat, from a: CGFloat = 0, to b: CGFloat = 1) -> CGFloat {
         return (b - a) * ((self - min) / (max - min)) + a
     }
-    
 }
 
 class MachineInfoProtocolImpl : MachineInfoProtocol {

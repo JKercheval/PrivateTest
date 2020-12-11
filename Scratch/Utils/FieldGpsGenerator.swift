@@ -1,10 +1,3 @@
-//
-//  FieldGpsGenerator.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 11/19/20.
-//
-
 import Foundation
 import CoreLocation
 import GEOSwift
