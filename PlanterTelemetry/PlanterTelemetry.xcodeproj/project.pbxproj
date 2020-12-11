@@ -1,0 +1,793 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6D07B7F2269E57C2772C0D85 /* Pods_PlanterTelemetry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652D1E1E6281CCD2D41334E4 /* Pods_PlanterTelemetry.framework */; };
+		855628B3EEC37D54B4C46A31 /* Pods_PlanterTelemetryTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C83C7D0FA198261C601C831 /* Pods_PlanterTelemetryTests.framework */; };
+		CC55BBDD2582582C00B378B1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBDC2582582C00B378B1 /* AppDelegate.swift */; };
+		CC55BBDF2582582C00B378B1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBDE2582582C00B378B1 /* ViewController.swift */; };
+		CC55BBE12582582D00B378B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC55BBE02582582D00B378B1 /* Assets.xcassets */; };
+		CC55BBE42582582D00B378B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC55BBE22582582D00B378B1 /* Main.storyboard */; };
+		CC55BBF02582582E00B378B1 /* PlanterTelemetryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBEF2582582E00B378B1 /* PlanterTelemetryTests.swift */; };
+		CC55BBFB2582582E00B378B1 /* PlanterTelemetryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBFA2582582E00B378B1 /* PlanterTelemetryUITests.swift */; };
+		CCA1037D2582D60D00E4468B /* FotF Plot E Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103772582D60D00E4468B /* FotF Plot E Boundary.geojson */; };
+		CCA1037E2582D60D00E4468B /* FotF Plot A Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103782582D60D00E4468B /* FotF Plot A Boundary.geojson */; };
+		CCA1037F2582D60D00E4468B /* FotF Plot D Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103792582D60D00E4468B /* FotF Plot D Boundary.geojson */; };
+		CCA103802582D60D00E4468B /* FotF Plot C Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA1037A2582D60D00E4468B /* FotF Plot C Boundary.geojson */; };
+		CCA103812582D60D00E4468B /* FotF Plot F Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA1037B2582D60D00E4468B /* FotF Plot F Boundary.geojson */; };
+		CCA103822582D60D00E4468B /* FotF Plot B Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA1037C2582D60D00E4468B /* FotF Plot B Boundary.geojson */; };
+		CCA103902582D81D00E4468B /* GEOJSONField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA1038F2582D81D00E4468B /* GEOJSONField.swift */; };
+		CCA1039E2582D9BC00E4468B /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA1039D2582D9BC00E4468B /* FieldGpsGenerator.swift */; };
+		CCA103A42582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA103A32582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift */; };
+		D1E9F613794DA18E72E52EE3 /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D205A62DA0871A93029A3F1A /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CC55BBEC2582582E00B378B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC55BBD12582582C00B378B1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC55BBD82582582C00B378B1;
+			remoteInfo = PlanterTelemetry;
+		};
+		CC55BBF72582582E00B378B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CC55BBD12582582C00B378B1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CC55BBD82582582C00B378B1;
+			remoteInfo = PlanterTelemetry;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0C17BBBCC6BFFCD1FE0D549B /* Pods-PlanterTelemetryTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetryTests.debug.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetryTests/Pods-PlanterTelemetryTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4C83C7D0FA198261C601C831 /* Pods_PlanterTelemetryTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlanterTelemetryTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		652D1E1E6281CCD2D41334E4 /* Pods_PlanterTelemetry.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlanterTelemetry.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		90DF60FA1179B49405A584D8 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry-PlanterTelemetryUITests.debug.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		A714249351C3A8227A7EB927 /* Pods-PlanterTelemetryTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetryTests.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetryTests/Pods-PlanterTelemetryTests.release.xcconfig"; sourceTree = "<group>"; };
+		B9920E7BC5965516A8275921 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig"; sourceTree = "<group>"; };
+		C7F485A1264B1A5E6D752E57 /* Pods-PlanterTelemetry.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry.debug.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry.debug.xcconfig"; sourceTree = "<group>"; };
+		CC55BBD92582582C00B378B1 /* PlanterTelemetry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlanterTelemetry.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC55BBDC2582582C00B378B1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CC55BBDE2582582C00B378B1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		CC55BBE02582582D00B378B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CC55BBE32582582D00B378B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		CC55BBE52582582D00B378B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC55BBE62582582D00B378B1 /* PlanterTelemetry.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlanterTelemetry.entitlements; sourceTree = "<group>"; };
+		CC55BBEB2582582E00B378B1 /* PlanterTelemetryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlanterTelemetryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC55BBEF2582582E00B378B1 /* PlanterTelemetryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanterTelemetryTests.swift; sourceTree = "<group>"; };
+		CC55BBF12582582E00B378B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC55BBF62582582E00B378B1 /* PlanterTelemetryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlanterTelemetryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC55BBFA2582582E00B378B1 /* PlanterTelemetryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanterTelemetryUITests.swift; sourceTree = "<group>"; };
+		CC55BBFC2582582E00B378B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CCA103772582D60D00E4468B /* FotF Plot E Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot E Boundary.geojson"; sourceTree = "<group>"; };
+		CCA103782582D60D00E4468B /* FotF Plot A Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot A Boundary.geojson"; sourceTree = "<group>"; };
+		CCA103792582D60D00E4468B /* FotF Plot D Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot D Boundary.geojson"; sourceTree = "<group>"; };
+		CCA1037A2582D60D00E4468B /* FotF Plot C Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot C Boundary.geojson"; sourceTree = "<group>"; };
+		CCA1037B2582D60D00E4468B /* FotF Plot F Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot F Boundary.geojson"; sourceTree = "<group>"; };
+		CCA1037C2582D60D00E4468B /* FotF Plot B Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot B Boundary.geojson"; sourceTree = "<group>"; };
+		CCA1038F2582D81D00E4468B /* GEOJSONField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GEOJSONField.swift; sourceTree = "<group>"; };
+		CCA1039D2582D9BC00E4468B /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
+		CCA103A32582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Extension.swift"; sourceTree = "<group>"; };
+		D205A62DA0871A93029A3F1A /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlanterTelemetry_PlanterTelemetryUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2D0D3DC2A059D292C4A0EC4 /* Pods-PlanterTelemetry.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CC55BBD62582582C00B378B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6D07B7F2269E57C2772C0D85 /* Pods_PlanterTelemetry.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBE82582582E00B378B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				855628B3EEC37D54B4C46A31 /* Pods_PlanterTelemetryTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBF32582582E00B378B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1E9F613794DA18E72E52EE3 /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CC55BBD02582582C00B378B1 = {
+			isa = PBXGroup;
+			children = (
+				CC55BBDB2582582C00B378B1 /* PlanterTelemetry */,
+				CC55BBEE2582582E00B378B1 /* PlanterTelemetryTests */,
+				CC55BBF92582582E00B378B1 /* PlanterTelemetryUITests */,
+				CC55BBDA2582582C00B378B1 /* Products */,
+				F9E7F693CDAC62C3DD931A48 /* Pods */,
+				DA14B9BE0A26626C27B7DCC0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		CC55BBDA2582582C00B378B1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CC55BBD92582582C00B378B1 /* PlanterTelemetry.app */,
+				CC55BBEB2582582E00B378B1 /* PlanterTelemetryTests.xctest */,
+				CC55BBF62582582E00B378B1 /* PlanterTelemetryUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CC55BBDB2582582C00B378B1 /* PlanterTelemetry */ = {
+			isa = PBXGroup;
+			children = (
+				CCA103A22582DA4200E4468B /* Extensions */,
+				CCA103762582D60D00E4468B /* geoJson */,
+				CC55BBDC2582582C00B378B1 /* AppDelegate.swift */,
+				CCA1039D2582D9BC00E4468B /* FieldGpsGenerator.swift */,
+				CC55BBDE2582582C00B378B1 /* ViewController.swift */,
+				CC55BBE02582582D00B378B1 /* Assets.xcassets */,
+				CC55BBE22582582D00B378B1 /* Main.storyboard */,
+				CC55BBE52582582D00B378B1 /* Info.plist */,
+				CC55BBE62582582D00B378B1 /* PlanterTelemetry.entitlements */,
+				CCA1038F2582D81D00E4468B /* GEOJSONField.swift */,
+			);
+			path = PlanterTelemetry;
+			sourceTree = "<group>";
+		};
+		CC55BBEE2582582E00B378B1 /* PlanterTelemetryTests */ = {
+			isa = PBXGroup;
+			children = (
+				CC55BBEF2582582E00B378B1 /* PlanterTelemetryTests.swift */,
+				CC55BBF12582582E00B378B1 /* Info.plist */,
+			);
+			path = PlanterTelemetryTests;
+			sourceTree = "<group>";
+		};
+		CC55BBF92582582E00B378B1 /* PlanterTelemetryUITests */ = {
+			isa = PBXGroup;
+			children = (
+				CC55BBFA2582582E00B378B1 /* PlanterTelemetryUITests.swift */,
+				CC55BBFC2582582E00B378B1 /* Info.plist */,
+			);
+			path = PlanterTelemetryUITests;
+			sourceTree = "<group>";
+		};
+		CCA103762582D60D00E4468B /* geoJson */ = {
+			isa = PBXGroup;
+			children = (
+				CCA103772582D60D00E4468B /* FotF Plot E Boundary.geojson */,
+				CCA103782582D60D00E4468B /* FotF Plot A Boundary.geojson */,
+				CCA103792582D60D00E4468B /* FotF Plot D Boundary.geojson */,
+				CCA1037A2582D60D00E4468B /* FotF Plot C Boundary.geojson */,
+				CCA1037B2582D60D00E4468B /* FotF Plot F Boundary.geojson */,
+				CCA1037C2582D60D00E4468B /* FotF Plot B Boundary.geojson */,
+			);
+			path = geoJson;
+			sourceTree = "<group>";
+		};
+		CCA103A22582DA4200E4468B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CCA103A32582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		DA14B9BE0A26626C27B7DCC0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				652D1E1E6281CCD2D41334E4 /* Pods_PlanterTelemetry.framework */,
+				D205A62DA0871A93029A3F1A /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework */,
+				4C83C7D0FA198261C601C831 /* Pods_PlanterTelemetryTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F9E7F693CDAC62C3DD931A48 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C7F485A1264B1A5E6D752E57 /* Pods-PlanterTelemetry.debug.xcconfig */,
+				D2D0D3DC2A059D292C4A0EC4 /* Pods-PlanterTelemetry.release.xcconfig */,
+				90DF60FA1179B49405A584D8 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.debug.xcconfig */,
+				B9920E7BC5965516A8275921 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig */,
+				0C17BBBCC6BFFCD1FE0D549B /* Pods-PlanterTelemetryTests.debug.xcconfig */,
+				A714249351C3A8227A7EB927 /* Pods-PlanterTelemetryTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CC55BBD82582582C00B378B1 /* PlanterTelemetry */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC55BBFF2582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetry" */;
+			buildPhases = (
+				54456C010E810B253006B1A8 /* [CP] Check Pods Manifest.lock */,
+				CC55BBD52582582C00B378B1 /* Sources */,
+				CC55BBD62582582C00B378B1 /* Frameworks */,
+				CC55BBD72582582C00B378B1 /* Resources */,
+				2DBE2840482AF56B88686674 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlanterTelemetry;
+			productName = PlanterTelemetry;
+			productReference = CC55BBD92582582C00B378B1 /* PlanterTelemetry.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CC55BBEA2582582E00B378B1 /* PlanterTelemetryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC55BC022582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetryTests" */;
+			buildPhases = (
+				32392E30B75C37E9B7070B2D /* [CP] Check Pods Manifest.lock */,
+				CC55BBE72582582E00B378B1 /* Sources */,
+				CC55BBE82582582E00B378B1 /* Frameworks */,
+				CC55BBE92582582E00B378B1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC55BBED2582582E00B378B1 /* PBXTargetDependency */,
+			);
+			name = PlanterTelemetryTests;
+			productName = PlanterTelemetryTests;
+			productReference = CC55BBEB2582582E00B378B1 /* PlanterTelemetryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CC55BBF52582582E00B378B1 /* PlanterTelemetryUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC55BC052582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetryUITests" */;
+			buildPhases = (
+				F59837176D8134672371D9F7 /* [CP] Check Pods Manifest.lock */,
+				CC55BBF22582582E00B378B1 /* Sources */,
+				CC55BBF32582582E00B378B1 /* Frameworks */,
+				CC55BBF42582582E00B378B1 /* Resources */,
+				805CDEC47D4766D6764DB94E /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CC55BBF82582582E00B378B1 /* PBXTargetDependency */,
+			);
+			name = PlanterTelemetryUITests;
+			productName = PlanterTelemetryUITests;
+			productReference = CC55BBF62582582E00B378B1 /* PlanterTelemetryUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CC55BBD12582582C00B378B1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1220;
+				LastUpgradeCheck = 1220;
+				TargetAttributes = {
+					CC55BBD82582582C00B378B1 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					CC55BBEA2582582E00B378B1 = {
+						CreatedOnToolsVersion = 12.2;
+						TestTargetID = CC55BBD82582582C00B378B1;
+					};
+					CC55BBF52582582E00B378B1 = {
+						CreatedOnToolsVersion = 12.2;
+						TestTargetID = CC55BBD82582582C00B378B1;
+					};
+				};
+			};
+			buildConfigurationList = CC55BBD42582582C00B378B1 /* Build configuration list for PBXProject "PlanterTelemetry" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CC55BBD02582582C00B378B1;
+			productRefGroup = CC55BBDA2582582C00B378B1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CC55BBD82582582C00B378B1 /* PlanterTelemetry */,
+				CC55BBEA2582582E00B378B1 /* PlanterTelemetryTests */,
+				CC55BBF52582582E00B378B1 /* PlanterTelemetryUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CC55BBD72582582C00B378B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC55BBE12582582D00B378B1 /* Assets.xcassets in Resources */,
+				CC55BBE42582582D00B378B1 /* Main.storyboard in Resources */,
+				CCA1037F2582D60D00E4468B /* FotF Plot D Boundary.geojson in Resources */,
+				CCA103822582D60D00E4468B /* FotF Plot B Boundary.geojson in Resources */,
+				CCA103812582D60D00E4468B /* FotF Plot F Boundary.geojson in Resources */,
+				CCA1037E2582D60D00E4468B /* FotF Plot A Boundary.geojson in Resources */,
+				CCA103802582D60D00E4468B /* FotF Plot C Boundary.geojson in Resources */,
+				CCA1037D2582D60D00E4468B /* FotF Plot E Boundary.geojson in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBE92582582E00B378B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBF42582582E00B378B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2DBE2840482AF56B88686674 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		32392E30B75C37E9B7070B2D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PlanterTelemetryTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		54456C010E810B253006B1A8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PlanterTelemetry-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		805CDEC47D4766D6764DB94E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F59837176D8134672371D9F7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PlanterTelemetry-PlanterTelemetryUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CC55BBD52582582C00B378B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC55BBDF2582582C00B378B1 /* ViewController.swift in Sources */,
+				CCA103902582D81D00E4468B /* GEOJSONField.swift in Sources */,
+				CCA103A42582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift in Sources */,
+				CC55BBDD2582582C00B378B1 /* AppDelegate.swift in Sources */,
+				CCA1039E2582D9BC00E4468B /* FieldGpsGenerator.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBE72582582E00B378B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC55BBF02582582E00B378B1 /* PlanterTelemetryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CC55BBF22582582E00B378B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC55BBFB2582582E00B378B1 /* PlanterTelemetryUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CC55BBED2582582E00B378B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC55BBD82582582C00B378B1 /* PlanterTelemetry */;
+			targetProxy = CC55BBEC2582582E00B378B1 /* PBXContainerItemProxy */;
+		};
+		CC55BBF82582582E00B378B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CC55BBD82582582C00B378B1 /* PlanterTelemetry */;
+			targetProxy = CC55BBF72582582E00B378B1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		CC55BBE22582582D00B378B1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC55BBE32582582D00B378B1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CC55BBFD2582582E00B378B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CC55BBFE2582582E00B378B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		CC55BC002582582E00B378B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C7F485A1264B1A5E6D752E57 /* Pods-PlanterTelemetry.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PlanterTelemetry/PlanterTelemetry.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = PlanterTelemetry/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetry;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CC55BC012582582E00B378B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2D0D3DC2A059D292C4A0EC4 /* Pods-PlanterTelemetry.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PlanterTelemetry/PlanterTelemetry.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = PlanterTelemetry/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetry;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CC55BC032582582E00B378B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0C17BBBCC6BFFCD1FE0D549B /* Pods-PlanterTelemetryTests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				INFOPLIST_FILE = PlanterTelemetryTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetryTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlanterTelemetry.app/Contents/MacOS/PlanterTelemetry";
+			};
+			name = Debug;
+		};
+		CC55BC042582582E00B378B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A714249351C3A8227A7EB927 /* Pods-PlanterTelemetryTests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				INFOPLIST_FILE = PlanterTelemetryTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetryTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlanterTelemetry.app/Contents/MacOS/PlanterTelemetry";
+			};
+			name = Release;
+		};
+		CC55BC062582582E00B378B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 90DF60FA1179B49405A584D8 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				INFOPLIST_FILE = PlanterTelemetryUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetryUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = PlanterTelemetry;
+			};
+			name = Debug;
+		};
+		CC55BC072582582E00B378B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B9920E7BC5965516A8275921 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = PDLK6696YR;
+				INFOPLIST_FILE = PlanterTelemetryUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.cropwise.data.PlanterTelemetryUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = PlanterTelemetry;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC55BBD42582582C00B378B1 /* Build configuration list for PBXProject "PlanterTelemetry" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC55BBFD2582582E00B378B1 /* Debug */,
+				CC55BBFE2582582E00B378B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC55BBFF2582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetry" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC55BC002582582E00B378B1 /* Debug */,
+				CC55BC012582582E00B378B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC55BC022582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC55BC032582582E00B378B1 /* Debug */,
+				CC55BC042582582E00B378B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC55BC052582582E00B378B1 /* Build configuration list for PBXNativeTarget "PlanterTelemetryUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC55BC062582582E00B378B1 /* Debug */,
+				CC55BC072582582E00B378B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CC55BBD12582582C00B378B1 /* Project object */;
+}

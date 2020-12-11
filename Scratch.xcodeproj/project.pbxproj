@@ -22,12 +22,12 @@
 		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
 		CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
-		CC7817482556E48400137BE2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817472556E48400137BE2 /* ViewController.swift */; };
 		CC78174B2556E48400137BE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC7817492556E48400137BE2 /* Main.storyboard */; };
 		CC78174D2556E48400137BE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC78174C2556E48400137BE2 /* Assets.xcassets */; };
 		CC7817502556E48400137BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */; };
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
+		CC899E86258405FA00618A13 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC899E85258405FA00618A13 /* ViewController.swift */; };
 		CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D85322575A72A0024A250 /* PlottedRow.swift */; };
 		CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */; };
 		CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */; };
@@ -77,7 +77,6 @@
 		CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleTileImageService.swift; sourceTree = "<group>"; };
 		CC7817402556E48400137BE2 /* Scratch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scratch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817432556E48400137BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CC7817472556E48400137BE2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CC78174A2556E48400137BE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CC78174C2556E48400137BE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CC78174F2556E48400137BE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -88,6 +87,7 @@
 		CC7817612556E48400137BE2 /* ScratchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScratchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817652556E48400137BE2 /* ScratchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchUITests.swift; sourceTree = "<group>"; };
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC899E85258405FA00618A13 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = Scratch/App/ViewController.swift; sourceTree = SOURCE_ROOT; };
 		CC8D85322575A72A0024A250 /* PlottedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottedRow.swift; sourceTree = "<group>"; };
 		CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerDrawingView.swift; sourceTree = "<group>"; };
 		CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
@@ -277,7 +277,7 @@
 		E57C45512583F1C300BFBA65 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				CC7817472556E48400137BE2 /* ViewController.swift */,
+				CC899E85258405FA00618A13 /* ViewController.swift */,
 				CC7817492556E48400137BE2 /* Main.storyboard */,
 			);
 			path = Views;
@@ -568,8 +568,8 @@
 				CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */,
 				CCF3B48D25783DC200E55A2D /* PlottingImageCanvasImpl.swift in Sources */,
 				CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */,
+				CC899E86258405FA00618A13 /* ViewController.swift in Sources */,
 				CC0DB90C257FC776006B1CA6 /* MqttPlottingManager.swift in Sources */,
-				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */,
 				CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */,
 				CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */,
