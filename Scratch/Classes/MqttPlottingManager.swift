@@ -1,10 +1,3 @@
-//
-//  PlottingManager.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 12/8/20.
-//
-
 import Foundation
 import MQTTClient
 

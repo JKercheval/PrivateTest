@@ -1,14 +1,9 @@
-//
-//  MapBox-Utilites.swift
-//  SeedSelector
-//
-//  Created by Jeremy Kercheval on 11/13/20.
-//
-
 import Foundation
 import GEOSwift
 import CoreLocation
 import Mapbox
+
+let TileSize : CGFloat = 512.0
 
 struct CartesianExtents2D {
     var XMinimum : CGFloat

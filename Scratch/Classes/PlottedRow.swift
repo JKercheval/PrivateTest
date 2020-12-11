@@ -1,10 +1,3 @@
-//
-//  PlottedRow.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 11/30/20.
-//
-
 import Foundation
 import UIKit
 import CoreLocation

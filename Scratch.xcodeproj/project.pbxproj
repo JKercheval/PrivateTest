@@ -10,7 +10,6 @@
 		1553D6665D673C2EA36204AF /* Pods_Scratch_ScratchUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71665127F9A5BC77D69677FB /* Pods_Scratch_ScratchUITests.framework */; };
 		4E9020F443940140421044E3 /* Pods_ScratchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42578437E9BA03A0E32D9DB9 /* Pods_ScratchTests.framework */; };
 		651B15AED475453BEA6C0D8B /* Pods_Scratch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B63193E48FBAAAFB0A4E3B84 /* Pods_Scratch.framework */; };
-		CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00101C25658E4B00BAE4F9 /* GoogleMapsViewController.swift */; };
 		CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00102225658EC900BAE4F9 /* MapBox-Utilites.swift */; };
 		CC00102E25658EF900BAE4F9 /* FotF Plot E Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102825658EF900BAE4F9 /* FotF Plot E Boundary.geojson */; };
 		CC00102F25658EF900BAE4F9 /* FotF Plot A Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102925658EF900BAE4F9 /* FotF Plot A Boundary.geojson */; };
@@ -21,20 +20,15 @@
 		CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */; };
 		CC0DB90C257FC776006B1CA6 /* MqttPlottingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */; };
 		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
-		CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200E0125672B57001759EC /* CustomTileLayer.swift */; };
 		CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
-		CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817452556E48400137BE2 /* SceneDelegate.swift */; };
 		CC7817482556E48400137BE2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817472556E48400137BE2 /* ViewController.swift */; };
 		CC78174B2556E48400137BE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC7817492556E48400137BE2 /* Main.storyboard */; };
 		CC78174D2556E48400137BE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC78174C2556E48400137BE2 /* Assets.xcassets */; };
 		CC7817502556E48400137BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */; };
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
-		CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */; };
-		CC8D852925752E010024A250 /* MapkitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D852825752E010024A250 /* MapkitViewController.swift */; };
 		CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D85322575A72A0024A250 /* PlottedRow.swift */; };
-		CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */; };
 		CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */; };
 		CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */; };
 		CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE1256F127300759A6F /* Primitives+Extension.swift */; };
@@ -70,7 +64,6 @@
 		ACBA2F3722AB96192E13A044 /* Pods-Scratch-ScratchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Scratch-ScratchUITests.release.xcconfig"; path = "Target Support Files/Pods-Scratch-ScratchUITests/Pods-Scratch-ScratchUITests.release.xcconfig"; sourceTree = "<group>"; };
 		B63193E48FBAAAFB0A4E3B84 /* Pods_Scratch.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Scratch.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9870E3E675D96A0035BE6BF /* Pods-Scratch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Scratch.debug.xcconfig"; path = "Target Support Files/Pods-Scratch/Pods-Scratch.debug.xcconfig"; sourceTree = "<group>"; };
-		CC00101C25658E4B00BAE4F9 /* GoogleMapsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapsViewController.swift; sourceTree = "<group>"; };
 		CC00102225658EC900BAE4F9 /* MapBox-Utilites.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MapBox-Utilites.swift"; sourceTree = "<group>"; };
 		CC00102825658EF900BAE4F9 /* FotF Plot E Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot E Boundary.geojson"; sourceTree = "<group>"; };
 		CC00102925658EF900BAE4F9 /* FotF Plot A Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot A Boundary.geojson"; sourceTree = "<group>"; };
@@ -81,11 +74,9 @@
 		CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MqttPlottingManager.swift; sourceTree = "<group>"; };
 		CC200DF225671F98001759EC /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
-		CC200E0125672B57001759EC /* CustomTileLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTileLayer.swift; sourceTree = "<group>"; };
 		CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleTileImageService.swift; sourceTree = "<group>"; };
 		CC7817402556E48400137BE2 /* Scratch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scratch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817432556E48400137BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CC7817452556E48400137BE2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CC7817472556E48400137BE2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CC78174A2556E48400137BE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CC78174C2556E48400137BE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -97,10 +88,7 @@
 		CC7817612556E48400137BE2 /* ScratchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScratchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817652556E48400137BE2 /* ScratchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchUITests.swift; sourceTree = "<group>"; };
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalMercator.swift; sourceTree = "<group>"; };
-		CC8D852825752E010024A250 /* MapkitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapkitViewController.swift; sourceTree = "<group>"; };
 		CC8D85322575A72A0024A250 /* PlottedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottedRow.swift; sourceTree = "<group>"; };
-		CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ICEMapTile.swift; sourceTree = "<group>"; };
 		CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerDrawingView.swift; sourceTree = "<group>"; };
 		CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		CCD73BE1256F127300759A6F /* Primitives+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Primitives+Extension.swift"; sourceTree = "<group>"; };
@@ -193,14 +181,6 @@
 			path = extensions;
 			sourceTree = "<group>";
 		};
-		CC200E0025672B57001759EC /* Layers */ = {
-			isa = PBXGroup;
-			children = (
-				CC200E0125672B57001759EC /* CustomTileLayer.swift */,
-			);
-			path = Layers;
-			sourceTree = "<group>";
-		};
 		CC7817372556E48300137BE2 = {
 			isa = PBXGroup;
 			children = (
@@ -227,20 +207,11 @@
 			isa = PBXGroup;
 			children = (
 				CCF3B48625783D6B00E55A2D /* Plotting */,
-				CC200E0025672B57001759EC /* Layers */,
 				CC8ED6D72565D69E000A1198 /* Classes */,
 				CC00103725658F1E00BAE4F9 /* extensions */,
 				CC00102725658EF900BAE4F9 /* geoJson */,
 				CC00102125658EC900BAE4F9 /* Utils */,
-				CC7817432556E48400137BE2 /* AppDelegate.swift */,
-				CC7817452556E48400137BE2 /* SceneDelegate.swift */,
-				CC7817472556E48400137BE2 /* ViewController.swift */,
-				CC7817492556E48400137BE2 /* Main.storyboard */,
-				CC78174C2556E48400137BE2 /* Assets.xcassets */,
-				CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */,
-				CC7817512556E48400137BE2 /* Info.plist */,
-				CC00101C25658E4B00BAE4F9 /* GoogleMapsViewController.swift */,
-				CC8D852825752E010024A250 /* MapkitViewController.swift */,
+				E57C454F2583F19A00BFBA65 /* App */,
 			);
 			path = Scratch;
 			sourceTree = "<group>";
@@ -266,9 +237,7 @@
 		CC8ED6D72565D69E000A1198 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				CC8ED6D82565D69E000A1198 /* ICEMapTile.swift */,
 				CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */,
-				CC7B791E256A090D00E4F3D1 /* GlobalMercator.swift */,
 				CC8D85322575A72A0024A250 /* PlottedRow.swift */,
 				CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */,
 				CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */,
@@ -283,6 +252,35 @@
 				CCF3B48C25783DC200E55A2D /* PlottingImageCanvasImpl.swift */,
 			);
 			path = Plotting;
+			sourceTree = "<group>";
+		};
+		E57C454F2583F19A00BFBA65 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				CC7817432556E48400137BE2 /* AppDelegate.swift */,
+				CC7817512556E48400137BE2 /* Info.plist */,
+				CC78174E2556E48400137BE2 /* LaunchScreen.storyboard */,
+				E57C45502583F1BA00BFBA65 /* Resources */,
+				E57C45512583F1C300BFBA65 /* Views */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E57C45502583F1BA00BFBA65 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CC78174C2556E48400137BE2 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		E57C45512583F1C300BFBA65 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CC7817472556E48400137BE2 /* ViewController.swift */,
+				CC7817492556E48400137BE2 /* Main.storyboard */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -573,17 +571,11 @@
 				CC0DB90C257FC776006B1CA6 /* MqttPlottingManager.swift in Sources */,
 				CC7817482556E48400137BE2 /* ViewController.swift in Sources */,
 				CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */,
-				CC8ED6D92565D69E000A1198 /* ICEMapTile.swift in Sources */,
 				CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */,
 				CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
-				CC00101D25658E4B00BAE4F9 /* GoogleMapsViewController.swift in Sources */,
-				CC7817462556E48400137BE2 /* SceneDelegate.swift in Sources */,
-				CC8D852925752E010024A250 /* MapkitViewController.swift in Sources */,
 				CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
-				CC7B791F256A090D00E4F3D1 /* GlobalMercator.swift in Sources */,
-				CC200E0225672B57001759EC /* CustomTileLayer.swift in Sources */,
 				CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */,
 				CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */,
 			);
@@ -764,7 +756,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WD22543E47;
-				INFOPLIST_FILE = Scratch/Info.plist;
+				INFOPLIST_FILE = Scratch/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -784,7 +776,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WD22543E47;
-				INFOPLIST_FILE = Scratch/Info.plist;
+				INFOPLIST_FILE = Scratch/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

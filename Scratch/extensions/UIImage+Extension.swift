@@ -1,10 +1,3 @@
-//
-//  UIImage+Extension.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 11/25/20.
-//
-
 import Foundation
 import UIKit
 

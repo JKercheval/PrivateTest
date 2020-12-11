@@ -1,10 +1,3 @@
-//
-//  PlottingImageCanvasProtocol.swift
-//  Scratch
-//
-//  Created by Jeremy Kercheval on 12/2/20.
-//
-
 import Foundation
 import UIKit
 import CoreLocation
