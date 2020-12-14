@@ -26,6 +26,14 @@ PODS:
   - Mapbox-iOS-SDK (6.2.2):
     - MapboxMobileEvents (~> 0.10.4)
   - MapboxMobileEvents (0.10.5)
+  - MQTTClient (0.15.3):
+    - MQTTClient/Core (= 0.15.3)
+  - MQTTClient/Core (0.15.3):
+    - MQTTClient/Manager
+    - MQTTClient/Min
+  - MQTTClient/Manager (0.15.3):
+    - MQTTClient/Min
+  - MQTTClient/Min (0.15.3)
 
 DEPENDENCIES:
   - geos
@@ -33,6 +41,7 @@ DEPENDENCIES:
   - Google-Maps-iOS-Utils
   - GoogleMaps (= 4.0.0)
   - Mapbox-iOS-SDK
+  - MQTTClient
 
 SPEC REPOS:
   trunk:
@@ -42,6 +51,7 @@ SPEC REPOS:
     - GoogleMaps
     - Mapbox-iOS-SDK
     - MapboxMobileEvents
+    - MQTTClient
 
 SPEC CHECKSUMS:
   geos: e91fba0bb3497e3a8e68ca6103bddd45ec548e06
@@ -50,7 +60,8 @@ SPEC CHECKSUMS:
   GoogleMaps: b7f7fc569a9b354a3af0d9729dbec40957b7d41e
   Mapbox-iOS-SDK: 3f83697efa97f3c21ea7f65c1e75205e1dc030ee
   MapboxMobileEvents: 7f6fb7fb0360302f524d198d36ccec3a0beae523
+  MQTTClient: 0dfa04e789479c2e461786464969895c1fcb0875
 
-PODFILE CHECKSUM: 277a35cbcd4c847abb1adc1f62d56b13fa30981f
+PODFILE CHECKSUM: 55739176f685881a2569c8b31a91ddf35161e415
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

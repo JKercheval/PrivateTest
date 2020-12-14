@@ -1,24 +1,21 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '13.0'
+# platform :ios, '9.0'
 
-target 'Scratch' do
+target 'PlanterTelemetry' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-  pod 'Mapbox-iOS-SDK'
-  # Pods for Scratch
 
+  # Pods for PlanterTelemetry
+  pod 'MQTTClient'
   pod 'geos'
   pod 'GEOSwift'
-  pod 'GoogleMaps', '4.0.0'
-  pod 'Google-Maps-iOS-Utils'
-  pod 'MQTTClient'
-  
-  target 'ScratchTests' do
+
+  target 'PlanterTelemetryTests' do
     inherit! :search_paths
     # Pods for testing
   end
 
-  target 'ScratchUITests' do
+  target 'PlanterTelemetryUITests' do
     # Pods for testing
   end
 

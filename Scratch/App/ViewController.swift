@@ -31,8 +31,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     @IBOutlet weak var mapView: UIView!
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
-    @IBOutlet weak var headingTextField: UITextField!
-    @IBOutlet weak var stepperControl: UIStepper!
 
     var geoField : GeoJSONField?
     var mglMapView: MGLMapView!
@@ -40,7 +38,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     let locationManager = CLLocationManager()
     var currentYlocation : CGFloat = 10
     var currentZoom : Double = 16.0
-    var gpsGenerator : FieldGpsGenerator!
     var layerIdentifier : String = ""
     var plottingView : LayerDrawingView?
     var boundaryQuad : FieldBoundaryCorners!
@@ -76,35 +73,43 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         self.view.insertSubview(mglMapView, belowSubview: startButton)
         mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.view)
 
-        let boundsMaxZoom = MBUtils.getCoordRect(forZoomLevel: UInt(20), northWest: field.northWest, northEast: field.northEast, southEast: field.southEast)
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
         let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
-        gpsGenerator = FieldGpsGenerator(fieldBoundary: boundaryQuad)
-        gpsGenerator.speed = 6.0 // mph
-        self.headingTextField.text = "\(gpsGenerator.heading)"
-
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        self.gpsGenerator.stop()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        appDelegate.plottingManager.disconnect()
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
-        self.gpsGenerator.start()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        appDelegate.plottingManager.connect() { success in
+            if success {
+                self.startButton.backgroundColor = UIColor.green
+            }
+        }
     }
     
     @IBAction func onStopButtonSelected(_ sender: Any) {
-        self.gpsGenerator.stop()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        appDelegate.plottingManager.disconnect()
+        self.startButton.backgroundColor = UIColor.red
     }
     
     @IBAction func onResetButtonSelected(_ sender: Any) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        self.gpsGenerator.reset()
-        appDelegate.plottingRowManager.reset()
+        appDelegate.plottingManager.reset()
         self.imageCanvas.reset()
         guard let view = self.plottingView else {
             return
@@ -112,18 +117,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         view.layer.setNeedsDisplay(view.layer.bounds)
     }
     
-    /// The user pressed one of the stepper buttons
-    /// - Parameter sender: Should be the UIStepper
-    @IBAction func onStepperValueChanged(_ sender: Any) {
-        guard let stepper = sender as? UIStepper else {
-            debugPrint("\(self)\(#function) Failed to get Stepper")
-            return
-        }
-        
-        gpsGenerator.heading = Double(stepper.value)
-        self.headingTextField.text = "\(gpsGenerator.heading)"
-    }
-        
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {
         guard let field = geoField else {
             return
