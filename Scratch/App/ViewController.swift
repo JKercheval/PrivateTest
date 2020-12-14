@@ -90,7 +90,11 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        appDelegate.plottingManager.connect()
+        appDelegate.plottingManager.connect() { success in
+            if success {
+                self.startButton.backgroundColor = UIColor.green
+            }
+        }
     }
     
     @IBAction func onStopButtonSelected(_ sender: Any) {
@@ -98,6 +102,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
             return
         }
         appDelegate.plottingManager.disconnect()
+        self.startButton.backgroundColor = UIColor.red
     }
     
     @IBAction func onResetButtonSelected(_ sender: Any) {

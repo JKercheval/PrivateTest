@@ -1,18 +1,22 @@
 import Foundation
 import MQTTClient
 
+// Set this to the IP Address of the machine running MQTT
+let serverAddress = "192.168.86.29"
+
 protocol PlottingManagerDelegate {
     func connected(success : Bool)
 }
 
+typealias CompletionHandler = (_ success:Bool) -> Void
 protocol PlottingManagerProtocol {
     func reset()
-    func connect()
+    func connect(completion : CompletionHandler?)
     func disconnect()
 }
 
 class MqttPlottingManager : NSObject, PlottingManagerProtocol {
-    
+
     private var transport = MQTTCFSocketTransport()
     fileprivate var mqttSession = MQTTSession()
     let serialQueue = DispatchQueue(label: "com.queue.plottingManager.serial")
@@ -24,21 +28,30 @@ class MqttPlottingManager : NSObject, PlottingManagerProtocol {
         NotificationCenter.default.addObserver(self, selector: #selector(onDidPlotRowRecieved(notification:)), name:.didPlotRowNotification, object: nil)
         self.mqttSession?.delegate = self
 
-        self.transport.host = "localhost"
+        
+        self.transport.host = serverAddress//
         self.transport.port = 1883
+        self.mqttSession?.userName = "tester"
+        self.mqttSession?.password = "tester"
         mqttSession?.transport = transport
     }
     
-    func connect() {
+    func connect(completion: CompletionHandler?) {
         guard let session = mqttSession else {
             return
         }
         session.connect() { error in
             guard let someError = error else {
                 debugPrint("\(#function) No Error")
+                if let handler = completion {
+                    handler(true)
+                }
                 return
             }
             debugPrint("\(#function) Error! - \(someError.localizedDescription)")
+            if let handler = completion {
+                handler(false)
+            }
         }
     }
     

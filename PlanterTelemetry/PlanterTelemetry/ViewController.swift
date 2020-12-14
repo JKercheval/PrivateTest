@@ -5,6 +5,10 @@
 //  Created by Jeremy Kercheval on 12/10/20.
 //
 
+// Set this to the IP Address of the machine running MQTT
+// Can be "localhost" if running on same machine
+let serverAddress = "192.168.86.29"
+
 import Cocoa
 import MQTTClient
 import CoreLocation
@@ -29,8 +33,10 @@ class ViewController: NSViewController {
 
         // Do any additional setup after loading the view.
         self.session?.delegate = self
-        self.transport.host = "localhost"
+        self.transport.host = serverAddress
         self.transport.port = 1883
+        session.userName = "tester"
+        session.password = "tester"
         session?.transport = transport
         textField.stringValue = "\(stepper.integerValue)"
         comboBox.removeAllItems()

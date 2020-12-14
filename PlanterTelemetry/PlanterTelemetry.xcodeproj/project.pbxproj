@@ -52,6 +52,7 @@
 		A714249351C3A8227A7EB927 /* Pods-PlanterTelemetryTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetryTests.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetryTests/Pods-PlanterTelemetryTests.release.xcconfig"; sourceTree = "<group>"; };
 		B9920E7BC5965516A8275921 /* Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry-PlanterTelemetryUITests/Pods-PlanterTelemetry-PlanterTelemetryUITests.release.xcconfig"; sourceTree = "<group>"; };
 		C7F485A1264B1A5E6D752E57 /* Pods-PlanterTelemetry.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry.debug.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry.debug.xcconfig"; sourceTree = "<group>"; };
+		CC1313F72587C0E7008FD592 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CC55BBD92582582C00B378B1 /* PlanterTelemetry.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlanterTelemetry.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC55BBDC2582582C00B378B1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CC55BBDE2582582C00B378B1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -109,6 +110,7 @@
 		CC55BBD02582582C00B378B1 = {
 			isa = PBXGroup;
 			children = (
+				CC1313F72587C0E7008FD592 /* README.md */,
 				CC55BBDB2582582C00B378B1 /* PlanterTelemetry */,
 				CC55BBEE2582582E00B378B1 /* PlanterTelemetryTests */,
 				CC55BBF92582582E00B378B1 /* PlanterTelemetryUITests */,
