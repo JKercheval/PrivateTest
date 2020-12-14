@@ -24,6 +24,7 @@
 		CCA103902582D81D00E4468B /* GEOJSONField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA1038F2582D81D00E4468B /* GEOJSONField.swift */; };
 		CCA1039E2582D9BC00E4468B /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA1039D2582D9BC00E4468B /* FieldGpsGenerator.swift */; };
 		CCA103A42582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCA103A32582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift */; };
+		CCCE1E1D2587DDBE007BE88E /* CodablePlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCE1E1C2587DDBE007BE88E /* CodablePlottedRow.swift */; };
 		D1E9F613794DA18E72E52EE3 /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D205A62DA0871A93029A3F1A /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework */; };
 /* End PBXBuildFile section */
 
@@ -75,6 +76,7 @@
 		CCA1038F2582D81D00E4468B /* GEOJSONField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GEOJSONField.swift; sourceTree = "<group>"; };
 		CCA1039D2582D9BC00E4468B /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
 		CCA103A32582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Extension.swift"; sourceTree = "<group>"; };
+		CCCE1E1C2587DDBE007BE88E /* CodablePlottedRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CodablePlottedRow.swift; path = ../../Scratch/Classes/CodablePlottedRow.swift; sourceTree = "<group>"; };
 		D205A62DA0871A93029A3F1A /* Pods_PlanterTelemetry_PlanterTelemetryUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PlanterTelemetry_PlanterTelemetryUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2D0D3DC2A059D292C4A0EC4 /* Pods-PlanterTelemetry.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PlanterTelemetry.release.xcconfig"; path = "Target Support Files/Pods-PlanterTelemetry/Pods-PlanterTelemetry.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -133,6 +135,7 @@
 		CC55BBDB2582582C00B378B1 /* PlanterTelemetry */ = {
 			isa = PBXGroup;
 			children = (
+				CCCE1E1C2587DDBE007BE88E /* CodablePlottedRow.swift */,
 				CCA103A22582DA4200E4468B /* Extensions */,
 				CCA103762582D60D00E4468B /* geoJson */,
 				CC55BBDC2582582C00B378B1 /* AppDelegate.swift */,
@@ -456,6 +459,7 @@
 				CCA103902582D81D00E4468B /* GEOJSONField.swift in Sources */,
 				CCA103A42582DA4E00E4468B /* CLLocationCoordinate2D+Extension.swift in Sources */,
 				CC55BBDD2582582C00B378B1 /* AppDelegate.swift in Sources */,
+				CCCE1E1D2587DDBE007BE88E /* CodablePlottedRow.swift in Sources */,
 				CCA1039E2582D9BC00E4468B /* FieldGpsGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -136,7 +136,11 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         }
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
-        guard drawRowIntoContext(withPoints: startingPoints, rowValues: plottedRow.rowInfo, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings) else {
+        // TODO: We need to get the values that correspond to the data type that we want to display... DashboardType
+        guard let value = plottedRow.rowInfo[1] else {
+            return false
+        }
+        guard drawRowIntoContext(withPoints: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings) else {
             debugPrint("Failed to draw into image")
             return false
         }
@@ -198,7 +202,7 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [CGFloat],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
         guard let bitmapContext = self.plottingBitmapContext else {
             return false
         }

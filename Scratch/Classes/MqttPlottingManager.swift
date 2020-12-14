@@ -20,7 +20,7 @@ class MqttPlottingManager : NSObject, PlottingManagerProtocol {
     private var transport = MQTTCFSocketTransport()
     fileprivate var mqttSession = MQTTSession()
     let serialQueue = DispatchQueue(label: "com.queue.plottingManager.serial")
-    var plottedRowsArray : Array<PlottedRowInfoProtocol> = Array<PlottedRowInfoProtocol>()
+    var plottedRowsArray : Array<PlottedRowImpl> = Array<PlottedRowImpl>()
 
     override init() {
         super.init()
@@ -140,8 +140,8 @@ extension MqttPlottingManager : MQTTSessionDelegate {
                 //            let str = String(decoding: messageData, as: UTF8.self)
                 //            debugPrint("\(#function) \(messageTopic):\(str)")
                 let baseRow = try JSONDecoder().decode(PlottedRowBase.self, from: messageData)
-                let plottedRow = PlottedRow(baseRow: baseRow)
-                guard var previous = self.plottedRowsArray.last else {
+                let plottedRow = PlottedRowImpl(baseRow: baseRow)
+                guard let previous = self.plottedRowsArray.last else {
                     self.plottedRowsArray.append(plottedRow)
                     return
                 }

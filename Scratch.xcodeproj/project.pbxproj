@@ -19,7 +19,6 @@
 		CC00103325658EF900BAE4F9 /* FotF Plot B Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */; };
 		CC00103925658F1E00BAE4F9 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */; };
 		CC0DB90C257FC776006B1CA6 /* MqttPlottingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */; };
-		CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC200DF225671F98001759EC /* FieldGpsGenerator.swift */; };
 		CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
 		CC78174B2556E48400137BE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC7817492556E48400137BE2 /* Main.storyboard */; };
@@ -28,8 +27,9 @@
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
 		CC899E86258405FA00618A13 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC899E85258405FA00618A13 /* ViewController.swift */; };
-		CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D85322575A72A0024A250 /* PlottedRow.swift */; };
+		CC8D85332575A72A0024A250 /* CodablePlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D85322575A72A0024A250 /* CodablePlottedRow.swift */; };
 		CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */; };
+		CCCE1E082587DC7F007BE88E /* PlottedRowImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCE1E072587DC7F007BE88E /* PlottedRowImpl.swift */; };
 		CCD73BDD256F11E800759A6F /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */; };
 		CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE1256F127300759A6F /* Primitives+Extension.swift */; };
 		CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */; };
@@ -73,7 +73,6 @@
 		CC00102D25658EF900BAE4F9 /* FotF Plot B Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot B Boundary.geojson"; sourceTree = "<group>"; };
 		CC00103825658F1E00BAE4F9 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MqttPlottingManager.swift; sourceTree = "<group>"; };
-		CC200DF225671F98001759EC /* FieldGpsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldGpsGenerator.swift; sourceTree = "<group>"; };
 		CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleTileImageService.swift; sourceTree = "<group>"; };
 		CC7817402556E48400137BE2 /* Scratch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scratch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC7817432556E48400137BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -88,8 +87,9 @@
 		CC7817652556E48400137BE2 /* ScratchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScratchUITests.swift; sourceTree = "<group>"; };
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC899E85258405FA00618A13 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = Scratch/App/ViewController.swift; sourceTree = SOURCE_ROOT; };
-		CC8D85322575A72A0024A250 /* PlottedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottedRow.swift; sourceTree = "<group>"; };
+		CC8D85322575A72A0024A250 /* CodablePlottedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodablePlottedRow.swift; sourceTree = "<group>"; };
 		CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerDrawingView.swift; sourceTree = "<group>"; };
+		CCCE1E072587DC7F007BE88E /* PlottedRowImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottedRowImpl.swift; sourceTree = "<group>"; };
 		CCD73BDC256F11E800759A6F /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		CCD73BE1256F127300759A6F /* Primitives+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Primitives+Extension.swift"; sourceTree = "<group>"; };
 		CCD73BE6256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocationCoordinate2D+Extension.swift"; sourceTree = "<group>"; };
@@ -152,7 +152,6 @@
 			isa = PBXGroup;
 			children = (
 				CC00102225658EC900BAE4F9 /* MapBox-Utilites.swift */,
-				CC200DF225671F98001759EC /* FieldGpsGenerator.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -238,9 +237,10 @@
 			isa = PBXGroup;
 			children = (
 				CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */,
-				CC8D85322575A72A0024A250 /* PlottedRow.swift */,
+				CC8D85322575A72A0024A250 /* CodablePlottedRow.swift */,
 				CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */,
 				CC0DB90B257FC776006B1CA6 /* MqttPlottingManager.swift */,
+				CCCE1E072587DC7F007BE88E /* PlottedRowImpl.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -570,14 +570,14 @@
 				CCD73BE7256F12ED00759A6F /* CLLocationCoordinate2D+Extension.swift in Sources */,
 				CC899E86258405FA00618A13 /* ViewController.swift in Sources */,
 				CC0DB90C257FC776006B1CA6 /* MqttPlottingManager.swift in Sources */,
-				CC8D85332575A72A0024A250 /* PlottedRow.swift in Sources */,
+				CCCE1E082587DC7F007BE88E /* PlottedRowImpl.swift in Sources */,
+				CC8D85332575A72A0024A250 /* CodablePlottedRow.swift in Sources */,
 				CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */,
 				CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
 				CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */,
-				CC200DF325671F98001759EC /* FieldGpsGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

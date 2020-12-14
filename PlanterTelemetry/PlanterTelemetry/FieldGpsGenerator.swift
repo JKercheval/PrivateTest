@@ -10,46 +10,46 @@ import CoreLocation
 import GEOSwift
 import MQTTClient
 
-let defaultMachineWidth : Double = 120 // feet
-let defaultMachineWidthMeters : Double = 27.432
-let defaultRowCount : UInt = 54
+//let defaultMachineWidth : Double = 120 // feet
+//let defaultMachineWidthMeters : Double = 27.432
+//let defaultRowCount : UInt = 54
 
-typealias PlottedRowValues = Array<CGFloat>
-struct PlottedRow : Codable {
-    var location : CLLocationCoordinate2D?
-    var rowInfoArr : PlottedRowValues?
-    var rowHeading : Double
-    
-    enum CodingKeys: String, CodingKey {
-        case location
-        case rowInfoArr
-        case rowHeading = "heading"
-    }
-    
-    init(location : CLLocationCoordinate2D, heading : Double, rows: PlottedRowValues) {
-        self.location = location
-        self.rowHeading = heading
-        self.rowInfoArr = rows
-    }
-    
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        
-        location = try values.decode(CLLocationCoordinate2D.self, forKey: .location)
-        rowHeading = try values.decode(Double.self, forKey: .rowHeading)
-        rowInfoArr = try values.decode(PlottedRowValues.self, forKey: .rowInfoArr)
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(location, forKey: .location)
-//        try container.encode(longitude, forKey: .longitude)
-        try container.encode(self.rowHeading, forKey: .rowHeading)
-        try container.encode(self.rowInfoArr, forKey: .rowInfoArr)
-        
-    }
-
-}
+//typealias PlottedRowValues = Array<CGFloat>
+//struct PlottedRow : Codable {
+//    var location : CLLocationCoordinate2D?
+//    var rowInfoArr : PlottedRowValues?
+//    var rowHeading : Double
+//
+//    enum CodingKeys: String, CodingKey {
+//        case location
+//        case rowInfoArr
+//        case rowHeading = "heading"
+//    }
+//
+//    init(location : CLLocationCoordinate2D, heading : Double, rows: PlottedRowValues) {
+//        self.location = location
+//        self.rowHeading = heading
+//        self.rowInfoArr = rows
+//    }
+//
+//    init(from decoder: Decoder) throws {
+//        let values = try decoder.container(keyedBy: CodingKeys.self)
+//
+//        location = try values.decode(CLLocationCoordinate2D.self, forKey: .location)
+//        rowHeading = try values.decode(Double.self, forKey: .rowHeading)
+//        rowInfoArr = try values.decode(PlottedRowValues.self, forKey: .rowInfoArr)
+//    }
+//
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(location, forKey: .location)
+////        try container.encode(longitude, forKey: .longitude)
+//        try container.encode(self.rowHeading, forKey: .rowHeading)
+//        try container.encode(self.rowInfoArr, forKey: .rowInfoArr)
+//
+//    }
+//
+//}
 
 class FieldGpsGenerator {
     var timer = Timer()
@@ -111,16 +111,25 @@ class FieldGpsGenerator {
         }
     }
     
-    func getMockRowInfoArray(rowCount : UInt) -> [CGFloat] {
-        var rowValues = [CGFloat]()
+    func getMockRowInfoArray(rowCount : UInt) -> DataRowValues {
+        var rowValues = [Float]()
         for _ in 0..<rowCount {
-            rowValues.append(CGFloat.random(in: 0.15...0.25))
+            rowValues.append(Float.random(in: 0.15...0.25))
         }
         return rowValues
     }
-    
-    func createMockPlottedRow(coord : CLLocationCoordinate2D, heading : Double, rowCount : UInt = defaultRowCount) -> PlottedRow {
-        let plottedRow = PlottedRow(location: coord, heading: heading, rows: getMockRowInfoArray(rowCount: defaultRowCount))
+
+    func getMockRowData(withDataID dataId : UInt, rowCount : UInt) -> PlottedRowData {
+        let rowValues1 = getMockRowInfoArray(rowCount: rowCount)
+        let rowValues2 = getMockRowInfoArray(rowCount: rowCount)
+        let rowValues3 = getMockRowInfoArray(rowCount: rowCount)
+
+        let rowData = PlottedRowData(dictionaryLiteral: (dataId, rowValues1), (dataId + 1, rowValues2), (dataId + 2, rowValues3))
+        return rowData
+    }
+
+    func createMockPlottedRow(coord : CLLocationCoordinate2D, heading : Double, rowCount : UInt = defaultRowCount) -> PlottedRowBase {
+        let plottedRow = PlottedRowBase(location: coord, heading: heading, speed: 6.0, rows: getMockRowData(withDataID: 1, rowCount: defaultRowCount))
         return plottedRow
     }
     
@@ -176,9 +185,8 @@ class FieldGpsGenerator {
         timer = Timer()
     }
     
-    func publishRow(row : PlottedRow) {
+    func publishRow(row : PlottedRowBase) {
         if let encoded =  try? JSONEncoder().encode(row) {
-//            let statusData = "Available".data(using: .utf8)
             self.session?.publishData(encoded, onTopic: "planter/row", retain: false, qos: .atLeastOnce) { error in
                 guard error == nil else {
                     assertionFailure("Failed to publish")
