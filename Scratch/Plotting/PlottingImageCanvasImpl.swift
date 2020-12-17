@@ -24,7 +24,6 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
     private var lastRowBoundsDrawn : GMSCoordinateBounds?
     private var displayPlottingContexts : [DisplayType : CGContext] = [DisplayType : CGContext]()
     private var plottingManager : PlottingManagerProtocol!
-    private var plottingBitmapContext : CGContext?
     var colorComponents : [CGFloat] = [CGFloat]()
     var locations : [CGFloat] = [CGFloat]()
     
@@ -46,9 +45,6 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         self.displayPlottingContexts[.downforce] = createBitmapContext(size: canvasImageSize)
         self.displayPlottingContexts[.rideQuality] = createBitmapContext(size: canvasImageSize)
 
-//        self.plottingBitmapContext = createBitmapContext(size: canvasImageSize)
-        createGradientInfo()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(onPlotNewRowReceived(notification:)), name:.plotNewRow, object: nil)
     }
     
@@ -166,29 +162,6 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         postRowDrawCompleteNotification(drawCoordinate: plottedRow)
         return success
     }
-    
-    
-    /// Gets the subimage which is defined by the CGRect defined by the subImageRect
-    /// - Parameter subImageRect: CGRect of the image
-    /// - Returns: UIImage of the sub-image requested
-    func getSubImageFromCanvas(with subImageRect: CGRect) -> UIImage? {
-        guard subImageRect.isEmpty == false else {
-            debugPrint("\(#function) - No CGRect defined, sub-image is invalid")
-            return nil
-        }
-        guard let context = self.plottingBitmapContext else {
-            return nil
-        }
-        guard let cgImage = context.makeImage() else {
-            return nil
-        }
-        guard let cropped = cgImage.cropping(to: subImageRect) else {
-            return nil
-        }
-        
-        // Convert to UIImage
-        return UIImage(cgImage: cropped)
-    }
 
 }
 
@@ -220,12 +193,8 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-//    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
     func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float], displayType : DisplayType, metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
-//        guard let bitmapContext = self.plottingBitmapContext else {
-//            return false
-//        }
-        
+
         assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
         bitmapContext.setStrokeColor(UIColor.black.cgColor)
         bitmapContext.setLineWidth(0.1)
@@ -233,7 +202,6 @@ extension PlottingImageCanvasImpl {
         let cellRowWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
         // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state
         // when we are done.
-//        bitmapContext.saveGState()
         
         // This is the machine width adjusted to our canvas
         let pixelMachineWidth = CGFloat(self.machineInfo.machineWidth / metersPerPixel)
@@ -249,7 +217,7 @@ extension PlottingImageCanvasImpl {
         for (index, value) in rowValues.enumerated() {
             
             let cellRowPath = CGMutablePath();
-            let fillColor = color(forValue: value, displayType: displayType)
+            let fillColor = UIColor.color(forValue: value, displayType: displayType)
             bitmapContext.setFillColor(fillColor)
             bitmapContext.beginPath()
             let topLeftOrig : CGPoint = CGPoint(x: points.nextStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index) * cellRowWidth), y: points.nextStartingPoint.y)
@@ -276,9 +244,7 @@ extension PlottingImageCanvasImpl {
             // this will not only draw (fill) the path, but it also clears it.
             bitmapContext.fillPath()
         }
-        // Restore previous CGState (pop).
-//        bitmapContext.restoreGState()
-        
+
         return true
     }
     
@@ -334,51 +300,6 @@ extension PlottingImageCanvasImpl {
         //        bitmapContext?.drawPath(using: .fillStroke)
         
         return bitmapContext
-    }
-    
-    func createGradientInfo() {
-
-        let startColor = UIColor.green
-        guard let startColorComponents = startColor.cgColor.components else { return }
-
-        let secondColor = UIColor.yellow
-        guard let secondColorComponents = secondColor.cgColor.components else { return }
-
-        let endColor = UIColor.red
-        guard let endColorComponents = endColor.cgColor.components else { return }
-
-        self.colorComponents = [startColorComponents[0], startColorComponents[1], startColorComponents[2], startColorComponents[3],
-                                secondColorComponents[0], secondColorComponents[1], secondColorComponents[2], secondColorComponents[3],
-                                endColorComponents[0], endColorComponents[1], endColorComponents[2], endColorComponents[3]]
-    }
-    
-    func color(forValue value : Float, displayType : DisplayType) -> CGColor {
-        switch displayType {
-            case .singulation:
-                let hue = value.normalize(min: 0.18, max: 0.22) * 0.33
-                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                return color.cgColor
-            case .rideQuality:
-                let hue = value.normalize(min: 0.70, max: 1.0) * 0.33
-                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                return color.cgColor
-            case .downforce:
-                let hue = value.normalize(min: 175.0, max: 300.0) * 0.33
-                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
-                return color.cgColor
-        }
-    }
-    
-}
-extension CGFloat {
-    func normalize(min: CGFloat, max: CGFloat, from a: CGFloat = 0, to b: CGFloat = 1) -> CGFloat {
-        return (b - a) * ((self - min) / (max - min)) + a
-    }
-}
-
-extension Float {
-    func normalize(min: Float, max: Float, from a: Float = 0, to b: Float = 1) -> Float {
-        return (b - a) * ((self - min) / (max - min)) + a
     }
 }
 
