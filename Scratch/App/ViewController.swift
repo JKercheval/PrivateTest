@@ -55,8 +55,9 @@ class ViewController: UIViewController, MGLMapViewDelegate {
             return
         }
 
+        let centerCoord = MBUtils.getCenterCoord(LocationPoints: [field.northWest, field.northEast, field.southWest, field.southEast])
         mglMapView = MGLMapView(frame: view.bounds, styleURL: MGLStyle.satelliteStreetsStyleURL)
-        self.mglMapView.setCenter(field.northWest, zoomLevel: currentZoom, animated: false)
+        self.mglMapView.setCenter(centerCoord, zoomLevel: currentZoom, animated: false)
         
         locationManager.requestAlwaysAuthorization()
         locationManager.requestWhenInUseAuthorization()
@@ -74,16 +75,19 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.view)
 
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        appDelegate.plottingManager.disconnect()
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, plottingManager: appDelegate.plottingManager)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        // TODO: Commenting out for now...
+//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+//            return
+//        }
+//        appDelegate.plottingManager.disconnect()
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
@@ -296,6 +300,19 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         
         style.addLayer(layer)
     }
+    
+    @IBAction func onSingulationSelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.singulation])
+    }
+
+    @IBAction func onDownforceSelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.downforce])
+    }
+
+    @IBAction func onRideQualitySelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.rideQuality])
+    }
+
 }
 
 extension ViewController : CLLocationManagerDelegate {

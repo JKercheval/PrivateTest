@@ -4,20 +4,11 @@ import MQTTClient
 // Set this to the IP Address of the machine running MQTT
 let serverAddress = "192.168.86.29"
 
-protocol PlottingManagerDelegate {
-    func connected(success : Bool)
-}
-
-typealias CompletionHandler = (_ success:Bool) -> Void
-protocol PlottingManagerProtocol {
-    func reset()
-    func connect(completion : CompletionHandler?)
-    func disconnect()
-}
-
 class MqttPlottingManager : NSObject, PlottingManagerProtocol {
 
     private var transport = MQTTCFSocketTransport()
+    private var displayType : DisplayType = .singulation
+    private var machineInfo : MachineInfoProtocol!
     fileprivate var mqttSession = MQTTSession()
     let serialQueue = DispatchQueue(label: "com.queue.plottingManager.serial")
     var plottedRowsArray : Array<PlottedRowImpl> = Array<PlottedRowImpl>()
@@ -25,9 +16,13 @@ class MqttPlottingManager : NSObject, PlottingManagerProtocol {
     override init() {
         super.init()
         MQTTLog.setLogLevel(.error)
-        NotificationCenter.default.addObserver(self, selector: #selector(onDidPlotRowRecieved(notification:)), name:.didPlotRowNotification, object: nil)
-        self.mqttSession?.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(onDidPlotRowRecieved(notification:)),
+                                               name:.didPlotRowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onDisplayTypeChanged(notification:)),
+                                               name:.didChangeDisplayTypeNotification, object: nil)
 
+        self.mqttSession?.delegate = self
+        self.machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
         
         self.transport.host = serverAddress//
         self.transport.port = 1883
@@ -61,6 +56,15 @@ class MqttPlottingManager : NSObject, PlottingManagerProtocol {
         }
         session.disconnect()
     }
+    
+    var currentDisplayType : DisplayType {
+        return displayType
+    }
+    
+    var machineInformation : MachineInfoProtocol {
+        return self.machineInfo
+    }
+
         
     /// This is called when a plotted row has been drawn to the canvas.
     /// - Parameter notification: Notification object containing the PlottedRowInfoProtocol
@@ -81,6 +85,15 @@ class MqttPlottingManager : NSObject, PlottingManagerProtocol {
         }
     }
     
+    @objc func onDisplayTypeChanged(notification : Notification) {
+        guard let type = notification.userInfo?[userInfoDisplayTypeKey] as? DisplayType else {
+            assert(notification.userInfo != nil, "There was no userInfo dictionary passed")
+            return
+        }
+        
+        self.displayType = type
+        NotificationCenter.default.post(name: .switchDisplayTypeNotification, object: self)
+    }
     
     /// Called when we are resetting our plotting for any reason.
     func reset() {

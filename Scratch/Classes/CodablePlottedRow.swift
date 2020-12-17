@@ -1,12 +1,18 @@
 import Foundation
 import CoreLocation
 
-typealias DataRowValues = Array<Float>
-typealias PlottedRowData = [UInt : DataRowValues]
-
 let defaultMachineWidth : Double = 120 // feet
 let defaultMachineWidthMeters : Double = 27.432
 let defaultRowCount : UInt = 54
+
+enum DisplayType : UInt, CaseIterable, Codable {
+    case singulation
+    case rideQuality
+    case downforce
+}
+
+typealias DataRowValues = Array<Float>
+typealias PlottedRowData = [DisplayType : DataRowValues]
 
 struct PlottedRowBase : Codable {
     var location : CLLocationCoordinate2D?
@@ -40,7 +46,6 @@ struct PlottedRowBase : Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(location, forKey: .location)
-        //        try container.encode(longitude, forKey: .longitude)
         try container.encode(self.rowHeading, forKey: .rowHeading)
         try container.encode(self.rowInfoArr, forKey: .rowInfoArr)
         try container.encode(self.speed, forKey: .speed)

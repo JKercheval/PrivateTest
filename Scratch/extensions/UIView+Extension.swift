@@ -9,11 +9,14 @@ func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
 let userInfoPlottedCoordinateKey = "PlottedCoordinate"
 let userInfoPlottedRowKey = "plottedRow"
+let userInfoDisplayTypeKey = "displayType"
 
 extension Notification.Name {
     static let newPlottedRow = Notification.Name("newPlottedRow")
     static let plotNewRow = Notification.Name("plotNewRow")
     static let didPlotRowNotification = Notification.Name("didPlotRow")
+    static let didChangeDisplayTypeNotification = Notification.Name("didChangeDisplayType")
+    static let switchDisplayTypeNotification = Notification.Name("switchDisplayType")
 }
 
 /// UIView extension fpr gettomg parent view controller.

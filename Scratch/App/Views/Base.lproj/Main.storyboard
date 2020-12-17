@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7R0-eE-xI3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7R0-eE-xI3">
     <device id="ipad10_2" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -91,15 +91,67 @@
                                     <action selector="onResetButtonSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QZI-xK-4Zf"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f68-1k-wuQ">
+                                <rect key="frame" x="640" y="70" width="150" height="30"/>
+                                <color key="backgroundColor" systemColor="systemOrangeColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="OFn-Ne-NIw"/>
+                                </constraints>
+                                <state key="normal" title="Singulation"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onSingulationSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="f9T-yY-LC3"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="huw-Xp-XSL">
+                                <rect key="frame" x="640" y="120" width="150" height="30"/>
+                                <color key="backgroundColor" systemColor="systemOrangeColor"/>
+                                <state key="normal" title="Downforce"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onDownforceSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="cvD-xY-uvG"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4uJ-z4-5bF">
+                                <rect key="frame" x="640" y="170" width="150" height="30"/>
+                                <color key="backgroundColor" systemColor="systemOrangeColor"/>
+                                <state key="normal" title="Ride Quality"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="onRideQualitySelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="n9N-Ec-gHk"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="REt-JW-5gm"/>
                         <constraints>
                             <constraint firstItem="arr-BN-dPa" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" constant="20" id="8ho-EK-Ebe"/>
+                            <constraint firstItem="4uJ-z4-5bF" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ICO-vX-zRw"/>
+                            <constraint firstItem="huw-Xp-XSL" firstAttribute="leading" secondItem="f68-1k-wuQ" secondAttribute="leading" id="LUT-ef-r1s"/>
+                            <constraint firstItem="f68-1k-wuQ" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" constant="20" id="Laz-sO-Zy8"/>
+                            <constraint firstItem="huw-Xp-XSL" firstAttribute="trailing" secondItem="f68-1k-wuQ" secondAttribute="trailing" id="ZpB-4B-scI"/>
+                            <constraint firstItem="4uJ-z4-5bF" firstAttribute="top" secondItem="huw-Xp-XSL" secondAttribute="bottom" constant="20" id="csi-Je-waY"/>
+                            <constraint firstItem="f68-1k-wuQ" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" constant="-20" id="eXs-MJ-Lwv"/>
+                            <constraint firstItem="huw-Xp-XSL" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ema-0m-Veb"/>
                             <constraint firstItem="te4-hL-ECZ" firstAttribute="leading" secondItem="arr-BN-dPa" secondAttribute="trailing" constant="25" id="f2a-dc-s7E"/>
                             <constraint firstItem="te4-hL-ECZ" firstAttribute="top" secondItem="arr-BN-dPa" secondAttribute="top" id="k36-pY-aoY"/>
+                            <constraint firstItem="huw-Xp-XSL" firstAttribute="top" secondItem="f68-1k-wuQ" secondAttribute="bottom" constant="20" id="nok-He-yGw"/>
+                            <constraint firstItem="4uJ-z4-5bF" firstAttribute="trailing" secondItem="f68-1k-wuQ" secondAttribute="trailing" id="ojA-hn-ZEN"/>
                             <constraint firstItem="yz0-9b-EB4" firstAttribute="leading" secondItem="te4-hL-ECZ" secondAttribute="trailing" constant="25" id="uWL-dR-d7x"/>
                             <constraint firstItem="arr-BN-dPa" firstAttribute="leading" secondItem="REt-JW-5gm" secondAttribute="leading" constant="20" id="upv-at-L9H"/>
                             <constraint firstItem="yz0-9b-EB4" firstAttribute="top" secondItem="te4-hL-ECZ" secondAttribute="top" id="wnZ-oV-hzv"/>
+                            <constraint firstItem="4uJ-z4-5bF" firstAttribute="leading" secondItem="f68-1k-wuQ" secondAttribute="leading" id="ySA-8o-cOH"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="GNV-n2-5Us"/>

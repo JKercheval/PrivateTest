@@ -15,22 +15,23 @@ struct PlottedRowHeadings {
 
 class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
+    private var zoomLevel : UInt = 20
     private var fieldBoundary :FieldBoundaryCorners!
     private var machineInfo : MachineInfoProtocol!
-    private var canvasZoom : UInt
     private var canvasImageSize : CGSize = CGSize.zero
     private var metersPerPixel : Double = 0
     private var lastPlottedRow : PlottedRowInfoProtocol?
     private var lastRowBoundsDrawn : GMSCoordinateBounds?
-
-    var plottingBitmapContext : CGContext?
+    private var displayPlottingContexts : [DisplayType : CGContext] = [DisplayType : CGContext]()
+    private var plottingManager : PlottingManagerProtocol!
+    private var plottingBitmapContext : CGContext?
     var colorComponents : [CGFloat] = [CGFloat]()
     var locations : [CGFloat] = [CGFloat]()
     
-    init(boundary : FieldBoundaryCorners, machineInfo : MachineInfoProtocol,  zoomLevel : UInt = 20) {
+    init(boundary : FieldBoundaryCorners, plottingManager : PlottingManagerProtocol) {
         self.fieldBoundary = boundary
-        self.canvasZoom = zoomLevel
-        self.machineInfo = machineInfo
+        self.plottingManager = plottingManager
+        self.machineInfo = plottingManager.machineInformation
         self.metersPerPixel = getMetersPerPixel(coord: self.fieldBoundary.northWest, zoom: zoomLevel)
         
         // Get the distance in meters.
@@ -41,21 +42,18 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         let imageHeight = heightDistance / self.metersPerPixel
         
         self.canvasImageSize = CGSize(width: imageWidth, height: imageHeight)
-        self.plottingBitmapContext = createBitmapContext(size: canvasImageSize)
+        self.displayPlottingContexts[.singulation] = createBitmapContext(size: canvasImageSize)
+        self.displayPlottingContexts[.downforce] = createBitmapContext(size: canvasImageSize)
+        self.displayPlottingContexts[.rideQuality] = createBitmapContext(size: canvasImageSize)
+
+//        self.plottingBitmapContext = createBitmapContext(size: canvasImageSize)
         createGradientInfo()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(onPlotNewRowReceived(notification:)), name:.plotNewRow, object: nil)
     }
     
-    var currentImage: UIImage? {
-        guard let context = self.plottingBitmapContext,
-              let image = context.makeImage() else {
-            return nil
-        }
-        return UIImage(cgImage: image)
-    }
-    
     var currentCGImage: CGImage? {
-        guard let context = self.plottingBitmapContext,
+        guard let context = self.displayPlottingContexts[self.plottingManager.currentDisplayType],
               let image = context.makeImage() else {
             return nil
         }
@@ -76,6 +74,12 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return bounds
     }
     
+    func image(forDisplayType type : DisplayType) -> CGImage? {
+        // TODO: Get the image for the display type
+        // for now, just return current image while implementing
+        return currentCGImage
+    }
+    
     func reset() {
         guard let bitmapContext = self.plottingBitmapContext else {
             return
@@ -83,6 +87,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: self.imageSize)
         bitmapContext.clear(imageRect)
     }
+
     
     @objc func onPlotNewRowReceived(notification : Notification) {
         guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
@@ -109,6 +114,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         // So, take the current draw coordinates and calculate the offset from our topleft point.
 
         let coord = plottedRow.plottingCoordinate
+        let currentDisplayType = plottingManager.currentDisplayType
     
         let currentStartingPt = getStartPt(fromCoord: coord)
         guard let nextPlottedRow = plottedRow.nextPlottedRow else {
@@ -137,16 +143,26 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         // TODO: We need to get the values that correspond to the data type that we want to display... DashboardType
-        guard let value = plottedRow.rowInfo[1] else {
+        guard let value = plottedRow.rowInfo[currentDisplayType], let context = self.displayPlottingContexts[currentDisplayType] else {
             return false
         }
-        guard drawRowIntoContext(withPoints: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings) else {
+        let success = drawRow(withContext: context, points: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
+        guard success else {
             debugPrint("Failed to draw into image")
-            return false
+            return success
         }
+        DispatchQueue.global().async {
+            for display in DisplayType.allCases {
+                guard let value = plottedRow.rowInfo[display], let context = self.displayPlottingContexts[display], display != currentDisplayType else {
+                    continue
+                }
+                let _ = self.drawRow(withContext: context, points: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
+            }
+        }
+
         self.lastPlottedRow = plottedRow
         postRowDrawCompleteNotification(drawCoordinate: plottedRow)
-        return true
+        return success
     }
     
     
@@ -202,10 +218,11 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
-        guard let bitmapContext = self.plottingBitmapContext else {
-            return false
-        }
+//    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+    func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+//        guard let bitmapContext = self.plottingBitmapContext else {
+//            return false
+//        }
         
         assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
         bitmapContext.setStrokeColor(UIColor.black.cgColor)

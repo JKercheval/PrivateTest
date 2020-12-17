@@ -119,17 +119,22 @@ class FieldGpsGenerator {
         return rowValues
     }
 
-    func getMockRowData(withDataID dataId : UInt, rowCount : UInt) -> PlottedRowData {
+    func getMockRowData(withDataID dataId : DisplayType, rowCount : UInt) -> PlottedRowData {
         let rowValues1 = getMockRowInfoArray(rowCount: rowCount)
         let rowValues2 = getMockRowInfoArray(rowCount: rowCount)
         let rowValues3 = getMockRowInfoArray(rowCount: rowCount)
 
-        let rowData = PlottedRowData(dictionaryLiteral: (dataId, rowValues1), (dataId + 1, rowValues2), (dataId + 2, rowValues3))
+        var rowData = PlottedRowData(dictionaryLiteral: (dataId, rowValues1))
+        rowData[.downforce] = rowValues2
+        rowData[.rideQuality] = rowValues3
         return rowData
     }
 
     func createMockPlottedRow(coord : CLLocationCoordinate2D, heading : Double, rowCount : UInt = defaultRowCount) -> PlottedRowBase {
-        let plottedRow = PlottedRowBase(location: coord, heading: heading, speed: 6.0, rows: getMockRowData(withDataID: 1, rowCount: defaultRowCount))
+        let plottedRow = PlottedRowBase(location: coord,
+                                        heading: heading,
+                                        speed: 6.0,
+                                        rows: getMockRowData(withDataID: .singulation, rowCount: defaultRowCount))
         return plottedRow
     }
     

@@ -2,6 +2,7 @@ import Foundation
 import GEOSwift
 import CoreLocation
 import Mapbox
+import GLKit
 
 let TileSize : CGFloat = 512.0
 
@@ -125,6 +126,39 @@ class MBUtils {
         let yPt = CGFloat(Double(TileSize) * (0.5 - log((1 + siny) / (1 - siny)) / (4 * Double.pi)))
         return CGPoint(x: xPt, y: yPt)
     }
+    
+    // center func
+    class func getCenterCoord(LocationPoints: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D{
+        
+        var x:Float = 0.0;
+        var y:Float = 0.0;
+        var z:Float = 0.0;
+        
+        for points in LocationPoints {
+            
+            let lat = GLKMathDegreesToRadians(Float(points.latitude));
+            let long = GLKMathDegreesToRadians(Float(points.longitude));
+            
+            x += cos(lat) * cos(long);
+            y += cos(lat) * sin(long);
+            z += sin(lat);
+        }
+        
+        x = x / Float(LocationPoints.count);
+        y = y / Float(LocationPoints.count);
+        z = z / Float(LocationPoints.count);
+        
+        let resultLong = atan2(y, x);
+        let resultHyp = sqrt(x * x + y * y);
+        let resultLat = atan2(z, resultHyp);
+        
+        
+        
+        let result = CLLocationCoordinate2D(latitude: CLLocationDegrees(GLKMathRadiansToDegrees(Float(resultLat))), longitude: CLLocationDegrees(GLKMathRadiansToDegrees(Float(resultLong))));
+        
+        return result;
+    }
+
 }
 
 public struct Stopwatch {
