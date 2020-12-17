@@ -81,11 +81,13 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
     }
     
     func reset() {
-        guard let bitmapContext = self.plottingBitmapContext else {
-            return
+        for type in DisplayType.allCases {
+            guard let bitmapContext = self.displayPlottingContexts[type] else {
+                return
+            }
+            let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: self.imageSize)
+            bitmapContext.clear(imageRect)
         }
-        let imageRect = CGRect(origin: CGPoint(x: 0, y: 0), size: self.imageSize)
-        bitmapContext.clear(imageRect)
     }
 
     
@@ -146,7 +148,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         guard let value = plottedRow.rowInfo[currentDisplayType], let context = self.displayPlottingContexts[currentDisplayType] else {
             return false
         }
-        let success = drawRow(withContext: context, points: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
+        let success = drawRow(withContext: context, points: startingPoints, rowValues: value, displayType: currentDisplayType, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
         guard success else {
             debugPrint("Failed to draw into image")
             return success
@@ -156,7 +158,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
                 guard let value = plottedRow.rowInfo[display], let context = self.displayPlottingContexts[display], display != currentDisplayType else {
                     continue
                 }
-                let _ = self.drawRow(withContext: context, points: startingPoints, rowValues: value, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
+                let _ = self.drawRow(withContext: context, points: startingPoints, rowValues: value, displayType: display, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
             }
         }
 
@@ -219,7 +221,7 @@ extension PlottingImageCanvasImpl {
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
 //    func drawRowIntoContext(withPoints points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
-    func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float],  metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+    func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float], displayType : DisplayType, metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
 //        guard let bitmapContext = self.plottingBitmapContext else {
 //            return false
 //        }
@@ -247,14 +249,8 @@ extension PlottingImageCanvasImpl {
         for (index, value) in rowValues.enumerated() {
             
             let cellRowPath = CGMutablePath();
-            var color = UIColor.green.cgColor
-            if value < 0.19 {
-                color = UIColor.yellow.cgColor
-            }
-            else if value > 0.21 {
-                color = UIColor.red.cgColor
-            }
-            bitmapContext.setFillColor(color)
+            let fillColor = color(forValue: value, displayType: displayType)
+            bitmapContext.setFillColor(fillColor)
             bitmapContext.beginPath()
             let topLeftOrig : CGPoint = CGPoint(x: points.nextStartingPoint.x - (pixelMachineWidth / 2.0) + (CGFloat(index) * cellRowWidth), y: points.nextStartingPoint.y)
             let  topLeftRotated = rotatePointAroundPivot(point: topLeftOrig, pivot: points.nextStartingPoint, degrees: headings.nextHeading)
@@ -356,9 +352,32 @@ extension PlottingImageCanvasImpl {
                                 endColorComponents[0], endColorComponents[1], endColorComponents[2], endColorComponents[3]]
     }
     
+    func color(forValue value : Float, displayType : DisplayType) -> CGColor {
+        switch displayType {
+            case .singulation:
+                let hue = value.normalize(min: 0.18, max: 0.22) * 0.33
+                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                return color.cgColor
+            case .rideQuality:
+                let hue = value.normalize(min: 0.70, max: 1.0) * 0.33
+                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                return color.cgColor
+            case .downforce:
+                let hue = value.normalize(min: 175.0, max: 300.0) * 0.33
+                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                return color.cgColor
+        }
+    }
+    
 }
 extension CGFloat {
     func normalize(min: CGFloat, max: CGFloat, from a: CGFloat = 0, to b: CGFloat = 1) -> CGFloat {
+        return (b - a) * ((self - min) / (max - min)) + a
+    }
+}
+
+extension Float {
+    func normalize(min: Float, max: Float, from a: Float = 0, to b: Float = 1) -> Float {
         return (b - a) * ((self - min) / (max - min)) + a
     }
 }

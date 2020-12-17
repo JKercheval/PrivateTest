@@ -9,6 +9,7 @@ import Foundation
 import CoreLocation
 import GEOSwift
 import MQTTClient
+import GameKit
 
 //let defaultMachineWidth : Double = 120 // feet
 //let defaultMachineWidthMeters : Double = 27.432
@@ -110,7 +111,28 @@ class FieldGpsGenerator {
             self.reset()
         }
     }
-    
+
+    func getMockRowInfoArray(forDisplayType type : DisplayType, rowCount : UInt) -> DataRowValues {
+        var rowValues = [Float]()
+        let random = GKARC4RandomSource()
+        random.dropValues(1024)
+
+        for _ in 0..<rowCount {
+            switch type {
+                case .singulation:
+                    let singulation = GKGaussianDistribution(randomSource: random, lowestValue: 18, highestValue: 22)
+                    rowValues.append(Float(singulation.nextInt()) / 100)
+                case .downforce:
+                    let downforce = GKGaussianDistribution(randomSource: random, lowestValue: 175, highestValue: 300)
+                    rowValues.append(Float(downforce.nextInt()))
+                case .rideQuality:
+                    let rideQuality = GKGaussianDistribution(randomSource: random, lowestValue: 75, highestValue: 95)
+                    rowValues.append(Float(rideQuality.nextInt()) / 100)
+            }
+        }
+        return rowValues
+    }
+
     func getMockRowInfoArray(rowCount : UInt) -> DataRowValues {
         var rowValues = [Float]()
         for _ in 0..<rowCount {
@@ -120,9 +142,9 @@ class FieldGpsGenerator {
     }
 
     func getMockRowData(withDataID dataId : DisplayType, rowCount : UInt) -> PlottedRowData {
-        let rowValues1 = getMockRowInfoArray(rowCount: rowCount)
-        let rowValues2 = getMockRowInfoArray(rowCount: rowCount)
-        let rowValues3 = getMockRowInfoArray(rowCount: rowCount)
+        let rowValues1 = getMockRowInfoArray(forDisplayType: .singulation, rowCount: rowCount)
+        let rowValues2 = getMockRowInfoArray(forDisplayType: .downforce, rowCount: rowCount)
+        let rowValues3 = getMockRowInfoArray(forDisplayType: .rideQuality, rowCount: rowCount)
 
         var rowData = PlottedRowData(dictionaryLiteral: (dataId, rowValues1))
         rowData[.downforce] = rowValues2
