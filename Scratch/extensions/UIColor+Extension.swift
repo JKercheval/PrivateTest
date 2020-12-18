@@ -25,8 +25,19 @@ extension UIColor {
     class func color(forValue value : Float, displayType : DisplayType) -> CGColor {
         switch displayType {
             case .singulation:
-                let hue = value.normalize(min: 0.18, max: 0.22) * 0.33
-                let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
+                var color = UIColor.green
+                switch value {
+                    case 0.0:
+                        break
+                    case 1.0:
+                        color = UIColor.red
+                    case 2.0:
+                        color = UIColor.blue
+                    case 3.0:
+                        color = UIColor.black
+                    default:
+                        break
+                }
                 return color.cgColor
             case .rideQuality:
                 let hue = value.normalize(min: 0.70, max: 1.0) * 0.33

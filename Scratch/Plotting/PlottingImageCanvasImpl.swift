@@ -196,8 +196,8 @@ extension PlottingImageCanvasImpl {
     func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float], displayType : DisplayType, metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
 
         assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
-        bitmapContext.setStrokeColor(UIColor.black.cgColor)
-        bitmapContext.setLineWidth(0.1)
+        bitmapContext.setStrokeColor(UIColor.clear.cgColor)
+        bitmapContext.setLineWidth(0.0)
 
         let cellRowWidth = CGFloat((self.machineInfo.machineWidth / Double(self.machineInfo.numberOfRows)) / metersPerPixel)
         // We want to do each row independently, so we push our CGContext state, make rotation changes, then pop the state

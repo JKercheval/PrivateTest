@@ -114,20 +114,20 @@ class FieldGpsGenerator {
 
     func getMockRowInfoArray(forDisplayType type : DisplayType, rowCount : UInt) -> DataRowValues {
         var rowValues = [Float]()
-        let random = GKARC4RandomSource()
-        random.dropValues(1024)
+        let random = GKLinearCongruentialRandomSource()
+//        random.dropValues(1024)
 
         for _ in 0..<rowCount {
             switch type {
                 case .singulation:
-                    let singulation = GKGaussianDistribution(randomSource: random, lowestValue: 18, highestValue: 22)
-                    rowValues.append(Float(singulation.nextInt()) / 100)
+                    let singulation = GKGaussianDistribution(randomSource: random, lowestValue: -16, highestValue: 3)
+                    rowValues.append(Float(max(singulation.nextInt(), 0)))
                 case .downforce:
-                    let downforce = GKGaussianDistribution(randomSource: random, lowestValue: 175, highestValue: 300)
-                    rowValues.append(Float(downforce.nextInt()))
+                    let downforce = GKGaussianDistribution(randomSource: random, lowestValue: 0, highestValue: 600)
+                    rowValues.append(Float(max(min(downforce.nextInt(), 300), 175)))
                 case .rideQuality:
-                    let rideQuality = GKGaussianDistribution(randomSource: random, lowestValue: 75, highestValue: 95)
-                    rowValues.append(Float(rideQuality.nextInt()) / 100)
+                    let rideQuality = GKGaussianDistribution(randomSource: random, lowestValue: 50, highestValue: 150)
+                    rowValues.append(Float(max(min(rideQuality.nextInt(), 100), 70)) / 100)
             }
         }
         return rowValues
