@@ -11,9 +11,12 @@ import CoreLocation
 protocol PlottedRowInfoProtocol {
     var plottingCoordinate : CLLocationCoordinate2D { get }
     var heading : Double { get }
-    var rowInfo : PlottedRowData { get }
+//    var rowInfo : PlottedRowData { get }
     var speed : Double { get }
     var nextPlottedRow : PlottedRowInfoProtocol? { get }
+    var masterRowState : Bool { get }
+    func isWorkStateOnForRowIndex(index : Int) -> Bool
+    func value(for rowIndex : Int, displayType : DisplayType) -> Float
 }
 
 class PlottedRowImpl : PlottedRowInfoProtocol {
@@ -36,12 +39,28 @@ class PlottedRowImpl : PlottedRowInfoProtocol {
         return base.rowHeading
     }
     
-    var rowInfo: PlottedRowData {
-        return base.rowInfoArr
+    var masterRowState: Bool {
+        return base.masterRowState
     }
-    
+
     var speed: Double {
         return base.speed
+    }
+    
+    func isWorkStateOnForRowIndex(index : Int) -> Bool {
+        assert(index < base.dataInfo.count, "Index is out of range!")
+        let dataInfo = base.dataInfo[index]
+        assert(index == dataInfo.rowId, "Row ID and index do not match!")
+        return dataInfo.rowState
+    }
+    
+    func value(for rowIndex : Int, displayType : DisplayType) -> Float {
+        let dataInfo = base.dataInfo[rowIndex]
+        guard let value = dataInfo.rowVariables[displayType] else {
+            return -Float.greatestFiniteMagnitude
+        }
+        assert(rowIndex == dataInfo.rowId, "Row ID and index do not match!")
+        return value
     }
     
 }

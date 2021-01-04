@@ -11,27 +11,37 @@ enum DisplayType : UInt, CaseIterable, Codable {
     case downforce
 }
 
-typealias DataRowValues = Array<Float>
-typealias PlottedRowData = [DisplayType : DataRowValues]
+typealias RowVariableInfo = [DisplayType : Float]
+
+struct RowDataInfo : Codable {
+    var rowId : UInt
+    var rowState : Bool
+    var rowVariables : RowVariableInfo
+}
+typealias RowDataInfoArray = [RowDataInfo]
 
 struct PlottedRowBase : Codable {
     var location : CLLocationCoordinate2D?
-    var rowInfoArr : PlottedRowData
+    var dataInfo : RowDataInfoArray
     var rowHeading : Double
     var speed : Double
+    var masterRowState : Bool
     
     enum CodingKeys: String, CodingKey {
         case location
         case rowInfoArr
+        case rowDataInfoArr
         case rowHeading = "heading"
         case speed
+        case masterRowState
     }
     
-    init(location : CLLocationCoordinate2D, heading : Double, speed : Double,  rows: PlottedRowData) {
+    init(location : CLLocationCoordinate2D, heading : Double, speed : Double, masterRowState: Bool, infoData: RowDataInfoArray) {
         self.location = location
         self.rowHeading = heading
-        self.rowInfoArr = rows
         self.speed = speed
+        self.masterRowState = masterRowState
+        self.dataInfo = infoData
     }
     
     init(from decoder: Decoder) throws {
@@ -39,15 +49,17 @@ struct PlottedRowBase : Codable {
         
         location = try values.decode(CLLocationCoordinate2D.self, forKey: .location)
         rowHeading = try values.decode(Double.self, forKey: .rowHeading)
-        rowInfoArr = try values.decode(PlottedRowData.self, forKey: .rowInfoArr)
+        dataInfo = try values.decode(RowDataInfoArray.self, forKey: .rowDataInfoArr)
         speed = try values.decode(Double.self, forKey: .speed)
+        masterRowState = try values.decode(Bool.self, forKey: .masterRowState)
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(location, forKey: .location)
         try container.encode(self.rowHeading, forKey: .rowHeading)
-        try container.encode(self.rowInfoArr, forKey: .rowInfoArr)
+        try container.encode(self.dataInfo, forKey: .rowDataInfoArr)
         try container.encode(self.speed, forKey: .speed)
+        try container.encode(self.masterRowState, forKey: .masterRowState)
     }
 }

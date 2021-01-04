@@ -11,49 +11,10 @@ import GEOSwift
 import MQTTClient
 import GameKit
 
-//let defaultMachineWidth : Double = 120 // feet
-//let defaultMachineWidthMeters : Double = 27.432
-//let defaultRowCount : UInt = 54
-
-//typealias PlottedRowValues = Array<CGFloat>
-//struct PlottedRow : Codable {
-//    var location : CLLocationCoordinate2D?
-//    var rowInfoArr : PlottedRowValues?
-//    var rowHeading : Double
-//
-//    enum CodingKeys: String, CodingKey {
-//        case location
-//        case rowInfoArr
-//        case rowHeading = "heading"
-//    }
-//
-//    init(location : CLLocationCoordinate2D, heading : Double, rows: PlottedRowValues) {
-//        self.location = location
-//        self.rowHeading = heading
-//        self.rowInfoArr = rows
-//    }
-//
-//    init(from decoder: Decoder) throws {
-//        let values = try decoder.container(keyedBy: CodingKeys.self)
-//
-//        location = try values.decode(CLLocationCoordinate2D.self, forKey: .location)
-//        rowHeading = try values.decode(Double.self, forKey: .rowHeading)
-//        rowInfoArr = try values.decode(PlottedRowValues.self, forKey: .rowInfoArr)
-//    }
-//
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(location, forKey: .location)
-////        try container.encode(longitude, forKey: .longitude)
-//        try container.encode(self.rowHeading, forKey: .rowHeading)
-//        try container.encode(self.rowInfoArr, forKey: .rowInfoArr)
-//
-//    }
-//
-//}
 
 class FieldGpsGenerator {
     var timer = Timer()
+    var masterStateOn = true
     private var fieldBoundary : FieldBoundaryCorners!
     fileprivate var session : MQTTSession!
     var currentLocation: CLLocationCoordinate2D = CLLocationCoordinate2D()
@@ -112,51 +73,31 @@ class FieldGpsGenerator {
         }
     }
 
-    func getMockRowInfoArray(forDisplayType type : DisplayType, rowCount : UInt) -> DataRowValues {
-        var rowValues = [Float]()
+    func getMockRowDataInfoArray(rowCount : UInt) -> [RowDataInfo] {
+        var dataInfo = [RowDataInfo]()
+        
         let random = GKLinearCongruentialRandomSource()
-//        random.dropValues(1024)
-
-        for _ in 0..<rowCount {
-            switch type {
-                case .singulation:
-                    let singulation = GKGaussianDistribution(randomSource: random, lowestValue: -16, highestValue: 3)
-                    rowValues.append(Float(max(singulation.nextInt(), 0)))
-                case .downforce:
-                    let downforce = GKGaussianDistribution(randomSource: random, lowestValue: 0, highestValue: 600)
-                    rowValues.append(Float(max(min(downforce.nextInt(), 300), 175)))
-                case .rideQuality:
-                    let rideQuality = GKGaussianDistribution(randomSource: random, lowestValue: 50, highestValue: 150)
-                    rowValues.append(Float(max(min(rideQuality.nextInt(), 100), 70)) / 100)
-            }
+        
+        for index in 0..<rowCount {
+            var info = RowVariableInfo()
+            let singulation = GKGaussianDistribution(randomSource: random, lowestValue: -16, highestValue: 3)
+            info[.singulation] = Float(max(singulation.nextInt(), 0))
+            let downforce = GKGaussianDistribution(randomSource: random, lowestValue: 0, highestValue: 600)
+            info[.downforce] = Float(max(min(downforce.nextInt(), 300), 175))
+            let rideQuality = GKGaussianDistribution(randomSource: random, lowestValue: 50, highestValue: 150)
+            info[.rideQuality] = Float(max(min(rideQuality.nextInt(), 100), 70)) / 100
+            dataInfo.append(RowDataInfo(rowId: index, rowState: true, rowVariables: info))
         }
-        return rowValues
-    }
-
-    func getMockRowInfoArray(rowCount : UInt) -> DataRowValues {
-        var rowValues = [Float]()
-        for _ in 0..<rowCount {
-            rowValues.append(Float.random(in: 0.15...0.25))
-        }
-        return rowValues
-    }
-
-    func getMockRowData(withDataID dataId : DisplayType, rowCount : UInt) -> PlottedRowData {
-        let rowValues1 = getMockRowInfoArray(forDisplayType: .singulation, rowCount: rowCount)
-        let rowValues2 = getMockRowInfoArray(forDisplayType: .downforce, rowCount: rowCount)
-        let rowValues3 = getMockRowInfoArray(forDisplayType: .rideQuality, rowCount: rowCount)
-
-        var rowData = PlottedRowData(dictionaryLiteral: (dataId, rowValues1))
-        rowData[.downforce] = rowValues2
-        rowData[.rideQuality] = rowValues3
-        return rowData
+        return dataInfo
     }
 
     func createMockPlottedRow(coord : CLLocationCoordinate2D, heading : Double, rowCount : UInt = defaultRowCount) -> PlottedRowBase {
+        let dataInfo = getMockRowDataInfoArray(rowCount: rowCount)
         let plottedRow = PlottedRowBase(location: coord,
                                         heading: heading,
                                         speed: 6.0,
-                                        rows: getMockRowData(withDataID: .singulation, rowCount: defaultRowCount))
+                                        masterRowState: self.masterStateOn,
+                                        infoData: dataInfo)
         return plottedRow
     }
     

@@ -111,56 +111,36 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         // Our image size is currently the size of the rectangle defined by the field coordinates
         // So, take the current draw coordinates and calculate the offset from our topleft point.
 
-        let coord = plottedRow.plottingCoordinate
         let currentDisplayType = plottingManager.currentDisplayType
     
-        let currentStartingPt = getStartPt(fromCoord: coord)
-        guard let nextPlottedRow = plottedRow.nextPlottedRow else {
-            return false
-        }
-        
-        let nextStartingPoint = getStartPt(fromCoord: nextPlottedRow.plottingCoordinate)
-        let startingPoints = StartingPoints(currentStartingPoint: currentStartingPt, nextStartingPoint: nextStartingPoint)
-        
-        let plottedRowHeadings = PlottedRowHeadings(currentHeading: plottedRow.heading, nextHeading: nextPlottedRow.heading)
-        
-        // This default value is taken directly from the knowledge of how often the GPS Generator is creating points - the 5 below
-        // is from the fact that we are measuring distance in meters per second, and we are generating a new coordinate 5 times per
-        // second.
-        var drawHeight = (Measurement(value: 6, unit: UnitSpeed.milesPerHour).converted(to: .metersPerSecond).value / 5) / self.metersPerPixel
         if let lastRow = self.lastPlottedRow {
             // get the distance between the rows
-            drawHeight = coord.distance(from: nextPlottedRow.plottingCoordinate) / self.metersPerPixel
             if lastRowBoundsDrawn == nil {
-                lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: coord, coordinate: lastRow.plottingCoordinate)
+                lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: plottedRow.plottingCoordinate, coordinate: lastRow.plottingCoordinate)
             }
             else {
-                lastRowBoundsDrawn?.includingCoordinate(coord)
+                lastRowBoundsDrawn?.includingCoordinate(plottedRow.plottingCoordinate)
             }
         }
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         // TODO: We need to get the values that correspond to the data type that we want to display... DashboardType
-        guard let value = plottedRow.rowInfo[currentDisplayType], let context = self.displayPlottingContexts[currentDisplayType] else {
+        guard let context = self.displayPlottingContexts[currentDisplayType] else {
             return false
         }
-        let success = drawRow(withContext: context, points: startingPoints, rowValues: value, displayType: currentDisplayType, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
-        guard success else {
-            debugPrint("Failed to draw into image")
-            return success
-        }
+        drawRow(withContext: context, plottedRow: plottedRow, displayType: currentDisplayType)
         DispatchQueue.global().async {
             for display in DisplayType.allCases {
-                guard let value = plottedRow.rowInfo[display], let context = self.displayPlottingContexts[display], display != currentDisplayType else {
+                guard let context = self.displayPlottingContexts[display], display != currentDisplayType else {
                     continue
                 }
-                let _ = self.drawRow(withContext: context, points: startingPoints, rowValues: value, displayType: display, metersPerPixel: self.metersPerPixel, drawHeight: drawHeight, headings: plottedRowHeadings)
+                self.drawRow(withContext: context, plottedRow: plottedRow, displayType: display)
             }
         }
 
         self.lastPlottedRow = plottedRow
         postRowDrawCompleteNotification(drawCoordinate: plottedRow)
-        return success
+        return true
     }
 
 }
@@ -193,9 +173,33 @@ extension PlottingImageCanvasImpl {
     ///   - drawHeight: Height of the row to draw
     ///   - heading: Heading of the tractor (implement)
     /// - Returns: True if the row was successfully drawn into the CGContext, false otherwise (currently only returns true - do we need this?)
-    func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float], displayType : DisplayType, metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+//    func drawRow(withContext bitmapContext : CGContext, points: StartingPoints, rowValues : [Float], displayType : DisplayType, metersPerPixel : Double, drawHeight : Double, headings : PlottedRowHeadings) -> Bool {
+    
+    
+    /// Draws an actual row of seed information to the bitmap context.
+    /// - Parameters:
+    ///   - bitmapContext: CGContext to draw into
+    ///   - plottedRow: PlottedRowInfoProtocol object that contains the required row information.
+    ///   - displayType: DisplayType enum
+    func drawRow(withContext bitmapContext : CGContext, plottedRow : PlottedRowInfoProtocol, displayType : DisplayType) {
 
-        assert(rowValues.count == self.machineInfo.numberOfRows, "Invalid row value array!")
+        guard plottedRow.masterRowState == true else {
+            debugPrint("Master row if off, nothing to draw")
+            return
+        }
+        
+        let coord = plottedRow.plottingCoordinate
+        let currentStartingPt = getStartPt(fromCoord: coord)
+        guard let nextPlottedRow = plottedRow.nextPlottedRow else {
+            debugPrint("Failed to draw into image")
+            return
+        }
+
+        let nextStartingPoint = getStartPt(fromCoord: nextPlottedRow.plottingCoordinate)
+        let points = StartingPoints(currentStartingPoint: currentStartingPt, nextStartingPoint: nextStartingPoint)
+        
+        let headings = PlottedRowHeadings(currentHeading: plottedRow.heading, nextHeading: nextPlottedRow.heading)
+
         bitmapContext.setStrokeColor(UIColor.clear.cgColor)
         bitmapContext.setLineWidth(0.0)
 
@@ -206,15 +210,13 @@ extension PlottingImageCanvasImpl {
         // This is the machine width adjusted to our canvas
         let pixelMachineWidth = CGFloat(self.machineInfo.machineWidth / metersPerPixel)
         
-        // calculate the rectangle of the whole section we are creating (all row rects created below) so that we can correctly
-        // rotate the plotted row.
-//        let rect = CGRect(x: startX, y: points.currentStartingPoint.y, width: pixelMachineWidth, height: rowHeight)
-//        let transfrom: CGAffineTransform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
-//            .rotated(by: CGFloat(radians(degrees: headings.currentHeading)))
-//                    .translatedBy(x: -rect.midX, y: -rect.midY)
-
         // go through each planter row and create the rect and fill the color value in depending on what we are displaying...
-        for (index, value) in rowValues.enumerated() {
+//        for (index, value) in rowValues.enumerated() {
+        for index in 0..<self.machineInfo.numberOfRows {
+            let value = plottedRow.value(for: Int(index), displayType: displayType)
+            if plottedRow.isWorkStateOnForRowIndex(index: Int(index)) == false {
+                continue
+            }
             
             let cellRowPath = CGMutablePath();
             let fillColor = UIColor.color(forValue: value, displayType: displayType)
@@ -245,7 +247,7 @@ extension PlottingImageCanvasImpl {
             bitmapContext.fillPath()
         }
 
-        return true
+        return
     }
     
     // rotates a point with a top left origin  around point pivot with 'degrees' in a clockwise fashion

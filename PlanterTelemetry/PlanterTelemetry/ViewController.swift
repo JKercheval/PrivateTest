@@ -16,11 +16,12 @@ import GEOSwift
 import MapKit
 
 class ViewController: NSViewController {
-    @IBOutlet weak var staratButton: NSButton!
+    @IBOutlet weak var startButton: NSButton!
     @IBOutlet weak var textField: NSTextField!
     @IBOutlet weak var stepper: NSStepper!
     @IBOutlet weak var comboBox: NSComboBox!
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var masterCheckbox: NSButton!
     
     var gpsGenerator : FieldGpsGenerator!
     var geoField : GeoJSONField?
@@ -108,9 +109,13 @@ class ViewController: NSViewController {
         // Update the view, if already loaded.
         }
     }
-
+    
+    @IBAction func masterSelected(_ sender: Any) {
+        debugPrint("Master Selected - checked is \(masterCheckbox.state)")
+        gpsGenerator.masterStateOn = masterCheckbox.state == .on
+    }
+    
     @IBAction func startButtonPressed(_ sender: Any) {
-//        debugPrint("Start Button Selected")
         self.comboBox.isEnabled = false
         gpsGenerator.start()
     }
