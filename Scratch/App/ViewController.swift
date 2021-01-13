@@ -31,7 +31,8 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     @IBOutlet weak var mapView: UIView!
     @IBOutlet weak var startButton: UIButton!
     @IBOutlet weak var stopButton: UIButton!
-
+    @IBOutlet weak var mapViewParent: UIView!
+    
     var geoField : GeoJSONField?
     var mglMapView: MGLMapView!
     var preciseButton: UIButton?
@@ -44,19 +45,22 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var mapViewImpl : MapboxMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
     let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
-
+    var appController : AppController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.newPlottedRow, object: nil)
 
+        appController = AppController()
+        
         geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
         guard let field = geoField else {
             return
         }
 
-        mglMapView = MGLMapView(frame: view.bounds, styleURL: MGLStyle.satelliteStreetsStyleURL)
-        self.mglMapView.setCenter(field.northWest, zoomLevel: currentZoom, animated: false)
+        let centerCoord = MBUtils.getCenterCoord(LocationPoints: [field.northWest, field.northEast, field.southWest, field.southEast])
+        mglMapView = MGLMapView(frame: mapViewParent.bounds, styleURL: MGLStyle.satelliteStreetsStyleURL)
+        self.mglMapView.setCenter(centerCoord, zoomLevel: currentZoom, animated: false)
         
         locationManager.requestAlwaysAuthorization()
         locationManager.requestWhenInUseAuthorization()
@@ -69,31 +73,23 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         // Do any additional setup after loading the view.
         mglMapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         mglMapView.delegate = self
-        self.view.addSubview(mglMapView)
-        self.view.insertSubview(mglMapView, belowSubview: startButton)
-        mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.view)
+        self.mapViewParent.addSubview(mglMapView)
+        mapViewImpl = MapboxMapViewImplementation(mapView: mglMapView, parent: self.mapViewParent)
 
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
-        let machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
-        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, machineInfo: machineInfo)
 
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        appDelegate.plottingManager.disconnect()
+        self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, plottingManager: appDelegate.plottingManager)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
     }
     
     @IBAction func onStartButtonSelected(_ sender: Any) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
-        }
-        appDelegate.plottingManager.connect() { success in
-            if success {
-                self.startButton.backgroundColor = UIColor.green
-            }
         }
     }
     
@@ -101,8 +97,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        appDelegate.plottingManager.disconnect()
-        self.startButton.backgroundColor = UIColor.red
     }
     
     @IBAction func onResetButtonSelected(_ sender: Any) {
@@ -296,6 +290,19 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         
         style.addLayer(layer)
     }
+    
+    @IBAction func onSingulationSelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.singulation])
+    }
+
+    @IBAction func onDownforceSelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.downforce])
+    }
+
+    @IBAction func onRideQualitySelected(_ sender: Any) {
+        NotificationCenter.default.post(name: .didChangeDisplayTypeNotification, object: self, userInfo: [userInfoDisplayTypeKey : DisplayType.rideQuality])
+    }
+
 }
 
 extension ViewController : CLLocationManagerDelegate {

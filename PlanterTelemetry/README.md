@@ -25,6 +25,7 @@ Have to have a password file
 ```
 sudo mosquitto_passwd -c /usr/local/etc/mosquitto/passwd tester
 ```
+### Set the password to "tester"
 
 Have to change conf file
 '/usr/local/etc/mosquitto/mosquitto.conf'

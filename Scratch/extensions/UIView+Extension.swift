@@ -7,13 +7,20 @@ let LatLonEarthRadius : CLLocationDegrees = 6371010.0;
 func radians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
 func degrees(radians: Double) -> Double { return radians * 180.0 / .pi }
 
+let userInfoDataReceivedKey = "DataReceived"
+let userInfoStatusReceivedKey = "StatusReceived"
 let userInfoPlottedCoordinateKey = "PlottedCoordinate"
 let userInfoPlottedRowKey = "plottedRow"
+let userInfoDisplayTypeKey = "displayType"
 
 extension Notification.Name {
+    static let didReceiveData = Notification.Name("didReceiveData")
     static let newPlottedRow = Notification.Name("newPlottedRow")
     static let plotNewRow = Notification.Name("plotNewRow")
     static let didPlotRowNotification = Notification.Name("didPlotRow")
+    static let didChangeDisplayTypeNotification = Notification.Name("didChangeDisplayType")
+    static let switchDisplayTypeNotification = Notification.Name("switchDisplayType")
+    static let dashboardAlertNotification = Notification.Name("dashboardAlertNotification")
 }
 
 /// UIView extension fpr gettomg parent view controller.

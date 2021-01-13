@@ -9,9 +9,9 @@ target 'Scratch' do
 
   pod 'geos'
   pod 'GEOSwift'
-  pod 'GoogleMaps', '4.0.0'
   pod 'Google-Maps-iOS-Utils'
   pod 'MQTTClient'
+  pod 'RealmSwift'
   
   target 'ScratchTests' do
     inherit! :search_paths
