@@ -18,6 +18,8 @@ class LayerDrawingView : UIView {
         self.imageCanvas = canvas
         self.mapView = mapView
         NotificationCenter.default.addObserver(self, selector: #selector(onDidUpdateRow(_:)), name:.didPlotRowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(switchDisplayTypeReceived(notification:)),
+                                               name:.switchDisplayTypeNotification, object: nil)
         debugPrint("\(self)\(#function)")
     }
     
@@ -57,6 +59,9 @@ class LayerDrawingView : UIView {
         ctx.draw(image, in: layer.bounds)
     }
     
+    @objc func switchDisplayTypeReceived(notification : Notification) {
+        self.layer.setNeedsDisplay(layer.bounds)
+    }
     
     /// This is the Notification message method that is called when a didPlotRowNotification message is posted.
     /// - Parameter notification: Notification object that contains the PlottedRowInfoProtocol object.

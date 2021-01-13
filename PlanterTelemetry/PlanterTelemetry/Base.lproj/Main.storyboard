@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
-        <plugIn identifier="com.apple.MapKitIBPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
+        <plugIn identifier="com.apple.MapKitIBPlugin" version="17701"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -765,6 +765,19 @@
                             <mapView mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Bbb-nF-S4W">
                                 <rect key="frame" x="10" y="10" width="739" height="359"/>
                             </mapView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5gx-J2-qTc">
+                                <rect key="frame" x="637" y="434" width="102" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="JAP-NJ-JeS"/>
+                                </constraints>
+                                <buttonCell key="cell" type="check" title="Master On" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vsa-cF-A7c">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="masterSelected:" target="XfG-lQ-9wD" id="mX0-bo-i1B"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="OLw-Ur-CBE" firstAttribute="leading" secondItem="G9m-cy-NHu" secondAttribute="trailing" id="1CL-b0-qc7"/>
@@ -777,7 +790,9 @@
                             <constraint firstAttribute="bottom" secondItem="Bbb-nF-S4W" secondAttribute="bottom" constant="10" id="SpQ-w9-q0z"/>
                             <constraint firstItem="G9m-cy-NHu" firstAttribute="centerY" secondItem="9qe-XV-m1s" secondAttribute="centerY" id="bd2-JA-9L0"/>
                             <constraint firstItem="OLw-Ur-CBE" firstAttribute="trailing" secondItem="Gy3-pb-a0C" secondAttribute="trailing" id="cTm-2D-fjz"/>
+                            <constraint firstItem="5gx-J2-qTc" firstAttribute="centerY" secondItem="gZi-tC-Ljm" secondAttribute="centerY" id="crt-Ss-o7R"/>
                             <constraint firstItem="G9m-cy-NHu" firstAttribute="top" secondItem="9qe-XV-m1s" secondAttribute="top" id="do7-JV-uBX"/>
+                            <constraint firstAttribute="trailing" secondItem="5gx-J2-qTc" secondAttribute="trailing" constant="20" id="eeD-s9-OFa"/>
                             <constraint firstAttribute="trailing" secondItem="Bbb-nF-S4W" secondAttribute="trailing" constant="10" id="g7D-1D-JXh"/>
                             <constraint firstItem="Gy3-pb-a0C" firstAttribute="leading" secondItem="gZi-tC-Ljm" secondAttribute="leading" id="iKd-hL-mvN"/>
                             <constraint firstItem="Bbb-nF-S4W" firstAttribute="top" secondItem="Gy3-pb-a0C" secondAttribute="bottom" constant="20" id="mTk-Ic-sAO"/>
@@ -789,14 +804,15 @@
                     <connections>
                         <outlet property="comboBox" destination="Gy3-pb-a0C" id="EOb-cF-9Zx"/>
                         <outlet property="mapView" destination="Bbb-nF-S4W" id="2u4-4p-txN"/>
-                        <outlet property="staratButton" destination="gZi-tC-Ljm" id="Zes-Vu-sQM"/>
+                        <outlet property="masterCheckbox" destination="5gx-J2-qTc" id="vVi-J5-W30"/>
+                        <outlet property="startButton" destination="gZi-tC-Ljm" id="Zes-Vu-sQM"/>
                         <outlet property="stepper" destination="OLw-Ur-CBE" id="kW9-D0-V87"/>
                         <outlet property="textField" destination="G9m-cy-NHu" id="DPq-0X-epC"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="205" y="908"/>
+            <point key="canvasLocation" x="204.5" y="907.5"/>
         </scene>
     </scenes>
 </document>
