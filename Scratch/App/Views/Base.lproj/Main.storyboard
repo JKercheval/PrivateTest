@@ -16,6 +16,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="810" height="1080"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3tb-sW-9ZY" userLabel="Map View">
+                                <rect key="frame" x="0.0" y="50" width="810" height="880"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="arr-BN-dPa">
                                 <rect key="frame" x="20" y="70" width="100" height="35"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
@@ -133,18 +137,35 @@
                                     <action selector="onRideQualitySelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="n9N-Ec-gHk"/>
                                 </connections>
                             </button>
+                            <containerView opaque="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NWw-q0-2uP" userLabel="Dashboard Container View">
+                                <rect key="frame" x="0.0" y="930" width="810" height="150"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="150" id="qnO-hY-LWs"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="RPK-pq-iPC" kind="embed" id="BAf-Le-4iy"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="REt-JW-5gm"/>
                         <constraints>
+                            <constraint firstItem="3tb-sW-9ZY" firstAttribute="bottom" secondItem="NWw-q0-2uP" secondAttribute="top" id="1jO-hh-AvX"/>
                             <constraint firstItem="arr-BN-dPa" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" constant="20" id="8ho-EK-Ebe"/>
+                            <constraint firstItem="NWw-q0-2uP" firstAttribute="leading" secondItem="REt-JW-5gm" secondAttribute="leading" id="Ck7-vu-cFq"/>
+                            <constraint firstItem="3tb-sW-9ZY" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" id="Ecc-ZK-I40"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ICO-vX-zRw"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="leading" secondItem="f68-1k-wuQ" secondAttribute="leading" id="LUT-ef-r1s"/>
                             <constraint firstItem="f68-1k-wuQ" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" constant="20" id="Laz-sO-Zy8"/>
+                            <constraint firstItem="3tb-sW-9ZY" firstAttribute="leading" secondItem="REt-JW-5gm" secondAttribute="leading" id="Rak-Jd-Ujz"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="trailing" secondItem="f68-1k-wuQ" secondAttribute="trailing" id="ZpB-4B-scI"/>
+                            <constraint firstItem="NWw-q0-2uP" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" id="bsX-CJ-LnR"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="top" secondItem="huw-Xp-XSL" secondAttribute="bottom" constant="20" id="csi-Je-waY"/>
                             <constraint firstItem="f68-1k-wuQ" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" constant="-20" id="eXs-MJ-Lwv"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ema-0m-Veb"/>
                             <constraint firstItem="te4-hL-ECZ" firstAttribute="leading" secondItem="arr-BN-dPa" secondAttribute="trailing" constant="25" id="f2a-dc-s7E"/>
+                            <constraint firstItem="NWw-q0-2uP" firstAttribute="bottom" secondItem="REt-JW-5gm" secondAttribute="bottom" id="feS-iL-Ek5"/>
+                            <constraint firstItem="3tb-sW-9ZY" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" id="h4y-ES-aQc"/>
                             <constraint firstItem="te4-hL-ECZ" firstAttribute="top" secondItem="arr-BN-dPa" secondAttribute="top" id="k36-pY-aoY"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="top" secondItem="f68-1k-wuQ" secondAttribute="bottom" constant="20" id="nok-He-yGw"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="trailing" secondItem="f68-1k-wuQ" secondAttribute="trailing" id="ojA-hn-ZEN"/>
@@ -156,6 +177,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="GNV-n2-5Us"/>
                     <connections>
+                        <outlet property="mapViewParent" destination="3tb-sW-9ZY" id="Bab-BA-yd8"/>
                         <outlet property="startButton" destination="arr-BN-dPa" id="5bS-a4-kcr"/>
                     </connections>
                 </viewController>
@@ -179,10 +201,30 @@
             </objects>
             <point key="canvasLocation" x="-606" y="-672"/>
         </scene>
+        <!--Dashboard View Controller-->
+        <scene sceneID="Kde-RE-0RG">
+            <objects>
+                <viewController id="RPK-pq-iPC" customClass="DashboardViewController" customModule="Scratch" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="RUO-fv-htE">
+                        <rect key="frame" x="0.0" y="0.0" width="810" height="150"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="N5R-ky-ikO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="107" y="-225"/>
+        </scene>
     </scenes>
     <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

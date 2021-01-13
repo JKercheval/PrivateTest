@@ -17,8 +17,5 @@ protocol PlottingManagerProtocol {
     var currentDisplayType : DisplayType { get }
     var machineInformation : MachineInfoProtocol { get }
     
-    func reset()
-    func connect(completion : CompletionHandler?)
-    func disconnect()
-    
+    func reset()    
 }

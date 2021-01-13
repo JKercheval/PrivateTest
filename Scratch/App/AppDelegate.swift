@@ -3,7 +3,7 @@ import GoogleMaps
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    private let plottingRowManager = MqttPlottingManager()
+    private let plottingRowManager = PlottingManager()
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

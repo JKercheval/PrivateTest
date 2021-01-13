@@ -8,24 +8,9 @@
 import Foundation
 import CoreLocation
 
-protocol PlottedRowInfoProtocol {
-    var plottingCoordinate : CLLocationCoordinate2D { get }
-    var heading : Double { get }
-//    var rowInfo : PlottedRowData { get }
-    var speed : Double { get }
-    var nextPlottedRow : PlottedRowInfoProtocol? { get }
-    var masterRowState : Bool { get }
-    func isWorkStateOnForRowIndex(index : Int) -> Bool
-    func value(for rowIndex : Int, displayType : DisplayType) -> Float
-}
-
 class PlottedRowImpl : PlottedRowInfoProtocol {
     private var base : PlottedRowBase!
     var nextPlottedRow: PlottedRowInfoProtocol?
-    
-//    init(plotCoord : CLLocationCoordinate2D, heading : Double, speed: Double, rowValues : DataRowValues) {
-//        base = PlottedRowBase(location: plotCoord, heading: heading, speed: speed, rows: [1 : rowValues])
-//    }
     
     init(baseRow : PlottedRowBase) {
         base = baseRow
