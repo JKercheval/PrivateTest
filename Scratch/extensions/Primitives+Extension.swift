@@ -60,3 +60,9 @@ extension NameDescribable {
         return String(describing: self)
     }
 }
+
+extension String {
+    static var emptyString: String {
+        return ""
+    }
+}

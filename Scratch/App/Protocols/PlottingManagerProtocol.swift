@@ -11,7 +11,6 @@ protocol PlottingManagerDelegate {
     func connected(success : Bool)
 }
 
-typealias CompletionHandler = (_ success:Bool) -> Void
 protocol PlottingManagerProtocol {
     
     var currentDisplayType : DisplayType { get }

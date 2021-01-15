@@ -5,9 +5,29 @@
 //  Created by Jeremy Kercheval on 1/12/21.
 //
 
+/*
+ // Bocsch Cloud Adapter.
+ // Move payloads
+ Messages : JSON
+ Files: files :)
+ 
+ New architecture allows high pri and low pri.
+ Messages are high pri
+ Files are low pri?
+ 
+ */
+
+
 import Foundation
 import MQTTClient
+
+// These ip addresses are for the MQTT instance on my computer, these will need to match the IP Address
+// of the computer that is running the MQTT.
+// These will change to the IP Address of the Syngenta DataBus in the near future, then maybe the IP of the
+// Nevonex device.
+
 let mqttServerAddress = "mqtt://192.168.86.29:1883"
+//let mqttServerAddress = "mqtt://172.20.10.2:1883"
 
 extension CommunicationsController: NameDescribable {}
 
@@ -29,6 +49,7 @@ class CommunicationsController : NSObject, CommunicationsProtocol {
     func connect(connectionUrl: URL, completion: CompletionHandler?) {
         self.connectionURL = connectionUrl
         guard let port = connectionUrl.port else {
+            assertionFailure("Invalid Port")
             return
         }
         
@@ -39,19 +60,20 @@ class CommunicationsController : NSObject, CommunicationsProtocol {
         mqttSession?.transport = transport
         
         guard let session = mqttSession else {
+            assertionFailure("Invalid mqttSession")
             return
         }
         session.connect() { error in
             guard let someError = error else {
                 debugPrint("\(#function) No Error")
                 if let handler = completion {
-                    handler(true)
+                    handler(nil)
                 }
                 return
             }
             debugPrint("\(#function) Error! - \(someError.localizedDescription)")
             if let handler = completion {
-                handler(false)
+                handler(someError)
             }
         }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+typealias CompletionHandler = (_ error : Error?) -> Void
 
 protocol CommunicationsProtocolDelegate {
     func didConnect(controller : CommunicationsProtocol)

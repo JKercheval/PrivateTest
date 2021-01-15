@@ -20,21 +20,46 @@ let DashboardUpdateTime : TimeInterval = 1.0 // in seconds
 
 extension AppController: NameDescribable {}
 
-class AppController : NSObject {
-    var plottedRowsArray : Array<PlottedRowImpl> = Array<PlottedRowImpl>()
+class AppController : NSObject, ApplicationControllerProtocol {
+    private var _serverUrl : URL?
+    private var _userName: String = String.emptyString
+    private var _passWord: String = String.emptyString
+
     let serialQueue = DispatchQueue(label: "com.queue.AppController.serial")
     var commController : CommunicationsProtocol?
 
     override init() {
         super.init()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(dataReceivedNotification(notification:)), name: .didReceiveData, object: nil)
-        
-        initializeCommunicationsController()
     }
     
+    convenience init(commsController : CommunicationsProtocol) {
+        self.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(dataReceivedNotification(notification:)), name: .didReceiveData, object: nil)
+        commController = commsController
+    }
+
+    func setCommsParameters(serverUrl: String, username: String, password: String) {
+        self._serverUrl = URL(string: serverUrl)
+        assert(self._serverUrl != nil, "Invalid URL String!")
+        self._userName = username
+        self._passWord = password
+        
+        initializeCommunicationsController(with: serverUrl, username: username, password: password)
+    }
+
+    var serverUrl: URL? {
+        return _serverUrl
+    }
+    
+    var userName: String {
+        return _userName
+    }
+    var passWord: String {
+        return _passWord
+    }
+
     @objc func dataReceivedNotification(notification : Notification) {
-        debugPrint("\(self.typeName):\(#function)")
+//        debugPrint("\(self.typeName):\(#function)")
         guard let plottedRowData = notification.userInfo?[userInfoDataReceivedKey] as? Data else {
             assertionFailure("Failed to get data from notification")
             return
@@ -42,8 +67,6 @@ class AppController : NSObject {
         
         var plottedRow : PlottedRowInfoProtocol?
         do {
-            //            let str = String(decoding: messageData, as: UTF8.self)
-            //            debugPrint("\(#function) \(messageTopic):\(str)")
             let baseRow = try JSONDecoder().decode(PlottedRowBase.self, from: plottedRowData)
             plottedRow = PlottedRowImpl(baseRow: baseRow)
         }
@@ -86,13 +109,17 @@ class AppController : NSObject {
 extension AppController {
   
     /// Initializes the communications manager.
-    private func initializeCommunicationsController() {
-        commController = CommunicationsController()
-        guard let url = URL(string: mqttServerAddress) else {
+    private func initializeCommunicationsController(with serverUrlString : String, username : String, password : String) {
+
+        guard let serverUrl = URL(string: serverUrlString) else {
             return
         }
-        commController?.connect(connectionUrl: url, completion: { (success) in
-            debugPrint("\(self.typeName):\(#function) : Connected")
+        self.commController?.connect(connectionUrl: serverUrl, completion: { (error) in
+            guard let someError = error else {
+                debugPrint("\(self.typeName):\(#function) - The connection was successful")
+                return
+            }
+            debugPrint("\(self.typeName):\(#function) - Error connecting to server \(serverUrl): \(someError.localizedDescription)")
         })
     }
     

@@ -45,13 +45,18 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     var mapViewImpl : MapboxMapViewImplementation!
     var imageCanvas : PlottingImageCanvasProtocol!
     let serialQueue = DispatchQueue(label: "com.mapbox.queue.serial")
-    var appController : AppController?
+    // TODO: Inject this dependency (AppController)
+    var appController : ApplicationControllerProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.newPlottedRow, object: nil)
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
 
-        appController = AppController()
+        appController = appDelegate.appController
+        appController?.setCommsParameters(serverUrl: mqttServerAddress, username: "tester", password: "tester")
         
         geoField = GeoJSONField(fieldName: "FotF Plot E Boundary")
         guard let field = geoField else {
@@ -78,9 +83,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 
         boundaryQuad = FieldBoundaryCorners(withCoordinates: field.northWest, southEast: field.southEast, northEast: field.northEast, southWest: field.southWest)
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, plottingManager: appDelegate.plottingManager)
     }
     
