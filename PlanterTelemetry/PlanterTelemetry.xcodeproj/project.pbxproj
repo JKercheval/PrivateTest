@@ -15,6 +15,7 @@
 		CC55BBE42582582D00B378B1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC55BBE22582582D00B378B1 /* Main.storyboard */; };
 		CC55BBF02582582E00B378B1 /* PlanterTelemetryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBEF2582582E00B378B1 /* PlanterTelemetryTests.swift */; };
 		CC55BBFB2582582E00B378B1 /* PlanterTelemetryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC55BBFA2582582E00B378B1 /* PlanterTelemetryUITests.swift */; };
+		CC8CCE6725C99624000ABAF9 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = CC8CCE5925C993C1000ABAF9 /* data.json */; };
 		CCA1037D2582D60D00E4468B /* FotF Plot E Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103772582D60D00E4468B /* FotF Plot E Boundary.geojson */; };
 		CCA1037E2582D60D00E4468B /* FotF Plot A Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103782582D60D00E4468B /* FotF Plot A Boundary.geojson */; };
 		CCA1037F2582D60D00E4468B /* FotF Plot D Boundary.geojson in Resources */ = {isa = PBXBuildFile; fileRef = CCA103792582D60D00E4468B /* FotF Plot D Boundary.geojson */; };
@@ -67,6 +68,7 @@
 		CC55BBF62582582E00B378B1 /* PlanterTelemetryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlanterTelemetryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC55BBFA2582582E00B378B1 /* PlanterTelemetryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanterTelemetryUITests.swift; sourceTree = "<group>"; };
 		CC55BBFC2582582E00B378B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CC8CCE5925C993C1000ABAF9 /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		CCA103772582D60D00E4468B /* FotF Plot E Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot E Boundary.geojson"; sourceTree = "<group>"; };
 		CCA103782582D60D00E4468B /* FotF Plot A Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot A Boundary.geojson"; sourceTree = "<group>"; };
 		CCA103792582D60D00E4468B /* FotF Plot D Boundary.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "FotF Plot D Boundary.geojson"; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 		CC55BBDB2582582C00B378B1 /* PlanterTelemetry */ = {
 			isa = PBXGroup;
 			children = (
+				CC8CCE4725C9907B000ABAF9 /* Data Files */,
 				CCCE1E1C2587DDBE007BE88E /* CodablePlottedRow.swift */,
 				CCA103A22582DA4200E4468B /* Extensions */,
 				CCA103762582D60D00E4468B /* geoJson */,
@@ -166,6 +169,14 @@
 				CC55BBFC2582582E00B378B1 /* Info.plist */,
 			);
 			path = PlanterTelemetryUITests;
+			sourceTree = "<group>";
+		};
+		CC8CCE4725C9907B000ABAF9 /* Data Files */ = {
+			isa = PBXGroup;
+			children = (
+				CC8CCE5925C993C1000ABAF9 /* data.json */,
+			);
+			path = "Data Files";
 			sourceTree = "<group>";
 		};
 		CCA103762582D60D00E4468B /* geoJson */ = {
@@ -327,6 +338,7 @@
 				CCA103812582D60D00E4468B /* FotF Plot F Boundary.geojson in Resources */,
 				CCA1037E2582D60D00E4468B /* FotF Plot A Boundary.geojson in Resources */,
 				CCA103802582D60D00E4468B /* FotF Plot C Boundary.geojson in Resources */,
+				CC8CCE6725C99624000ABAF9 /* data.json in Resources */,
 				CCA1037D2582D60D00E4468B /* FotF Plot E Boundary.geojson in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

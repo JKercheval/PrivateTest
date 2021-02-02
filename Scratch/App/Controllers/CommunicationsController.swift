@@ -26,7 +26,7 @@ import MQTTClient
 // These will change to the IP Address of the Syngenta DataBus in the near future, then maybe the IP of the
 // Nevonex device.
 
-let mqttServerAddress = "mqtt://192.168.86.29:1883"
+let mqttServerAddress = "mqtt://192.168.86.55:1883"
 //let mqttServerAddress = "mqtt://172.20.10.2:1883"
 
 extension CommunicationsController: NameDescribable {}
@@ -92,7 +92,10 @@ extension CommunicationsController : MQTTSessionDelegate {
     func connected(_ session: MQTTSession!) {
         debugPrint("\(#function) Connected")
         
-        session.subscribe(toTopics: ["planter/row" : 1, "planter/status" : 2]) { (error, array) in
+        session.subscribe(toTopics: ["planter/row" : NSNumber(integerLiteral: Int(MQTTQosLevel.atMostOnce.rawValue)),
+                                     "planter/status" : NSNumber(integerLiteral: Int(MQTTQosLevel.atMostOnce.rawValue)),
+                                     "planter/sessionStart" : NSNumber(integerLiteral: Int(MQTTQosLevel.atMostOnce.rawValue)),
+                                     "planter/sessionData" : NSNumber(integerLiteral: Int(MQTTQosLevel.atMostOnce.rawValue))]) { (error, array) in
             guard error == nil else {
                 assertionFailure("Failed to subscribe")
                 debugPrint("\(#function) Error! - \(error!.localizedDescription)")
@@ -124,6 +127,14 @@ extension CommunicationsController : MQTTSessionDelegate {
             case "planter/status":
                 let str = String(decoding: messageData, as: UTF8.self)
                 debugPrint("\(#function) \(messageTopic):\(str)")
+            case "planter/sessionStart":
+                handleSessionStart(messageData: messageData)
+//                let str = String(decoding: messageData, as: UTF8.self)
+//                debugPrint("\(#function) \(messageTopic):\(str)")
+            case "planter/sessionData":
+                handleSessionData(messageData: messageData)
+//                let str = String(decoding: messageData, as: UTF8.self)
+//                debugPrint("\(#function) \(messageTopic):\(str)")
             default:
                 break
         }
@@ -138,4 +149,26 @@ extension CommunicationsController : MQTTSessionDelegate {
         }
         
     }
+    
+    func handleSessionStart(messageData : Data) {
+        
+        serialQueue.sync {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .sessionStartNotification, object: self, userInfo: [userInfoSessionStartKey : messageData])
+            }
+        }
+        
+    }
+    
+    func handleSessionData(messageData : Data) {
+        
+        serialQueue.sync {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .sessionDataMessageNotification, object: self, userInfo: [userInfoSessionDataReceivedKey : messageData])
+            }
+        }
+        
+    }
+
+    
 }

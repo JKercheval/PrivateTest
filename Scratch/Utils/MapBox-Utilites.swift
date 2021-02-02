@@ -17,6 +17,21 @@ class TileRectMap {
     var tileRectDictionary : [UInt : CGRect] = [UInt : CGRect]()
 }
 
+class FieldBoundaryCorners {
+    var northWest : CLLocationCoordinate2D
+    var southEast : CLLocationCoordinate2D
+    var northEast : CLLocationCoordinate2D
+    var southWest : CLLocationCoordinate2D
+    
+    init(withCoordinates northWest : CLLocationCoordinate2D, southEast : CLLocationCoordinate2D,
+         northEast : CLLocationCoordinate2D, southWest : CLLocationCoordinate2D) {
+        self.northWest = northWest
+        self.southEast = southEast
+        self.northEast = northEast
+        self.southWest = southWest
+    }
+}
+
 class MBUtils {
     static func loadGeoJson(jsonFileName : String) ->Data {
         

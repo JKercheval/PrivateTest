@@ -13,8 +13,11 @@ import GameKit
 
 
 class FieldGpsGenerator {
-    var timer = Timer()
+    var timer : Timer? = nil
     var masterStateOn = true
+    private var testData = [SessionData]()
+    private var testDataIndex = 0
+    
     private var fieldBoundary : FieldBoundaryCorners!
     fileprivate var session : MQTTSession!
     var currentLocation: CLLocationCoordinate2D = CLLocationCoordinate2D()
@@ -30,6 +33,24 @@ class FieldGpsGenerator {
         // that we actually start in the field...
         let centerOffset = Measurement(value: defaultMachineWidth, unit: UnitLength.feet).converted(to: UnitLength.meters).value / 2
         self.currentLocation = self.startLocation.locationWithBearing(bearingRadians: 90, distanceMeters: centerOffset).locationWithBearing(bearingRadians: 0, distanceMeters: 10)
+        testData = loadDataFile(name: "data")
+    }
+    
+    private func loadDataFile(name : String) -> [SessionData] {
+        let bundle = Bundle.main
+        let path = bundle.url(forResource: name, withExtension: "json")//(forResource: "data", ofType: "json")!
+        let jsonFileData = try? Data(contentsOf: path!)
+        
+        let decoder = JSONDecoder()
+        if let jsonData = jsonFileData {
+            do {
+                let testData = try decoder.decode([SessionData].self, from: jsonData)
+                return testData
+            } catch {
+                print(error)
+            }
+        }
+        return [SessionData]()
     }
     
     var speed : Double {
@@ -102,10 +123,24 @@ class FieldGpsGenerator {
     }
     
     func start() {
+        guard self.timer == nil else {
+            return
+        }
         debugPrint("\(self):\(#function) - Curent location is: \(currentLocation)")
         let plottedRow = createMockPlottedRow(coord: self.currentLocation, heading: self.currentHeading)
         publishRow(row: plottedRow)
         timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(updateNextCoord), userInfo: nil, repeats: true)
+    }
+    
+    func startSessionData() {
+        guard self.timer == nil else {
+            return
+        }
+        testDataIndex = 0
+        let data = testData[testDataIndex]
+        publishSessionStart(row: data)
+
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(sendNextSessionDataPacket), userInfo: nil, repeats: true)
     }
     
     func step() {
@@ -114,10 +149,29 @@ class FieldGpsGenerator {
     
     func reset() {
         self.stop()
+        testDataIndex = 0
         self.currentHeading = 0
         self.currentLocation = fieldBoundary.southWest
         let centerOffset = Measurement(value: defaultMachineWidth, unit: UnitLength.feet).converted(to: UnitLength.meters).value / 2
         self.currentLocation = self.startLocation.locationWithBearing(bearingRadians: 90, distanceMeters: centerOffset).locationWithBearing(bearingRadians: 0, distanceMeters: 10)
+    }
+    
+    func stop() {
+        debugPrint("\(#function) - Stopped timer")
+        self.timer?.invalidate()
+        self.timer = nil
+    }
+
+    @objc func sendNextSessionDataPacket() {
+        guard testDataIndex < testData.count else {
+            self.stop()
+            testDataIndex = 0
+            return
+        }
+        
+        let data = testData[testDataIndex]
+        testDataIndex += 1
+        publishSessionData(row: data)
     }
     
     @objc func updateNextCoord() {
@@ -146,13 +200,7 @@ class FieldGpsGenerator {
             stop()
         }
     }
-    
-    func stop() {
-        debugPrint("\(#function) - Stopped timer")
-        timer.invalidate()
-        timer = Timer()
-    }
-    
+        
     func publishRow(row : PlottedRowBase) {
         if let encoded =  try? JSONEncoder().encode(row) {
             self.session?.publishData(encoded, onTopic: "planter/row", retain: false, qos: .atLeastOnce) { error in
@@ -164,5 +212,29 @@ class FieldGpsGenerator {
             }
         }
     }
-    
+
+    func publishSessionData(row : SessionData) {
+        if let encoded =  try? JSONEncoder().encode(row) {
+            self.session?.publishData(encoded, onTopic: "planter/sessionData", retain: false, qos: .atLeastOnce) { error in
+                guard error == nil else {
+                    assertionFailure("Failed to publish")
+                    debugPrint("\(#function) Error! - \(error!.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+
+    func publishSessionStart(row : SessionData) {
+        if let encoded =  try? JSONEncoder().encode(row) {
+            self.session?.publishData(encoded, onTopic: "planter/sessionStart", retain: false, qos: .atLeastOnce) { error in
+                guard error == nil else {
+                    assertionFailure("Failed to publish")
+                    debugPrint("\(#function) Error! - \(error!.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+
 }

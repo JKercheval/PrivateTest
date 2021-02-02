@@ -20,6 +20,7 @@ class PlottingManager : NSObject, PlottingManagerProtocol {
         NotificationCenter.default.addObserver(self, selector: #selector(onDisplayTypeChanged(notification:)),
                                                name:.didChangeDisplayTypeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onNewRowRecieved(notification:)), name: .newPlottedRow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onNewSessionDataRowNotification(notification:)), name: .newSessionDataRowNotification, object: nil)
 
         self.machineInfo = MachineInfoProtocolImpl(with: defaultMachineWidthMeters, rowCount: defaultRowCount)
     }
@@ -78,6 +79,16 @@ class PlottingManager : NSObject, PlottingManagerProtocol {
             NotificationCenter.default.post(name: .plotNewRow, object: self, userInfo: [userInfoPlottedRowKey : previous])
         }
         
+    }
+    
+    @objc func onNewSessionDataRowNotification(notification : Notification) {
+        guard let plottedRow = notification.userInfo?[userInfoPlotSessionDataKey] as? SessionData else {
+            assert(notification.userInfo != nil, "There was no userInfo dictionary passed")
+            return
+        }
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .plotSessionDataNotification, object: self, userInfo: [userInfoPlotSessionDataKey : plottedRow])
+        }
     }
     
     /// Called when we are resetting our plotting for any reason.

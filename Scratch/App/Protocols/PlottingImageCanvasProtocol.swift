@@ -7,7 +7,7 @@ protocol PlottingImageCanvasProtocol {
     var currentCGImage : CGImage? { get }
     var machineWidth : Double { get }
     var imageSize : CGSize { get }
-    var lastRowBound : GMSCoordinateBounds? { get }
+//    var lastRowBound : GMSCoordinateBounds? { get }
     func image(forDisplayType type : DisplayType) -> CGImage?
     func drawRow(with plottedRow : PlottedRowInfoProtocol) -> Bool
     func reset()

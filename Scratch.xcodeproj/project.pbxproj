@@ -25,7 +25,6 @@
 		CC0D069025AE5BB700F1FDDF /* CommunicationsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D068F25AE5BB700F1FDDF /* CommunicationsProtocol.swift */; };
 		CC0D069525AE5F2900F1FDDF /* PlottedRowInfoProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0D069425AE5F2900F1FDDF /* PlottedRowInfoProtocol.swift */; };
 		CC0DB90C257FC776006B1CA6 /* PlottingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0DB90B257FC776006B1CA6 /* PlottingManager.swift */; };
-		CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
 		CC69DD22258BB7B70007691D /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC69DD21258BB7B70007691D /* UIColor+Extension.swift */; };
 		CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817432556E48400137BE2 /* AppDelegate.swift */; };
 		CC78174B2556E48400137BE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CC7817492556E48400137BE2 /* Main.storyboard */; };
@@ -34,7 +33,9 @@
 		CC78175B2556E48400137BE2 /* ScratchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC78175A2556E48400137BE2 /* ScratchTests.swift */; };
 		CC7817662556E48400137BE2 /* ScratchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7817652556E48400137BE2 /* ScratchUITests.swift */; };
 		CC899E86258405FA00618A13 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC899E85258405FA00618A13 /* ViewController.swift */; };
+		CC8BEBCE25C9C2DF004BEA1B /* GoogleTileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC3FA6A92568550D006BEB4B /* GoogleTileImageService.swift */; };
 		CC8D85332575A72A0024A250 /* CodablePlottedRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D85322575A72A0024A250 /* CodablePlottedRow.swift */; };
+		CCA9698925C3791700BBFCC6 /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = CCA9698825C3791700BBFCC6 /* data.json */; };
 		CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */; };
 		CCCA5FFE25B0D707004A21AD /* ApplicationControllerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCA5FFD25B0D707004A21AD /* ApplicationControllerProtocol.swift */; };
 		CCCE1E082587DC7F007BE88E /* PlottedRowImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCE1E072587DC7F007BE88E /* PlottedRowImpl.swift */; };
@@ -104,6 +105,7 @@
 		CC7817672556E48400137BE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC899E85258405FA00618A13 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = Scratch/App/ViewController.swift; sourceTree = SOURCE_ROOT; };
 		CC8D85322575A72A0024A250 /* CodablePlottedRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodablePlottedRow.swift; sourceTree = "<group>"; };
+		CCA9698825C3791700BBFCC6 /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		CCBF6B302576AE38007EC9F3 /* LayerDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerDrawingView.swift; sourceTree = "<group>"; };
 		CCCA5FFD25B0D707004A21AD /* ApplicationControllerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationControllerProtocol.swift; sourceTree = "<group>"; };
 		CCCE1E072587DC7F007BE88E /* PlottedRowImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottedRowImpl.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 		CC7817592556E48400137BE2 /* ScratchTests */ = {
 			isa = PBXGroup;
 			children = (
+				CCA9698825C3791700BBFCC6 /* data.json */,
 				CC78175A2556E48400137BE2 /* ScratchTests.swift */,
 				CC78175C2556E48400137BE2 /* Info.plist */,
 			);
@@ -460,6 +463,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCA9698925C3791700BBFCC6 /* data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -630,11 +634,11 @@
 				CCCE1E082587DC7F007BE88E /* PlottedRowImpl.swift in Sources */,
 				CC8D85332575A72A0024A250 /* CodablePlottedRow.swift in Sources */,
 				CCF3B48825783D8800E55A2D /* PlottingImageCanvasProtocol.swift in Sources */,
-				CC3FA6AA2568550D006BEB4B /* GoogleTileImageService.swift in Sources */,
 				CC0D068625AE5A7500F1FDDF /* CommunicationsController.swift in Sources */,
 				CC7817442556E48400137BE2 /* AppDelegate.swift in Sources */,
 				CC0D069025AE5BB700F1FDDF /* CommunicationsProtocol.swift in Sources */,
 				CCD73BE2256F127300759A6F /* Primitives+Extension.swift in Sources */,
+				CC8BEBCE25C9C2DF004BEA1B /* GoogleTileImageService.swift in Sources */,
 				CC00102325658EC900BAE4F9 /* MapBox-Utilites.swift in Sources */,
 				CCBF6B312576AE38007EC9F3 /* LayerDrawingView.swift in Sources */,
 				CC0284EC25A7AF470026C012 /* DashboardViewController.swift in Sources */,

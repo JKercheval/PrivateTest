@@ -12,6 +12,9 @@ let userInfoStatusReceivedKey = "StatusReceived"
 let userInfoPlottedCoordinateKey = "PlottedCoordinate"
 let userInfoPlottedRowKey = "plottedRow"
 let userInfoDisplayTypeKey = "displayType"
+let userInfoSessionStartKey = "sessionStart"
+let userInfoSessionDataReceivedKey = "sessionDataReceived"
+let userInfoPlotSessionDataKey = "sessionData"
 
 extension Notification.Name {
     static let didReceiveData = Notification.Name("didReceiveData")
@@ -20,7 +23,12 @@ extension Notification.Name {
     static let didPlotRowNotification = Notification.Name("didPlotRow")
     static let didChangeDisplayTypeNotification = Notification.Name("didChangeDisplayType")
     static let switchDisplayTypeNotification = Notification.Name("switchDisplayType")
-    static let dashboardAlertNotification = Notification.Name("dashboardAlertNotification")
+    static let dashboardAlertNotification = Notification.Name("dashboardAlert")
+    static let sessionStartNotification = Notification.Name("sessionStart")
+    // Session Data not yet decoded
+    static let sessionDataMessageNotification = Notification.Name("sessionDataMessage")
+    static let newSessionDataRowNotification = Notification.Name("newSessionDataRow")
+    static let plotSessionDataNotification = Notification.Name("plotSessionData")
 }
 
 /// UIView extension fpr gettomg parent view controller.

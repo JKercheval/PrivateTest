@@ -12,7 +12,7 @@ struct PlottedRowHeadings {
     var currentHeading : Double = 0
     var nextHeading : Double = 0
 }
-
+extension PlottingImageCanvasImpl: NameDescribable {}
 class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
     private var zoomLevel : UInt = 20
@@ -21,7 +21,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
     private var canvasImageSize : CGSize = CGSize.zero
     private var metersPerPixel : Double = 0
     private var lastPlottedRow : PlottedRowInfoProtocol?
-    private var lastRowBoundsDrawn : GMSCoordinateBounds?
+//    private var lastRowBoundsDrawn : GMSCoordinateBounds?
     private var displayPlottingContexts : [DisplayType : CGContext] = [DisplayType : CGContext]()
     private var plottingManager : PlottingManagerProtocol!
     var colorComponents : [CGFloat] = [CGFloat]()
@@ -46,6 +46,7 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         self.displayPlottingContexts[.rideQuality] = createBitmapContext(size: canvasImageSize)
 
         NotificationCenter.default.addObserver(self, selector: #selector(onPlotNewRowReceived(notification:)), name:.plotNewRow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onPlotNewSessionDataReceived(notification:)), name:.plotSessionDataNotification, object: nil)
     }
     
     var currentCGImage: CGImage? {
@@ -64,11 +65,11 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         return self.canvasImageSize
     }
     
-    var lastRowBound: GMSCoordinateBounds? {
-        let bounds = self.lastRowBoundsDrawn
-        self.lastRowBoundsDrawn = nil
-        return bounds
-    }
+//    var lastRowBound: GMSCoordinateBounds? {
+//        let bounds = self.lastRowBoundsDrawn
+//        self.lastRowBoundsDrawn = nil
+//        return bounds
+//    }
     
     func image(forDisplayType type : DisplayType) -> CGImage? {
         // TODO: Get the image for the display type
@@ -86,7 +87,13 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
         }
     }
 
-    
+    @objc func onPlotNewSessionDataReceived(notification : Notification) {
+        guard let plottedRow = notification.userInfo?[userInfoPlotSessionDataKey] as? SessionData else {
+            return
+        }
+        debugPrint("\(self.typeName):\(#function)")// : \(plottedRow)")
+    }
+
     @objc func onPlotNewRowReceived(notification : Notification) {
         guard let plottedRow = notification.userInfo?[userInfoPlottedRowKey] as? PlottedRowInfoProtocol else {
             return
@@ -113,15 +120,15 @@ class PlottingImageCanvasImpl : PlottingImageCanvasProtocol {
 
         let currentDisplayType = plottingManager.currentDisplayType
     
-        if let lastRow = self.lastPlottedRow {
-            // get the distance between the rows
-            if lastRowBoundsDrawn == nil {
-                lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: plottedRow.plottingCoordinate, coordinate: lastRow.plottingCoordinate)
-            }
-            else {
-                lastRowBoundsDrawn?.includingCoordinate(plottedRow.plottingCoordinate)
-            }
-        }
+//        if let lastRow = self.lastPlottedRow {
+//            // get the distance between the rows
+//            if lastRowBoundsDrawn == nil {
+//                lastRowBoundsDrawn = GMSCoordinateBounds(coordinate: plottedRow.plottingCoordinate, coordinate: lastRow.plottingCoordinate)
+//            }
+//            else {
+//                lastRowBoundsDrawn?.includingCoordinate(plottedRow.plottingCoordinate)
+//            }
+//        }
         
         //        debugPrint("\(#function) Coord is: \(coord), Draw Point is: \(drawPoint), Draw Height is: \(drawHeight), meters per pixel is: \(mpp)")
         // TODO: We need to get the values that correspond to the data type that we want to display... DashboardType

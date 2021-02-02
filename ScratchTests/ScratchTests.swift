@@ -12,8 +12,6 @@ import CoreLocation
 
 class ScratchTests: XCTestCase {
 
-    let mercator = GlobalMercator(tileSize: 256.0)
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -22,113 +20,102 @@ class ScratchTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    let json = """
+{
+        "serial": "1",
+        "id": "d7535ce5-06a6-4f51-92de-76823bce27c3",
+        "omCode": "M-ACT-PLT-RATE",
+        "phentime": "2019-09-01T20:55:02",
+        "lon": "-88.4551194",
+        "lat": "36.5404538",
+        "assetRef": "3284b28d-51af-46f4-8249-8c7f29fba8bd",
+        "value": "35000",
+        "uomCode": "seeds1ac-1",
+        "taskref": "d53778fe-484c-49b2-a162-75c9da7e8f6a",
+        "channel": "1",
+        "section": "1",
+        "box": "1",
+        "fieldRef": "",
+        "cropzoneRef": "",
+        "param1": "PLANTING",
+        "param2": "",
+        "param3": ""
     }
-
-    func testLatLonToMeters() throws {
-        let meters = GlobalMercator(tileSize: 256.0).LatLonToMeters(lat: 62.3, lon: 14.1)
-        XCTAssertEqual(meters.X, 1569604.8201851572, accuracy: 0.000000001)
-        XCTAssertEqual(meters.Y, 8930630.669201756, accuracy: 0.00000001)
-    }
-
-    func testMetersToLatLon() throws {
-        let meters = GlobalMercator(tileSize: 256.0).MetersToLatLon(mx: 1569604.8201851572, my: 8930630.669201756)
-        XCTAssertEqual(meters.X, 62.3, accuracy: 0.1)
-        XCTAssertEqual(meters.Y, 14.1, accuracy: 0.1)
-    }
-
-    func testPixelsToMeters() throws {
-        var meters = mercator.PixelsToMeters(px: 128, py: 128, zoom: 0)
-        XCTAssertEqual(meters.X, 0)
-        XCTAssertEqual(meters.Y, 0)
+"""
+    func testDecodeSerialData() {
+        let decoder = JSONDecoder()
         
-        meters = mercator.PixelsToMeters(px: 123456789, py: 123456789, zoom: 15)
-        XCTAssertEqual(meters.X, 569754371.206588, accuracy: 0.000000001)
-        XCTAssertEqual(meters.Y, 569754371.206588, accuracy: 0.00000001)
-    }
+        if let jsonData = json.data(using: .utf8) {
+            
+            do {
+                let testData = try decoder.decode(SessionData.self, from: jsonData)
+                XCTAssertNotNil(testData.location)
+                XCTAssertEqual(String(testData.location!.latitude), testData.lat, "Latitude does not match")
+                XCTAssertEqual(String(testData.location!.longitude), testData.lon, "Longitude does not match")
 
-    func testMetersToPixels() throws {
-        let mercator = GlobalMercator(tileSize: 256.0)
-        var meters = mercator.MetersToPixels(mx: 0, my: 0, zoom: 0)
-        XCTAssertEqual(meters.X, 128, accuracy: 0.1)
-        XCTAssertEqual(meters.Y, 128, accuracy: 0.1)
-
-        meters = mercator.MetersToPixels(mx: 569754371.206588, my: 569754371.206588, zoom: 15)
-        XCTAssertEqual(meters.X, 123456789)
-        XCTAssertEqual(meters.Y, 123456789)
-
-        meters = mercator.MetersToPixels(mx: 1473870.058102942, my: 6856372.69101939, zoom: 7)
-        XCTAssertEqual(meters.X, 17589.134222222223, accuracy: 0.000000001)
-        XCTAssertEqual(meters.Y, 21990.22649522623, accuracy: 0.00000001)
-
+            } catch {
+                print(error)
+                XCTFail()
+            }
+        }
     }
     
-    func testLatLonToPixels() {
-//        aproxArrayEqual([4522857.8133333335, 6063687.123767246], mercator.latLonToPixels(62.3, 14.1, 15));
-        let latLon = mercator.LatLonToPixels(lat: 62.3, lon: 14.1, zoom: 15)
-        XCTAssertEqual(latLon.X, 4522857.8133333335, accuracy: 0.000000001)
-        XCTAssertEqual(latLon.Y, 6063687.123767246, accuracy: 0.00000001)
+    func testFileData() {
+        let bundle = Bundle(for: type(of: self))
+        let path = bundle.url(forResource: "data", withExtension: "json")//(forResource: "data", ofType: "json")!
+        let jsonFileData = try? Data(contentsOf: path!)
 
-        let latLon11 = mercator.LatLonToPixels(lat: 52.31, lon: 13.24, zoom: 7 )
-        XCTAssertEqual(latLon11.X, 17589.134222222223, accuracy: 0.000000001)
-        XCTAssertEqual(latLon11.Y, 21990.22649522623, accuracy: 0.00000001)
-
+        XCTAssertNotNil(jsonFileData)
+        let decoder = JSONDecoder()
+        if let jsonData = jsonFileData {
+            do {
+                let testData = try decoder.decode([SessionData].self, from: jsonData)
+                XCTAssertNotNil(testData)
+                XCTAssertEqual(testData.count, 2139, "Invlaid number of data items")                
+            } catch {
+                print(error)
+                XCTFail()
+            }
+        }
     }
     
-    func testLatLonToTile() {
-        let tile = mercator.LatLonToTile(lat: 52.31, lon: 13.24, zoom: 7)
-        XCTAssertEqual(tile.X, 68)
-        XCTAssertEqual(tile.Y, 85)
+    func testDateConversionFromData() {
+        let bundle = Bundle(for: type(of: self))
+        let path = bundle.url(forResource: "data", withExtension: "json")//(forResource: "data", ofType: "json")!
+        let jsonFileData = try? Data(contentsOf: path!)
         
-        let googleTile = mercator.GoogleTile(tx: tile.X, ty: tile.Y, zoom: 7)
-        XCTAssertEqual(googleTile.X, 68)
-        XCTAssertEqual(googleTile.Y, 42)
-    }
+        XCTAssertNotNil(jsonFileData)
+        let decoder = JSONDecoder()
+        if let jsonData = jsonFileData {
+            do {
+                let testData = try decoder.decode([SessionData].self, from: jsonData)
+                XCTAssertNotNil(testData)
+                XCTAssertEqual(testData.count, 2139, "Invlaid number of data items")
+                guard let firstItem = testData.first else {
+                    XCTFail("Failed to get first item")
+                    return
+                }
+                let timeZone = TimeZone(secondsFromGMT: 0)
+                let dateFormatterGet = DateFormatter()
+                dateFormatterGet.locale = Locale(identifier: "en_US_POSIX")
+                dateFormatterGet.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+                dateFormatterGet.timeZone = timeZone
+                
+                guard let firstItemDate = dateFormatterGet.date(from: firstItem.phentime) else {
+                    XCTFail("Failed to get date from formatter")
+                    return
+                }
+                XCTAssertNotNil(firstItemDate, "Failed to convert date")
+                print("Date is: \(firstItemDate)")
+                
+                let dateComponents = DateComponents(calendar: Calendar.current, timeZone: timeZone, era: nil, year: 2019, month: 9, day: 1, hour: 20, minute: 55, second: 2, nanosecond: nil, weekday: nil, weekdayOrdinal: nil, quarter: nil, weekOfMonth: nil, weekOfYear: nil, yearForWeekOfYear: nil)
+                let testDate = Calendar.current.date(from: dateComponents)
+                XCTAssertEqual(testDate, firstItemDate)
+            } catch {
+                print(error)
+                XCTFail()
+            }
+        }
 
-    func testPixelsToLatLon() {
-        var latLon = mercator.PixelsToLatLon(px: 4522857.8133333335, py: 6063687.123767246, zoom: 15)
-        XCTAssertEqual(latLon.X, 62.3, accuracy: 0.1)
-        XCTAssertEqual(latLon.Y, 14.1, accuracy: 0.1)
     }
-
-    /*
-     it('should return tile bounds', function () {
-     var expected = [ 569754270.8829883, 569754270.8829883, 569755493.875441, 569755493.875441];
-     aproxArrayEqual(expected, mercator.tileBounds(482253, 482253, 15));
-     });
-     */
-    func testTileBounds() {
-        let bounds = mercator.TileBounds(tx: 482253, ty: 482253, zoom: 15)
-        XCTAssertEqual(bounds.North, 569755493.875441, accuracy: 0.00000001)
-        XCTAssertEqual(bounds.South, 569754270.8829883, accuracy: 0.00000001)
-        XCTAssertEqual(bounds.West, 569754270.8829883, accuracy: 0.00000001)
-        XCTAssertEqual(bounds.East, 569755493.875441, accuracy: 0.00000001)
-    }
-    
-    /*
-     it('should return tile latlon bounds', function () {
-     aproxArrayEqual([ -85.05112877980659, -180, -85.05018093458115, -179.989013671875], mercator.tileLatLonBounds(0, 0, 15));
-     aproxArrayEqual([85.0511287798066, 180, 85.05207644397983, 180.010986328125], mercator.tileLatLonBounds(32768, 32768, 15));
-     });
-     */
-    
-    func testTileLatLonBounds() {
-        let tileBounds = mercator.TileLatLonBounds(tx: 0, ty: 0, zoom: 15)
-        XCTAssertEqual(tileBounds.North, -179.989013671875, accuracy: 0.00000001)
-        XCTAssertEqual(tileBounds.South, -180, accuracy: 0.00000001)
-        XCTAssertEqual(tileBounds.West, -85.05112877980659, accuracy: 0.00000001)
-        XCTAssertEqual(tileBounds.East, -85.05018093458115, accuracy: 0.00000001)
-    }
-    
-//    func testLatLong() {
-//        // 41.85, -87.65
-////        let merc = GlobalMercator(tileSize: 512.0)
-//        let coord = CLLocationCoordinate2DMake(41.85, -87.65)
-//        let pixels = mercator.LatLonToPixels(lat: coord.latitude, lon: coord.longitude, zoom: 14)
-//        let pixelCoords = MBUtils.getPixelCoordinates(latLng: coord, zoom: 7)
-//        debugPrint("\(pixels), \(pixelCoords)")
-////        let tileBounds = mercator.TileBounds(tx: <#T##Double#>, ty: <#T##Double#>, zoom: <#T##UInt#>)
-//    }
 }

@@ -35,6 +35,7 @@ class AppController : NSObject, ApplicationControllerProtocol {
     convenience init(commsController : CommunicationsProtocol) {
         self.init()
         NotificationCenter.default.addObserver(self, selector: #selector(dataReceivedNotification(notification:)), name: .didReceiveData, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onSessionDataReceivedNotification(notification:)), name: .sessionDataMessageNotification, object: nil)
         commController = commsController
     }
 
@@ -58,6 +59,25 @@ class AppController : NSObject, ApplicationControllerProtocol {
         return _passWord
     }
 
+    @objc func onSessionDataReceivedNotification(notification : Notification) {
+        //        debugPrint("\(self.typeName):\(#function)")
+        guard let sessionDataMessage = notification.userInfo?[userInfoSessionDataReceivedKey] as? Data else {
+            assertionFailure("Failed to get data from notification")
+            return
+        }
+        
+        let decoder = JSONDecoder()
+        guard let testData = try? decoder.decode(SessionData.self, from: sessionDataMessage) else {
+            debugPrint("\(self.typeName):\(#function) - Error getting SessionData object")
+            return
+        }
+        
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .newSessionDataRowNotification, object: self, userInfo: [userInfoPlotSessionDataKey : testData])
+        }
+        
+    }
+    
     @objc func dataReceivedNotification(notification : Notification) {
 //        debugPrint("\(self.typeName):\(#function)")
         guard let plottedRowData = notification.userInfo?[userInfoDataReceivedKey] as? Data else {

@@ -7,7 +7,7 @@
 
 // Set this to the IP Address of the machine running MQTT
 // Can be "localhost" if running on same machine
-let serverAddress = "192.168.86.29"
+let serverAddress = "192.168.86.55"
 
 import Cocoa
 import MQTTClient
@@ -118,6 +118,7 @@ class ViewController: NSViewController {
     @IBAction func startButtonPressed(_ sender: Any) {
         self.comboBox.isEnabled = false
         gpsGenerator.start()
+//        gpsGenerator.startSessionData()
     }
     
     @IBAction func onStopButtonSelected(_ sender: Any) {

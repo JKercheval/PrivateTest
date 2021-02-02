@@ -20,81 +20,6 @@
                                 <rect key="frame" x="0.0" y="50" width="810" height="880"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="arr-BN-dPa">
-                                <rect key="frame" x="20" y="70" width="100" height="35"/>
-                                <color key="backgroundColor" systemColor="systemRedColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="FLz-Md-mce"/>
-                                    <constraint firstAttribute="width" constant="100" id="q3a-nc-jOO"/>
-                                </constraints>
-                                <state key="normal" title="Connect">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                        <real key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="5"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="onStartButtonSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Rpz-WE-3GW"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="te4-hL-ECZ">
-                                <rect key="frame" x="145" y="70" width="100" height="35"/>
-                                <color key="backgroundColor" systemColor="systemBlueColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="nWx-d1-LJg"/>
-                                    <constraint firstAttribute="width" constant="100" id="xbd-gE-J5m"/>
-                                </constraints>
-                                <state key="normal" title="Disconnect">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                        <real key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="5"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="onStopButtonSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="PB1-ch-dsl"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yz0-9b-EB4">
-                                <rect key="frame" x="270" y="70" width="60" height="35"/>
-                                <color key="backgroundColor" systemColor="systemBlueColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="35" id="NSH-Mj-lLg"/>
-                                    <constraint firstAttribute="width" constant="60" id="zXJ-LI-0RR"/>
-                                </constraints>
-                                <state key="normal" title="Reset">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
-                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
-                                        <real key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                        <real key="value" value="5"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="onResetButtonSelected:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QZI-xK-4Zf"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f68-1k-wuQ">
                                 <rect key="frame" x="640" y="70" width="150" height="30"/>
                                 <color key="backgroundColor" systemColor="systemOrangeColor"/>
@@ -151,7 +76,6 @@
                         <viewLayoutGuide key="safeArea" id="REt-JW-5gm"/>
                         <constraints>
                             <constraint firstItem="3tb-sW-9ZY" firstAttribute="bottom" secondItem="NWw-q0-2uP" secondAttribute="top" id="1jO-hh-AvX"/>
-                            <constraint firstItem="arr-BN-dPa" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" constant="20" id="8ho-EK-Ebe"/>
                             <constraint firstItem="NWw-q0-2uP" firstAttribute="leading" secondItem="REt-JW-5gm" secondAttribute="leading" id="Ck7-vu-cFq"/>
                             <constraint firstItem="3tb-sW-9ZY" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" id="Ecc-ZK-I40"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ICO-vX-zRw"/>
@@ -163,22 +87,16 @@
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="top" secondItem="huw-Xp-XSL" secondAttribute="bottom" constant="20" id="csi-Je-waY"/>
                             <constraint firstItem="f68-1k-wuQ" firstAttribute="trailing" secondItem="REt-JW-5gm" secondAttribute="trailing" constant="-20" id="eXs-MJ-Lwv"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="width" secondItem="f68-1k-wuQ" secondAttribute="width" id="ema-0m-Veb"/>
-                            <constraint firstItem="te4-hL-ECZ" firstAttribute="leading" secondItem="arr-BN-dPa" secondAttribute="trailing" constant="25" id="f2a-dc-s7E"/>
                             <constraint firstItem="NWw-q0-2uP" firstAttribute="bottom" secondItem="REt-JW-5gm" secondAttribute="bottom" id="feS-iL-Ek5"/>
                             <constraint firstItem="3tb-sW-9ZY" firstAttribute="top" secondItem="REt-JW-5gm" secondAttribute="top" id="h4y-ES-aQc"/>
-                            <constraint firstItem="te4-hL-ECZ" firstAttribute="top" secondItem="arr-BN-dPa" secondAttribute="top" id="k36-pY-aoY"/>
                             <constraint firstItem="huw-Xp-XSL" firstAttribute="top" secondItem="f68-1k-wuQ" secondAttribute="bottom" constant="20" id="nok-He-yGw"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="trailing" secondItem="f68-1k-wuQ" secondAttribute="trailing" id="ojA-hn-ZEN"/>
-                            <constraint firstItem="yz0-9b-EB4" firstAttribute="leading" secondItem="te4-hL-ECZ" secondAttribute="trailing" constant="25" id="uWL-dR-d7x"/>
-                            <constraint firstItem="arr-BN-dPa" firstAttribute="leading" secondItem="REt-JW-5gm" secondAttribute="leading" constant="20" id="upv-at-L9H"/>
-                            <constraint firstItem="yz0-9b-EB4" firstAttribute="top" secondItem="te4-hL-ECZ" secondAttribute="top" id="wnZ-oV-hzv"/>
                             <constraint firstItem="4uJ-z4-5bF" firstAttribute="leading" secondItem="f68-1k-wuQ" secondAttribute="leading" id="ySA-8o-cOH"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="GNV-n2-5Us"/>
                     <connections>
                         <outlet property="mapViewParent" destination="3tb-sW-9ZY" id="Bab-BA-yd8"/>
-                        <outlet property="startButton" destination="arr-BN-dPa" id="5bS-a4-kcr"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -208,6 +126,7 @@
                     <view key="view" contentMode="scaleToFill" id="RUO-fv-htE">
                         <rect key="frame" x="0.0" y="0.0" width="810" height="150"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="6xu-6c-HrO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                 </viewController>
@@ -220,14 +139,8 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
-        <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

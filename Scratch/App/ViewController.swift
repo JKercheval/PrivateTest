@@ -29,8 +29,6 @@ class MapboxMapViewImplementation: MapViewProtocol {
 
 class ViewController: UIViewController, MGLMapViewDelegate {
     @IBOutlet weak var mapView: UIView!
-    @IBOutlet weak var startButton: UIButton!
-    @IBOutlet weak var stopButton: UIButton!
     @IBOutlet weak var mapViewParent: UIView!
     
     var geoField : GeoJSONField?
@@ -51,6 +49,8 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(ondidUpdateLocation(_:)), name:.newPlottedRow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onSessionStartNotification(_:)), name:.sessionStartNotification, object: nil)
+        
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
@@ -87,30 +87,6 @@ class ViewController: UIViewController, MGLMapViewDelegate {
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-    }
-    
-    @IBAction func onStartButtonSelected(_ sender: Any) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-    }
-    
-    @IBAction func onStopButtonSelected(_ sender: Any) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-    }
-    
-    @IBAction func onResetButtonSelected(_ sender: Any) {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-        appDelegate.plottingManager.reset()
-        self.imageCanvas.reset()
-        guard let view = self.plottingView else {
-            return
-        }
-        view.layer.setNeedsDisplay(view.layer.bounds)
     }
     
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {
@@ -155,6 +131,21 @@ class ViewController: UIViewController, MGLMapViewDelegate {
         } else {
             removePreciseButton()
         }
+    }
+    
+    @objc func onSessionStartNotification(_ notification : Notification) {
+        //        debugPrint("\(self.typeName):\(#function)")
+        guard let sessionDataMessage = notification.userInfo?[userInfoSessionStartKey] as? Data else {
+            assertionFailure("Failed to get data from notification")
+            return
+        }
+        
+        let decoder = JSONDecoder()
+        guard let testData = try? decoder.decode(SessionData.self, from: sessionDataMessage),
+              let location = testData.location else {
+            return
+        }
+        self.mglMapView.setCenter(location, zoomLevel: currentZoom, animated: true)
     }
     
     @objc func ondidUpdateLocation(_ notification:Notification) {
