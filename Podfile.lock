@@ -34,6 +34,7 @@ PODS:
   - MQTTClient/Manager (0.15.3):
     - MQTTClient/Min
   - MQTTClient/Min (0.15.3)
+  - PureLayout (3.1.6)
   - Realm (10.5.0):
     - Realm/Headers (= 10.5.0)
   - Realm/Headers (10.5.0)
@@ -46,6 +47,7 @@ DEPENDENCIES:
   - Google-Maps-iOS-Utils
   - Mapbox-iOS-SDK
   - MQTTClient
+  - PureLayout
   - RealmSwift
 
 SPEC REPOS:
@@ -57,6 +59,7 @@ SPEC REPOS:
     - Mapbox-iOS-SDK
     - MapboxMobileEvents
     - MQTTClient
+    - PureLayout
     - Realm
     - RealmSwift
 
@@ -68,9 +71,10 @@ SPEC CHECKSUMS:
   Mapbox-iOS-SDK: 2563ed87ead6ec08f1c2090873977b8a7be335a8
   MapboxMobileEvents: d0a581dedd8f47411cc65ea520b965e83914316e
   MQTTClient: 0dfa04e789479c2e461786464969895c1fcb0875
+  PureLayout: bd3c4ec3a3819ad387c99ebb72c6b129c3ed4d2d
   Realm: e1c22c3d83b229afb70ebc10e1771c91e9542d12
   RealmSwift: 6fc078d9d3fd7e58c71bfdbb694e252462f112a5
 
-PODFILE CHECKSUM: d73fb31c7891ce3b3a9dd9a4f0dcbf12fc36ed63
+PODFILE CHECKSUM: 0dcee093c195f78cc78246ccec730fb6af62aec7
 
 COCOAPODS: 1.10.0

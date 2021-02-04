@@ -21,6 +21,7 @@ struct SessionData : Codable {
     var lon : String
     var lat : String
     var assetRef : String
+    // Someday this wont always be a number (value).
     var value : String
     var uomCode : String
     var taskref : String

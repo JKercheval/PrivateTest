@@ -85,7 +85,7 @@ class ViewController: UIViewController, MGLMapViewDelegate {
 
         self.imageCanvas = PlottingImageCanvasImpl(boundary: self.boundaryQuad, plottingManager: appDelegate.plottingManager)
     }
-    
+        
     override func viewDidDisappear(_ animated: Bool) {
     }
     

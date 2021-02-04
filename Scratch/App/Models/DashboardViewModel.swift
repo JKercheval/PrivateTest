@@ -7,14 +7,19 @@
 
 import Foundation
 
-class DashboardViewModel : NSObject {
+protocol DashboardViewModelProtocol {
+    init(type : DashboardType)
+    func onPlotNewRowReceived(notification : Notification)
+}
+
+class DashboardViewModel : NSObject, DashboardViewModelProtocol {
     
     var dashboardType : DashboardType = .none
     
     override init() {
         super.init()
     }
-    convenience init(type : DashboardType) {
+    required convenience init(type : DashboardType) {
         self.init()
         dashboardType = type
         NotificationCenter.default.addObserver(self, selector: #selector(onPlotNewRowReceived(notification:)), name:.dashboardAlertNotification, object: nil)
