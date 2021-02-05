@@ -47,6 +47,9 @@ extension UIColor {
                 let hue = value.normalize(min: 175.0, max: 300.0) * 0.33
                 let color = UIColor(hue: CGFloat(hue), saturation: 1.0, brightness: 1.0, alpha: 1.0)
                 return color.cgColor
+            default:
+                assert(false, "Color Type not supported")
+                return UIColor.purple.cgColor
         }
     }
 }

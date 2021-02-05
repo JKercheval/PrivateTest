@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import PureLayout
 
 class DashboardViewController: UIViewController {
 
@@ -14,8 +15,32 @@ class DashboardViewController: UIViewController {
         debugPrint("\(self):\(#function)")
 
         // Do any additional setup after loading the view.
+        createDashboardView(dashboardViewContainer: self.view)
     }
     
+    private func createDashboardView(dashboardViewContainer : UIView) {
+        // Get the number of types so that we can use that when setting up constraints.
+//        let numDashboards = DisplayType.allCases.count
+        var dashboard = [UIView]()
+        
+        // Loop through each, create a view
+        for type in DisplayType.allCases {
+            if type == .none {
+                continue
+            }
+            let model = DashboardViewModel(type: type)
+            let dashView = DashboardView(model: model)
+            dashboardViewContainer.addSubview(dashView)
+            dashboard.append(dashView)
+            dashView.autoPinEdge(toSuperviewEdge: .top)
+            dashView.autoPinEdge(toSuperviewEdge: .bottom)
+        }
+        
+        let dashboardArray : NSArray = dashboard as NSArray
+        dashboardArray.autoDistributeViews(along: .horizontal, alignedTo: .horizontal, withFixedSpacing: 0)
+        self.updateViewConstraints()
+    }
+
 
     /*
     // MARK: - Navigation

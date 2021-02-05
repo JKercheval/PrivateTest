@@ -12,6 +12,7 @@ target 'Scratch' do
   pod 'Google-Maps-iOS-Utils'
   pod 'MQTTClient'
   pod 'RealmSwift'
+  pod 'PureLayout'
   
   target 'ScratchTests' do
     inherit! :search_paths
