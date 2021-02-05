@@ -20,12 +20,15 @@ class DashboardViewController: UIViewController {
     
     private func createDashboardView(dashboardViewContainer : UIView) {
         // Get the number of types so that we can use that when setting up constraints.
-        let numDashboards = DashboardType.allCases.count
+//        let numDashboards = DisplayType.allCases.count
         var dashboard = [UIView]()
         
         // Loop through each, create a view
-        for dashboardTypes in DashboardType.allCases {
-            let model = DashboardViewModel(type: dashboardTypes)
+        for type in DisplayType.allCases {
+            if type == .none {
+                continue
+            }
+            let model = DashboardViewModel(type: type)
             let dashView = DashboardView(model: model)
             dashboardViewContainer.addSubview(dashView)
             dashboard.append(dashView)
@@ -35,6 +38,7 @@ class DashboardViewController: UIViewController {
         
         let dashboardArray : NSArray = dashboard as NSArray
         dashboardArray.autoDistributeViews(along: .horizontal, alignedTo: .horizontal, withFixedSpacing: 0)
+        self.updateViewConstraints()
     }
 
 

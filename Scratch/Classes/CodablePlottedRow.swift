@@ -5,10 +5,26 @@ let defaultMachineWidth : Double = 120 // feet
 let defaultMachineWidthMeters : Double = 27.432
 let defaultRowCount : UInt = 54
 
-enum DisplayType : UInt, CaseIterable, Codable {
+enum DisplayType : UInt, CaseIterable, Codable, CustomStringConvertible {
+    var description: String {
+        switch self {
+            case .singulation: return "Singulation"
+            case .rideQuality: return "Ride Quality"
+            case .downforce: return "Downforce"
+            case .speed: return "Speed"
+            case .actualPlantingRate : return "Actual Planting Rate"
+            case .plannedPlantingRate : return "Planned Planned Rate"
+            default: return "\(self)"
+        }
+    }
+    
+    case none
     case singulation
     case rideQuality
     case downforce
+    case speed
+    case actualPlantingRate
+    case plannedPlantingRate
 }
 
 typealias RowVariableInfo = [DisplayType : Float]

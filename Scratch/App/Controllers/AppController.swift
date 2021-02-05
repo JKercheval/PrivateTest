@@ -8,14 +8,6 @@
 import Foundation
 import GLKit
 
-enum DashboardType : UInt, CaseIterable, Codable {
-    case none
-    case singulation
-    case rideQuality
-    case downforce
-    case speed
-}
-
 let DashboardUpdateTime : TimeInterval = 1.0 // in seconds
 
 extension AppController: NameDescribable {}
@@ -116,7 +108,7 @@ class AppController : NSObject, ApplicationControllerProtocol {
             debugPrint("\(self.typeName):\(#function) - sending dashboard info")
 
             DispatchQueue.main.async {
-                let notification = Notification(name: .dashboardAlertNotification, object: self, userInfo: nil)
+                let notification = Notification(name: .dashboardAlertNotification, object: self, userInfo: [userInfoPlottedRowKey : plottedRow])
                 NotificationQueue.default.enqueue(notification, postingStyle: .whenIdle, coalesceMask: .onName, forModes: nil)
             }
             elapsedTime = CACurrentMediaTime();
